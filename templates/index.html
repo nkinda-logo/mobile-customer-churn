@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="hero-section mb-5">
+    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{{ url_for('static', filename='images/slide1.jpg') }}" class="d-block w-100" alt="Telecom Services">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Advanced Churn Prediction</h5>
+                    <p>Identify customers at risk of leaving with our powerful prediction models.</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/slide2.jpg') }}" class="d-block w-100" alt="Customer Retention">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Retention Strategies</h5>
+                    <p>Develop targeted retention strategies based on predictive insights.</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="{{ url_for('static', filename='images/slide3.jpg') }}" class="d-block w-100" alt="Data Analysis">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Comprehensive Analytics</h5>
+                    <p>Understand the key factors driving customer churn in Tanzania.</p>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Churn Prediction</h5>
+                <p class="card-text">Predict which customers are likely to churn based on their behavior and demographics.</p>
+                <a href="{{ url_for('predict') }}" class="btn btn-primary">Try Predictor</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Data Analysis</h5>
+                <p class="card-text">Explore comprehensive analytics and visualizations of churn factors in Tanzania.</p>
+                <a href="{{ url_for('analysis') }}" class="btn btn-primary">View Analysis</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">About the Project</h5>
+                <p class="card-text">Learn more about our churn prediction system and how it can benefit your business.</p>
+                <a href="{{ url_for('about') }}" class="btn btn-primary">About Us</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                Why Churn Prediction Matters
+            </div>
+            <div class="card-body">
+                <p>Customer churn is a critical challenge for telecom companies in Tanzania. Our predictive analytics solution helps you:</p>
+                <ul>
+                    <li>Identify at-risk customers before they leave</li>
+                    <li>Understand key factors driving churn</li>
+                    <li>Develop targeted retention strategies</li>
+                    <li>Improve customer satisfaction and loyalty</li>
+                    <li>Optimize marketing and service investments</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                Key Features
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Advanced machine learning models for accurate predictions</li>
+                    <li>Comprehensive dashboard with key metrics and visualizations</li>
+                    <li>Export predictions to PDF, CSV, or Excel formats</li>
+                    <li>Secure user authentication and data protection</li>
+                    <li>API access for integration with other systems</li>
+                    <li>Regular model updates based on new data</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

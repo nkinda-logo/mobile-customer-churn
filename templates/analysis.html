@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Churn Analysis{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4>Churn Distribution</h4>
+    </div>
+    <div class="card-body">
+        <img src="data:image/png;base64,{{ viz_data['churn_dist'] }}" class="img-fluid" alt="Churn Distribution">
+        <p class="mt-3">
+            This chart shows the distribution of churned vs. non-churned customers in our dataset.
+            Understanding this baseline helps us measure the effectiveness of our prediction models.
+        </p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h4>Churn by Telecom Company</h4>
+            </div>
+            <div class="card-body">
+                <img src="data:image/png;base64,{{ viz_data['churn_by_company'] }}" class="img-fluid" alt="Churn by Telecom Company">
+                <p class="mt-3">
+                    Different telecom companies experience varying churn rates. This insight can help
+                    tailor company-specific retention strategies.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h4>Churn by Contract Type</h4>
+            </div>
+            <div class="card-body">
+                <img src="data:image/png;base64,{{ viz_data['churn_by_contract'] }}" class="img-fluid" alt="Churn by Contract Type">
+                <p class="mt-3">
+                    Contract type significantly impacts churn behavior. Postpaid customers generally
+                    show lower churn rates compared to prepaid customers.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h4>Age Distribution</h4>
+            </div>
+            <div class="card-body">
+                <img src="data:image/png;base64,{{ viz_data['age_dist'] }}" class="img-fluid" alt="Age Distribution by Churn">
+                <p class="mt-3">
+                    Age plays a role in churn behavior, with certain age groups more likely to
+                    switch providers than others.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h4>Tenure Distribution</h4>
+            </div>
+            <div class="card-body">
+                <img src="data:image/png;base64,{{ viz_data['tenure_dist'] }}" class="img-fluid" alt="Tenure Distribution by Churn">
+                <p class="mt-3">
+                    Customers with longer tenure are generally less likely to churn, highlighting
+                    the value of customer loyalty programs.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h4>Monthly Charges</h4>
+            </div>
+            <div class="card-body">
+                <img src="data:image/png;base64,{{ viz_data['charges_dist'] }}" class="img-fluid" alt="Monthly Charges by Churn">
+                <p class="mt-3">
+                    Higher monthly charges correlate with increased churn risk, suggesting the need
+                    for competitive pricing strategies.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if 'feature_imp' in viz_data %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h4>Feature Importance</h4>
+    </div>
+    <div class="card-body">
+        <img src="data:image/png;base64,{{ viz_data['feature_imp'] }}" class="img-fluid" alt="Feature Importance">
+        <p class="mt-3">
+            Our machine learning model identifies these as the most influential factors in predicting
+            customer churn. Understanding these can help prioritize retention efforts.
+        </p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
