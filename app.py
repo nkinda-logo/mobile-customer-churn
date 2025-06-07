@@ -23,6 +23,8 @@ import base64
 from utils.data_processing import preprocess_data
 from utils.visualization import create_visualizations
 import config
+from flask import send_file
+
 
 app = Flask(__name__)
 app.config.from_object(config.Config)
@@ -533,6 +535,168 @@ def download_batch_results(batch_id):
     except Exception as e:
         app.logger.error(f"Download batch results error: {str(e)}")
         flash(f'Failed to download results: {str(e)}', 'danger')
+        return redirect(url_for('predict'))
+ 
+@app.route('/download_sample_csv')
+def download_sample_csv():
+    try:
+        # Define the column headers as specified
+        columns = [
+            'TelecomCompany',
+            'Region',
+            'Age',
+            'Gender',
+            'ContractType',
+            'ContractDuration',
+            'TenureMonths',
+            'MonthlyCharges',
+            'DataUsageGB',
+            'CallDurationMinutes',
+            'ComplaintsFiled',
+            'CustomerSupportCalls',
+            'PaymentMethod',
+            'InternetService',
+            'AdditionalServices',
+            'DiscountOfferUsed',
+            'BillingIssuesReported'
+        ]
+
+        # Sample data adhering to PredictionForm choices
+        sample_data = [
+            {
+                'TelecomCompany': 'Airtel',
+                'Region': 'Dar es Salaam',
+                'Age': 35,
+                'Gender': 'Male',
+                'ContractType': 'Postpaid',
+                'ContractDuration': '12 Months',
+                'TenureMonths': 24,
+                'MonthlyCharges': 65.50,
+                'DataUsageGB': 10.5,
+                'CallDurationMinutes': 120,
+                'ComplaintsFiled': 1,
+                'CustomerSupportCalls': 2,
+                'PaymentMethod': 'Credit Card',
+                'InternetService': 'Fiber',
+                'AdditionalServices': 'Streaming',
+                'DiscountOfferUsed': 'Yes',
+                'BillingIssuesReported': 0
+            },
+            {
+                'TelecomCompany': 'Vodacom',
+                'Region': 'Mwanza',
+                'Age': 28,
+                'Gender': 'Female',
+                'ContractType': 'Prepaid',
+                'ContractDuration': '1 Month',
+                'TenureMonths': 12,
+                'MonthlyCharges': 45.00,
+                'DataUsageGB': 5.0,
+                'CallDurationMinutes': 80,
+                'ComplaintsFiled': 0,
+                'CustomerSupportCalls': 1,
+                'PaymentMethod': 'Mobile Money',
+                'InternetService': 'Mobile Data',
+                'AdditionalServices': 'None',
+                'DiscountOfferUsed': 'No',
+                'BillingIssuesReported': 1
+            },
+            {
+                'TelecomCompany': 'Tigo',
+                'Region': 'Arusha',
+                'Age': 45,
+                'Gender': 'Male',
+                'ContractType': 'Hybrid',
+                'ContractDuration': '6 Months',
+                'TenureMonths': 18,
+                'MonthlyCharges': 75.00,
+                'DataUsageGB': 15.0,
+                'CallDurationMinutes': 200,
+                'ComplaintsFiled': 2,
+                'CustomerSupportCalls': 3,
+                'PaymentMethod': 'Bank Transfer',
+                'InternetService': 'DSL',
+                'AdditionalServices': 'Cloud Storage',
+                'DiscountOfferUsed': 'Yes',
+                'BillingIssuesReported': 0
+            },
+              {
+                'TelecomCompany': 'Vodacom',
+                'Region': 'Mwanza',
+                'Age': 28,
+                'Gender': 'Female',
+                'ContractType': 'Prepaid',
+                'ContractDuration': '1 Month',
+                'TenureMonths': 1,
+                'MonthlyCharges': 45.00,
+                'DataUsageGB': 5.0,
+                'CallDurationMinutes': 80,
+                'ComplaintsFiled': 0,
+                'CustomerSupportCalls': 1,
+                'PaymentMethod': 'Mobile Money',
+                'InternetService': 'Mobile Data',
+                'AdditionalServices': 'None',
+                'DiscountOfferUsed': 'No',
+                'BillingIssuesReported': 1
+            },
+              {
+                'TelecomCompany': 'Vodacom',
+                'Region': 'Mwanza',
+                'Age': 60,
+                'Gender': 'Female',
+                'ContractType': 'Postpaid',
+                'ContractDuration': '1 Month',
+                'TenureMonths': 1,
+                'MonthlyCharges': 87.00,
+                'DataUsageGB': 1.0,
+                'CallDurationMinutes': 80,
+                'ComplaintsFiled': 48,
+                'CustomerSupportCalls': 8,
+                'PaymentMethod': 'Mobile Money',
+                'InternetService': 'Mobile Data',
+                'AdditionalServices': 'None',
+                'DiscountOfferUsed': 'No',
+                'BillingIssuesReported': 1
+            },
+              {
+                'TelecomCompany': 'Vodacom',
+                'Region': 'Simiyu',
+                'Age': 28,
+                'Gender': 'Female',
+                'ContractType': 'Postpaid',
+                'ContractDuration': '1 Month',
+                'TenureMonths': 1,
+                'MonthlyCharges': 787.00,
+                'DataUsageGB': 5.0,
+                'CallDurationMinutes': 800,
+                'ComplaintsFiled': 0,
+                'CustomerSupportCalls': 1,
+                'PaymentMethod': 'Mobile Money',
+                'InternetService': 'Mobile Data',
+                'AdditionalServices': 'None',
+                'DiscountOfferUsed': 'No',
+                'BillingIssuesReported': 1
+            }
+        ]
+
+        # Create a DataFrame with the sample data
+        df = pd.DataFrame(sample_data, columns=columns)
+
+        # Generate CSV in memory
+        output = io.StringIO()
+        df.to_csv(output, index=False)
+        output.seek(0)
+
+        # Serve the CSV as a downloadable file
+        return send_file(
+            io.BytesIO(output.getvalue().encode('utf-8')),
+            mimetype='text/csv',
+            as_attachment=True,
+            download_name='sample_batch_prediction.csv'
+        )
+    except Exception as e:
+        app.logger.error(f"Sample CSV download error: {str(e)}")
+        flash(f'Failed to download sample CSV: {str(e)}', 'danger')
         return redirect(url_for('predict'))
 
 @app.route('/predictions')

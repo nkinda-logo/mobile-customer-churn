@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 {% block title %}Churn Prediction{% endblock %}
 
@@ -291,37 +294,99 @@
                                     </div>
                                 </div>
                                 
-                                <div class="required-columns">
-                                    <h6><i class="bi bi-list-check me-2"></i>Required Columns:</h6>
-                                    <div class="row g-2">
-                                        <div class="col-md-4"><span class="column-tag">CustomerID</span></div>
-                                        <div class="col-md-4"><span class="column-tag">TelecomCompany</span></div>
-                                        <div class="col-md-4"><span class="column-tag">Region</span></div>
-                                        <div class="col-md-4"><span class="column-tag">Age</span></div>
-                                        <div class="col-md-4"><span class="column-tag">Gender</span></div>
-                                        <div class="col-md-4"><span class="column-tag">ContractType</span></div>
-                                        <div class="col-md-4"><span class="column-tag">ContractDuration</span></div>
-                                        <div class="col-md-4"><span class="column-tag">TenureMonths</span></div>
-                                        <div class="col-md-4"><span class="column-tag">MonthlyCharges</span></div>
-                                        <div class="col-md-4"><span class="column-tag">DataUsageGB</span></div>
-                                        <div class="col-md-4"><span class="column-tag">CallDurationMinutes</span></div>
-                                        <div class="col-md-4"><span class="column-tag">ComplaintsFiled</span></div>
-                                        <div class="col-md-4"><span class="column-tag">CustomerSupportCalls</span></div>
-                                        <div class="col-md-4"><span class="column-tag">PaymentMethod</span></div>
-                                        <div class="col-md-4"><span class="column-tag">InternetService</span></div>
-                                        <div class="col-md-4"><span class="column-tag">AdditionalServices</span></div>
-                                        <div class="col-md-4"><span class="column-tag">DiscountOfferUsed</span></div>
-                                        <div class="col-md-4"><span class="column-tag">BillingIssuesReported</span></div>
-                                    </div>
-                                </div>
+<div class="required-columns">
+    <h6 class="d-flex justify-content-between align-items-center mb-2">
+        <span><i class="bi bi-list-check me-2"></i>Required Columns:</span>
+        <button class="btn btn-sm btn-primary view-columns-btn" data-bs-toggle="collapse" data-bs-target="#requiredColumnsTable" aria-expanded="false" aria-controls="requiredColumnsTable">
+            View
+        </button>
+    </h6>
+    <div class="collapse" id="requiredColumnsTable">
+        <table class="table table-striped table-bordered table-hover custom-table">
+            <thead>
+                <tr>
+                    <th>Column Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><span class="column-tag">CustomerID</span></td><td>Unique identifier for each customer</td></tr>
+                <tr><td><span class="column-tag">TelecomCompany</span></td><td>The telecom service provider</td></tr>
+                <tr><td><span class="column-tag">Region</span></td><td>Geographical region of the customer</td></tr>
+                <tr><td><span class="column-tag">Age</span></td><td>Age of the customer</td></tr>
+                <tr><td><span class="column-tag">Gender</span></td><td>Gender of the customer</td></tr>
+                <tr><td><span class="column-tag">ContractType</span></td><td>Type of contract (e.g., Prepaid, Postpaid)</td></tr>
+                <tr><td><span class="column-tag">ContractDuration</span></td><td>Duration of the contract</td></tr>
+                <tr><td><span class="column-tag">TenureMonths</span></td><td>How long a customer has been with a company, measured in months.</td></tr>
+                <tr><td><span class="column-tag">MonthlyCharges</span></td><td>Monthly billing amount</td></tr>
+                <tr><td><span class="column-tag">DataUsageGB</span></td><td>Data usage in gigabytes</td></tr>
+                <tr><td><span class="column-tag">CallDurationMinutes</span></td><td>Total call duration in minutes</td></tr>
+                <tr><td><span class="column-tag">ComplaintsFiled</span></td><td>Number of complaints filed</td></tr>
+                <tr><td><span class="column-tag">CustomerSupportCalls</span></td><td>Number of support calls</td></tr>
+                <tr><td><span class="column-tag">PaymentMethod</span></td><td>Customer's payment method</td></tr>
+                <tr><td><span class="column-tag">InternetService</span></td><td>Type of internet service</td></tr>
+                <tr><td><span class="column-tag">AdditionalServices</span></td><td>Additional services subscribed</td></tr>
+                <tr><td><span class="column-tag">DiscountOfferUsed</span></td><td>Whether a discount was used</td></tr>
+                <tr><td><span class="column-tag">BillingIssuesReported</span></td><td>Number of billing issues reported</td></tr>
+            </tbody>
+        </table>
+        <div class="text-end">
+            <button class="btn btn-sm btn-secondary close-columns-btn" data-bs-toggle="collapse" data-bs-target="#requiredColumnsTable" aria-expanded="true" aria-controls="requiredColumnsTable">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .required-columns .custom-table {
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #f8f9fa;
+    }
+    .required-columns .column-tag {
+        display: inline-block;
+        padding: 2px 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        font-weight: 500;
+        color: #212529;
+    }
+    .required-columns .table th,
+    .required-columns .table td {
+        vertical-align: middle;
+        padding: 8px;
+        border-color: #dee2e6;
+    }
+    .required-columns .table th {
+        background-color: #007bff;
+        color: white;
+        text-align: center;
+    }
+    .required-columns .view-columns-btn,
+    .required-columns .close-columns-btn {
+        padding: 2px 10px;
+        font-size: 0.875rem;
+    }
+    .required-columns .collapse {
+        transition: all 0.3s ease;
+    }
+    @media (max-width: 768px) {
+        .required-columns .table th,
+        .required-columns .table td {
+            font-size: 0.9rem;
+            padding: 6px;
+        }
+    }
+</style>
                                 
                                 <div class="action-buttons">
                                     <button type="submit" class="btn btn-primary-gradient btn-lg px-4">
                                         <i class="bi bi-upload me-2"></i>Process Batch Prediction
                                     </button>
-                                    <a href="{{ url_for('static', filename='sample_batch_prediction.csv') }}" class="btn btn-outline-secondary btn-lg px-4">
-                                        <i class="bi bi-download me-2"></i>Download Sample CSV
-                                    </a>
+                                   <a href="{{ url_for('download_sample_csv') }}" class="btn btn-outline-secondary btn-lg px-4">
+                                   <i class="bi bi-download me-2"></i>Download Sample CSV
+                                  </a>
                                 </div>
                             </form>
                         </div>
