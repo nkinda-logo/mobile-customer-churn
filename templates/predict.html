@@ -1,1133 +1,1916 @@
 {% extends "base.html" %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-{% block title %}Churn Prediction{% endblock %}
+{% block title %}Customer Churn Prediction{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-4 py-3">
-    <!-- Header Section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="header-banner">
-                <h1 class="display-5 fw-bold text-white mb-2">Customer Churn Prediction</h1>
-                <p class="lead text-white-50">Predict customer churn probability with advanced analytics</p>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="row mb-4">
-                <div class="col-12">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
-                            <i class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
-    {% endwith %}
-
-    <div class="row g-4">
-        <!-- Main Form Section -->
-        <div class="col-lg-8">
-            <!-- Enhanced Tabs -->
-            <div class="prediction-tabs-container mb-4">
-                <ul class="nav nav-pills justify-content-center" id="predictionTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active px-4 py-3" id="single-tab" data-bs-toggle="tab" data-bs-target="#single-prediction" type="button" role="tab" aria-controls="single-prediction" aria-selected="true">
-                            <i class="bi bi-person-fill me-2"></i>Single Prediction
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link px-4 py-3" id="batch-tab" data-bs-toggle="tab" data-bs-target="#batch-prediction" type="button" role="tab" aria-controls="batch-prediction" aria-selected="false">
-                            <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction
-                        </button>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="tab-content" id="predictionTabContent">
-                <!-- Enhanced Single Prediction Form -->
-                <div class="tab-pane fade show active" id="single-prediction" role="tabpanel" aria-labelledby="single-tab">
-                    <div class="enhanced-card">
-                        <div class="card-header-gradient">
-                            <h5 class="mb-0 text-white">
-                                <i class="bi bi-person-plus me-2"></i>Enter Customer Details
-                            </h5>
-                        </div>
-                        <div class="card-body p-4">
-                            <form method="POST" action="{{ url_for('predict') }}">
-                                {{ form.hidden_tag() }}
-                                
-                                <!-- Personal Information Section -->
-                                <div class="form-section mb-5">
-                                    <div class="section-header">
-                                        <h6 class="section-title">
-                                            <i class="bi bi-person-circle me-2"></i>Personal Information
-                                        </h6>
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.telecom_company(class="form-select") }}
-                                                {{ form.telecom_company.label(class="form-label") }}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.region(class="form-select") }}
-                                                {{ form.region.label(class="form-label") }}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.age(class="form-control", placeholder="Age") }}
-                                                {{ form.age.label(class="form-label") }}
-                                                {% for error in form.age.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.gender(class="form-select") }}
-                                                {{ form.gender.label(class="form-label") }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Contract Details Section -->
-                                <div class="form-section mb-5">
-                                    <div class="section-header">
-                                        <h6 class="section-title">
-                                            <i class="bi bi-file-text me-2"></i>Contract Details
-                                        </h6>
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.contract_type(class="form-select") }}
-                                                {{ form.contract_type.label(class="form-label") }}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.contract_duration(class="form-select") }}
-                                                {{ form.contract_duration.label(class="form-label") }}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.tenure_months(class="form-control", placeholder="Tenure in Months") }}
-                                                {{ form.tenure_months.label(class="form-label") }}
-                                                {% for error in form.tenure_months.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="input-group-enhanced">
-                                                <span class="input-group-text currency-badge">TZS</span>
-                                                <div class="form-floating">
-                                                    {{ form.monthly_charges(class="form-control", placeholder="Monthly Charges") }}
-                                                    {{ form.monthly_charges.label(class="form-label") }}
-                                                </div>
-                                            </div>
-                                            {% for error in form.monthly_charges.errors %}
-                                                <div class="invalid-feedback d-block">{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Usage Information Section -->
-                                <div class="form-section mb-5">
-                                    <div class="section-header">
-                                        <h6 class="section-title">
-                                            <i class="bi bi-graph-up me-2"></i>Usage Information
-                                        </h6>
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <div class="input-group-enhanced">
-                                                <div class="form-floating">
-                                                    {{ form.data_usage_gb(class="form-control", placeholder="Data Usage") }}
-                                                    {{ form.data_usage_gb.label(class="form-label") }}
-                                                </div>
-                                                <span class="input-group-text unit-badge">GB</span>
-                                            </div>
-                                            {% for error in form.data_usage_gb.errors %}
-                                                <div class="invalid-feedback d-block">{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="input-group-enhanced">
-                                                <div class="form-floating">
-                                                    {{ form.call_duration_minutes(class="form-control", placeholder="Call Duration") }}
-                                                    {{ form.call_duration_minutes.label(class="form-label") }}
-                                                </div>
-                                                <span class="input-group-text unit-badge">mins</span>
-                                            </div>
-                                            {% for error in form.call_duration_minutes.errors %}
-                                                <div class="invalid-feedback d-block">{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Customer Support Section -->
-                                <div class="form-section mb-5">
-                                    <div class="section-header">
-                                        <h6 class="section-title">
-                                            <i class="bi bi-headset me-2"></i>Customer Support
-                                        </h6>
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.complaints_filed(class="form-control", placeholder="Complaints Filed") }}
-                                                {{ form.complaints_filed.label(class="form-label") }}
-                                                {% for error in form.complaints_filed.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.customer_support_calls(class="form-control", placeholder="Support Calls") }}
-                                                {{ form.customer_support_calls.label(class="form-label") }}
-                                                {% for error in form.customer_support_calls.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Payment and Services Section -->
-                                <div class="form-section mb-5">
-                                    <div class="section-header">
-                                        <h6 class="section-title">
-                                            <i class="bi bi-credit-card me-2"></i>Payment & Services
-                                        </h6>
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.payment_method(class="form-select") }}
-                                                {{ form.payment_method.label(class="form-label") }}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.internet_service(class="form-select") }}
-                                                {{ form.internet_service.label(class="form-label") }}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.additional_services(class="form-select") }}
-                                                {{ form.additional_services.label(class="form-label") }}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.discount_offer_used(class="form-select") }}
-                                                {{ form.discount_offer_used.label(class="form-label") }}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating">
-                                                {{ form.billing_issues_reported(class="form-control", placeholder="Billing Issues") }}
-                                                {{ form.billing_issues_reported.label(class="form-label") }}
-                                                {% for error in form.billing_issues_reported.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Action Buttons -->
-                                <div class="action-buttons">
-                                    <button type="submit" name="predict" class="btn btn-primary-gradient btn-lg px-4">
-                                        <i class="bi bi-calculator me-2"></i>Predict Churn
-                                    </button>
-                                    <button type="submit" name="add_another" class="btn btn-outline-primary btn-lg px-4">
-                                        <i class="bi bi-plus-circle me-2"></i>Predict & Add Another
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Enhanced Batch Prediction Form -->
-                <div class="tab-pane fade" id="batch-prediction" role="tabpanel" aria-labelledby="batch-tab">
-                    <div class="enhanced-card">
-                        <div class="card-header-gradient">
-                            <h5 class="mb-0 text-white">
-                                <i class="bi bi-cloud-upload me-2"></i>Batch Prediction (CSV Upload)
-                            </h5>
-                        </div>
-                        <div class="card-body p-4">
-                            <form method="POST" action="{{ url_for('batch_predict') }}" enctype="multipart/form-data">
-                                <div class="upload-section">
-                                    <div class="upload-area">
-                                        <i class="bi bi-cloud-upload upload-icon"></i>
-                                        <h6>Upload CSV File</h6>
-                                        <input type="file" class="form-control" id="file" name="file" accept=".csv" required>
-                                        <div class="upload-info">
-                                            <small class="text-muted">
-                                                <i class="bi bi-info-circle me-1"></i>
-                                                CSV file must contain all required columns as listed below
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-<div class="required-columns">
-    <h6 class="d-flex justify-content-between align-items-center mb-2">
-        <span><i class="bi bi-list-check me-2"></i>Required Columns:</span>
-        <button class="btn btn-sm btn-primary view-columns-btn" data-bs-toggle="collapse" data-bs-target="#requiredColumnsTable" aria-expanded="false" aria-controls="requiredColumnsTable">
-            View
-        </button>
-    </h6>
-    <div class="collapse" id="requiredColumnsTable">
-        <table class="table table-striped table-bordered table-hover custom-table">
-            <thead>
-                <tr>
-                    <th>Column Name</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td><span class="column-tag">CustomerID</span></td><td>Unique identifier for each customer</td></tr>
-                <tr><td><span class="column-tag">TelecomCompany</span></td><td>The telecom service provider</td></tr>
-                <tr><td><span class="column-tag">Region</span></td><td>Geographical region of the customer</td></tr>
-                <tr><td><span class="column-tag">Age</span></td><td>Age of the customer</td></tr>
-                <tr><td><span class="column-tag">Gender</span></td><td>Gender of the customer</td></tr>
-                <tr><td><span class="column-tag">ContractType</span></td><td>Type of contract (e.g., Prepaid, Postpaid)</td></tr>
-                <tr><td><span class="column-tag">ContractDuration</span></td><td>Duration of the contract</td></tr>
-                <tr><td><span class="column-tag">TenureMonths</span></td><td>How long a customer has been with a company, measured in months.</td></tr>
-                <tr><td><span class="column-tag">MonthlyCharges</span></td><td>Monthly billing amount</td></tr>
-                <tr><td><span class="column-tag">DataUsageGB</span></td><td>Data usage in gigabytes</td></tr>
-                <tr><td><span class="column-tag">CallDurationMinutes</span></td><td>Total call duration in minutes</td></tr>
-                <tr><td><span class="column-tag">ComplaintsFiled</span></td><td>Number of complaints filed</td></tr>
-                <tr><td><span class="column-tag">CustomerSupportCalls</span></td><td>Number of support calls</td></tr>
-                <tr><td><span class="column-tag">PaymentMethod</span></td><td>Customer's payment method</td></tr>
-                <tr><td><span class="column-tag">InternetService</span></td><td>Type of internet service</td></tr>
-                <tr><td><span class="column-tag">AdditionalServices</span></td><td>Additional services subscribed</td></tr>
-                <tr><td><span class="column-tag">DiscountOfferUsed</span></td><td>Whether a discount was used</td></tr>
-                <tr><td><span class="column-tag">BillingIssuesReported</span></td><td>Number of billing issues reported</td></tr>
-            </tbody>
-        </table>
-        <div class="text-end">
-            <button class="btn btn-sm btn-secondary close-columns-btn" data-bs-toggle="collapse" data-bs-target="#requiredColumnsTable" aria-expanded="true" aria-controls="requiredColumnsTable">
-                Close
-            </button>
-        </div>
-    </div>
-</div>
-
-<style>
-    .required-columns .custom-table {
-        border-radius: 8px;
-        overflow: hidden;
-        background-color: #f8f9fa;
-    }
-    .required-columns .column-tag {
-        display: inline-block;
-        padding: 2px 8px;
-        background-color: #e9ecef;
-        border-radius: 4px;
-        font-weight: 500;
-        color: #212529;
-    }
-    .required-columns .table th,
-    .required-columns .table td {
-        vertical-align: middle;
-        padding: 8px;
-        border-color: #dee2e6;
-    }
-    .required-columns .table th {
-        background-color: #007bff;
-        color: white;
-        text-align: center;
-    }
-    .required-columns .view-columns-btn,
-    .required-columns .close-columns-btn {
-        padding: 2px 10px;
-        font-size: 0.875rem;
-    }
-    .required-columns .collapse {
-        transition: all 0.3s ease;
-    }
-    @media (max-width: 768px) {
-        .required-columns .table th,
-        .required-columns .table td {
-            font-size: 0.9rem;
-            padding: 6px;
-        }
-    }
-</style>
-                                
-                                <div class="action-buttons">
-                                    <button type="submit" class="btn btn-primary-gradient btn-lg px-4">
-                                        <i class="bi bi-upload me-2"></i>Process Batch Prediction
-                                    </button>
-                                   <a href="{{ url_for('download_sample_csv') }}" class="btn btn-outline-secondary btn-lg px-4">
-                                   <i class="bi bi-download me-2"></i>Download Sample CSV
-                                  </a>
-                                </div>
-                            </form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Churn Prediction - Advanced Analytics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+    <div class="container-fluid px-4 py-3">
+        <!-- Enhanced Header Section with Particles Background -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="header-banner">
+                    <canvas id="particles-canvas"></canvas>
+                    <div class="header-content animate__animated animate__fadeInDown">
+                        <h1 class="display-4 fw-bold text-white mb-2">
+                            <i class="bi bi-graph-up-arrow me-3"></i>Customer Churn Prediction
+                        </h1>
+                        <p class="lead text-white-75">AI-powered customer retention analytics with real-time insights</p>
+                        <div class="stats-row mt-4">
+                            <div class="stat-item">
+                                <div class="stat-number">91.2%</div>
+                                <div class="stat-label">Accuracy</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">15K+</div>
+                                <div class="stat-label">Predictions</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Enhanced Results Column -->
-        <div class="col-lg-4">
-            {% if batch_results is defined %}
-                <div class="enhanced-card mb-4">
-                    <div class="card-header bg-info-gradient">
-                        <h5 class="mb-0 text-white">
-                            <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction Results
-                        </h5>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm animate__animated animate__slideInDown" role="alert" id="successAlert">
+                            <i class="bi bi-check-circle me-2"></i>
+                            <span id="successMessage">
+                                {% for category, message in messages %}
+                                    {{ message }}
+                                {% endfor %}
+                            </span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                     </div>
-                    <div class="card-body p-4">
-                        {% if batch_results %}
-                            <p>Total customers processed: {{ batch_results|length }}</p>
-                            <p>Customers predicted to churn: {{ batch_results|selectattr('prediction', 'equalto', 'Yes')|list|length }}</p>
-                            <p>Customers not predicted to churn: {{ batch_results|selectattr('prediction', 'equalto', 'No')|list|length }}</p>
-                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                <table class="table table-striped table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Customer ID</th>
-                                            <th scope="col">Prediction</th>
-                                            <th scope="col">Probability</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for result in batch_results %}
-                                        <tr>
-                                            <td>{{ result.customer_id }}</td>
-                                            <td class="{% if result.prediction == 'Yes' %}text-danger{% else %}text-success{% endif %}">{{ result.prediction }}</td>
-                                            <td>{{ (result.probability * 100)|round(2) }}%</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {% if batch_id %}
-                                <div class="mt-3">
-                                    <a href="{{ url_for('download_batch_results', batch_id=batch_id) }}" class="btn btn-outline-primary btn-lg w-100">
-                                        <i class="bi bi-download me-2"></i>Download Full Results (CSV)
-                                    </a>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="row g-4">
+            <!-- Enhanced Main Form Section -->
+            <div class="col-lg-8" id="formSection" {% if result or batch_results is defined %}style="display: none;"{% endif %}>
+                <!-- Premium Tabs with Glassmorphism -->
+                <div class="prediction-tabs-container mb-4 animate__animated animate__fadeInUp">
+                    <ul class="nav nav-pills justify-content-center" id="predictionTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active px-5 py-3" id="single-tab" data-bs-toggle="tab" data-bs-target="#single-prediction" type="button" role="tab">
+                                <i class="bi bi-person-fill me-2"></i>
+                                <span>Single Prediction</span>
+                                <div class="tab-indicator"></div>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link px-5 py-3" id="batch-tab" data-bs-toggle="tab" data-bs-target="#batch-prediction" type="button" role="tab">
+                                <i class="bi bi-file-earmark-spreadsheet me-2"></i>
+                                <span>Batch Prediction</span>
+                                <div class="tab-indicator"></div>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="tab-content" id="predictionTabContent">
+                    <!-- Enhanced Single Prediction Form -->
+                    <div class="tab-pane fade show active" id="single-prediction" role="tabpanel">
+                        <div class="enhanced-card animate__animated animate__fadeInUp">
+                            <div class="card-header-gradient">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0 text-white">
+                                        <i class="bi bi-person-plus me-2"></i>Customer Intelligence Form
+                                    </h5>
+                                    <div class="form-progress">
+                                        <div class="progress-circle">
+                                            <div class="progress-text">0%</div>
+                                        </div>
+                                    </div>
                                 </div>
-                            {% endif %}
-                        {% else %}
-                            <div class="alert alert-info-custom">
-                                <i class="bi bi-info-circle me-2"></i>
-                                No valid customers found in the uploaded CSV.
                             </div>
-                        {% endif %}
-                    </div>
-                </div>
-            {% elif result %}
-                <div class="enhanced-card mb-4">
-                    <div class="card-header {% if result.prediction == 'Yes' %}bg-danger-gradient{% else %}bg-success-gradient{% endif %}">
-                        <h5 class="mb-0 text-white">
-                            <i class="bi bi-{% if result.prediction == 'Yes' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
-                            Prediction Result
-                        </h5>
-                    </div>
-                    <div class="card-body text-center p-4">
-                        <div class="prediction-result">
-                            <div class="prediction-circle {% if result.prediction == 'Yes' %}danger{% else %}success{% endif %}">
-                                <div class="prediction-text">{{ result.prediction }}</div>
-                                <div class="prediction-prob">{{ (result.probability * 100)|round(2) }}%</div>
+                            <div class="card-body p-4">
+                                <form method="POST" action="{{ url_for('predict') }}" id="predictionForm">
+                                    {{ form.hidden_tag() }}
+                                    
+                                    <!-- Personal Information Section -->
+                                    <div class="form-section mb-5" data-section="1">
+                                        <div class="section-header">
+                                            <h6 class="section-title">
+                                                <i class="bi bi-person-circle me-2"></i>Personal Information
+                                                <div class="section-status">
+                                                    <i class="bi bi-circle section-indicator"></i>
+                                                </div>
+                                            </h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.telecom_company(class="form-select", required="required") }}
+                                                    {{ form.telecom_company.label(class="form-label") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.region(class="form-select", required="required") }}
+                                                    {{ form.region.label(class="form-label") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.age(class="form-control", placeholder="Age", min="18", max="100", required="required") }}
+                                                    {{ form.age.label(class="form-label") }}
+                                                    {% for error in form.age.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.gender(class="form-select", required="required") }}
+                                                    {{ form.gender.label(class="form-label") }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Contract Details Section -->
+                                    <div class="form-section mb-5" data-section="2">
+                                        <div class="section-header">
+                                            <h6 class="section-title">
+                                                <i class="bi bi-file-text me-2"></i>Contract Details
+                                                <div class="section-status">
+                                                    <i class="bi bi-circle section-indicator"></i>
+                                                </div>
+                                            </h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.contract_type(class="form-select", required="required") }}
+                                                    {{ form.contract_type.label(class="form-label") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.contract_duration(class="form-select", required="required") }}
+                                                    {{ form.contract_duration.label(class="form-label") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.tenure_months(class="form-control", placeholder="Tenure in Months", min="1", max="100", required="required") }}
+                                                    {{ form.tenure_months.label(class="form-label") }}
+                                                    {% for error in form.tenure_months.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="input-group-enhanced">
+                                                    <span class="input-group-text currency-badge">TZS</span>
+                                                    <div class="form-floating">
+                                                        {{ form.monthly_charges(class="form-control", placeholder="Monthly Charges", step="0.01", min="0", required="required") }}
+                                                        {{ form.monthly_charges.label(class="form-label") }}
+                                                    </div>
+                                                </div>
+                                                {% for error in form.monthly_charges.errors %}
+                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Usage Information Section -->
+                                    <div class="form-section mb-5" data-section="3">
+                                        <div class="section-header">
+                                            <h6 class="section-title">
+                                                <i class="bi bi-graph-up me-2"></i>Usage Information
+                                                <div class="section-status">
+                                                    <i class="bi bi-circle section-indicator"></i>
+                                                </div>
+                                            </h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="input-group-enhanced">
+                                                    <div class="form-floating">
+                                                        {{ form.data_usage_gb(class="form-control", placeholder="Data Usage", step="0.1", min="0", required="required") }}
+                                                        {{ form.data_usage_gb.label(class="form-label") }}
+                                                    </div>
+                                                    <span class="input-group-text unit-badge">GB</span>
+                                                </div>
+                                                {% for error in form.data_usage_gb.errors %}
+                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="input-group-enhanced">
+                                                    <div class="form-floating">
+                                                        {{ form.call_duration_minutes(class="form-control", placeholder="Call Duration", min="0", required="required") }}
+                                                        {{ form.call_duration_minutes.label(class="form-label") }}
+                                                    </div>
+                                                    <span class="input-group-text unit-badge">mins</span>
+                                                </div>
+                                                {% for error in form.call_duration_minutes.errors %}
+                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Customer Support Section -->
+                                    <div class="form-section mb-5" data-section="4">
+                                        <div class="section-header">
+                                            <h6 class="section-title">
+                                                <i class="bi bi-headset me-2"></i>Customer Support
+                                                <div class="section-status">
+                                                    <i class="bi bi-circle section-indicator"></i>
+                                                </div>
+                                            </h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.complaints_filed(class="form-control", placeholder="Complaints Filed", min="0", required="required") }}
+                                                    {{ form.complaints_filed.label(class="form-label") }}
+                                                    {% for error in form.complaints_filed.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.customer_support_calls(class="form-control", placeholder="Support Calls", min="0", required="required") }}
+                                                    {{ form.customer_support_calls.label(class="form-label") }}
+                                                    {% for error in form.customer_support_calls.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Payment and Services Section -->
+                                    <div class="form-section mb-5" data-section="5">
+                                        <div class="section-header">
+                                            <h6 class="section-title">
+                                                <i class="bi bi-credit-card me-2"></i>Payment & Services
+                                                <div class="section-status">
+                                                    <i class="bi bi-circle section-indicator"></i>
+                                                </div>
+                                            </h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.payment_method(class="form-select", required="required") }}
+                                                    {{ form.payment_method.label(class="form-label") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.internet_service(class="form-select", required="required") }}
+                                                    {{ form.internet_service.label(class="form-label") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.additional_services(class="form-select", required="required") }}
+                                                    {{ form.additional_services.label(class="form-label") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.discount_offer_used(class="form-select", required="required") }}
+                                                    {{ form.discount_offer_used.label(class="form-label") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    {{ form.billing_issues_reported(class="form-control", placeholder="Billing Issues", min="0", required="required") }}
+                                                    {{ form.billing_issues_reported.label(class="form-label") }}
+                                                    {% for error in form.billing_issues_reported.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Enhancedúr Enhanced Action Buttons -->
+                                    <div class="action-buttons">
+                                        <button type="submit" name="predict" class="btn btn-primary-gradient btn-lg px-5">
+                                            <i class="bi bi-cpu me-2"></i>
+                                            <span class="btn-text">Predict Churn</span>
+                                            <div class="btn-loader"></div>
+                                        </button>
+                                        <button type="submit" name="add_another" class="btn btn-outline-primary btn-lg px-4">
+                                            <i class="bi bi-plus-circle me-2"></i>Predict & Add Another
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary btn-lg px-4" onclick="clearForm()">
+                                            <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                        
-                        <div class="recommendation-box {% if result.prediction == 'Yes' %}alert-danger{% else %}alert-success{% endif %}">
-                            <i class="bi bi-{% if result.prediction == 'Yes' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
-                            <strong>{{ result.recommendation }}</strong>
-                        </div>
-                        
-                        {% if prediction_id %}
-                            <div class="mt-3">
-                                <a href="{{ url_for('download_pdf', prediction_id=prediction_id) }}" class="btn btn-outline-primary btn-lg w-100">
-                                    <i class="bi bi-download me-2"></i>Download Report (PDF)
-                                </a>
+                    </div>
+
+                    <!-- Enhanced Batch Prediction -->
+                    <div class="tab-pane fade" id="batch-prediction" role="tabpanel">
+                        <div class="enhanced-card animate__animated animate__fadeInUp">
+                            <div class="card-header-gradient">
+                                <h5 class="mb-0 text-white">
+                                    <i class="bi bi-cloud-upload me-2"></i>Batch Prediction Analytics
+                                </h5>
                             </div>
-                        {% endif %}
+                            <div class="card-body p-4">
+                                <form id="batchForm" method="POST" action="{{ url_for('batch_predict') }}" enctype="multipart/form-data">
+                                    <div class="upload-section">
+                                        <div class="upload-area" id="uploadArea">
+                                            <i class="bi bi-cloud-upload upload-icon"></i>
+                                            <h6>Drag & Drop CSV File or Click to Browse</h6>
+                                            <input type="file" class="form-control" id="csvFile" name="file" accept=".csv" style="display: none;" required>
+                                            <div class="upload-info">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-info-circle me-1"></i>
+                                                    Maximum file size: 50MB | Supported format: CSV
+                                                </small>
+                                            </div>
+                                            <div class="file-preview" id="filePreview" style="display: none;">
+                                                <div class="file-info">
+                                                    <i class="bi bi-file-earmark-spreadsheet file-icon"></i>
+                                                    <div class="file-details">
+                                                        <div class="file-name"></div>
+                                                        <div class="file-size"></div>
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-danger" onclick="removeFile()">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inline Columns Functionality</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 2rem;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .required-columns {
+            margin: 2rem 0;
+        }
+
+        .columns-header {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(102, 126, 234, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .columns-header:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .columns-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .columns-content.expanded {
+            max-height: 800px;
+            opacity: 1;
+            transform: translateY(0);
+            margin-top: 1rem;
+        }
+
+        .toggle-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .toggle-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .toggle-button:focus {
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-button.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .custom-table {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            animation: slideInUp 0.4s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .custom-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .custom-table th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+        }
+
+        .custom-table td {
+            padding: 0.75rem 1rem;
+            border-color: rgba(0, 0, 0, 0.05);
+            transition: background-color 0.2s ease;
+        }
+
+        .custom-table tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+
+        .custom-table code {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        .section-title {
+            color: #495057;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .column-count {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        /* Smooth scrolling for focus */
+        .columns-content:focus-within {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading animation for table */
+        .table-loading {
+            position: relative;
+        }
+
+        .table-loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
+            animation: loading 1.5s infinite;
+            border-radius: 2px;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h2 class="text-center mb-4">
+            <i class="bi bi-table me-2"></i>
+            Required CSV Columns Demo
+        </h2>
+        
+        <div class="required-columns">
+            <div class="columns-header" onclick="toggleColumns()" id="columnsHeader">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <h6 class="section-title">
+                            <i class="bi bi-list-check me-2"></i>
+                            Required CSV Columns
+                        </h6>
+                        <span class="column-count">18 columns</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="status-indicator">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Ready
+                        </span>
+                        <button type="button" class="btn btn-sm toggle-button" id="toggleButton">
+                            <i class="bi bi-chevron-down me-1 toggle-icon" id="toggleIcon"></i>
+                            <span id="toggleText">View Requirements</span>
+                        </button>
                     </div>
                 </div>
+            </div>
+            
+            <div class="columns-content" id="columnsContent">
+                <div class="table-responsive">
+                    <table class="table table-hover custom-table table-loading" id="requirementsTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">Column Name</th>
+                                <th style="width: 15%;">Type</th>
+                                <th style="width: 60%;">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>CustomerID</code></td>
+                                <td><span class="badge bg-primary">String</span></td>
+                                <td>Unique customer identifier</td>
+                            </tr>
+                            <tr>
+                                <td><code>TelecomCompany</code></td>
+                                <td><span class="badge bg-primary">String</span></td>
+                                <td>Service provider name (Vodacom, Airtel, Tigo, Halotel)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Region</code></td>
+                                <td><span class="badge bg-primary">String</span></td>
+                                <td>Customer's geographical region</td>
+                            </tr>
+                            <tr>
+                                <td><code>Age</code></td>
+                                <td><span class="badge bg-success">Integer</span></td>
+                                <td>Customer age (18-100)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Gender</code></td>
+                                <td><span class="badge bg-primary">String</span></td>
+                                <td>Customer gender (Male, Female, Other)</td>
+                            </tr>
+                            <tr>
+                                <td><code>ContractType</code></td>
+                                <td><span class="badge bg-primary">String</span></td>
+                                <td>Prepaid or Postpaid</td>
+                            </tr>
+                            <tr>
+                                <td><code>ContractDuration</code></td>
+                                <td><span class="badge bg-primary">String</span></td>
+                                <td>Duration of contract (Month-to-month, One year, Two year)</td>
+                            </tr>
+                            <tr>
+                                <td><code>TenureMonths</code></td>
+                                <td><span class="badge bg-success">Integer</span></td>
+                                <td>Number of months with company</td>
+                            </tr>
+                            <tr>
+                                <td><code>MonthlyCharges</code></td>
+                                <td><span class="badge bg-warning">Float</span></td>
+                                <td>Monthly billing amount in TZS</td>
+                            </tr>
+                            <tr>
+                                <td><code>DataUsageGB</code></td>
+                                <td><span class="badge bg-warning">Float</span></td>
+                                <td>Data consumption in GB</td>
+                            </tr>
+                            <tr>
+                                <td><code>CallDurationMinutes</code></td>
+                                <td><span class="badge bg-success">Integer</span></td>
+                                <td>Total call duration in minutes</td>
+                            </tr>
+                            <tr>
+                                <td><code>ComplaintsFiled</code></td>
+                                <td><span class="badge bg-success">Integer</span></td>
+                                <td>Number of complaints filed</td>
+                            </tr>
+                            <tr>
+                                <td><code>CustomerSupportCalls</code></td>
+                                <td><span class="badge bg-success">Integer</span></td>
+                                <td>Number of customer support calls</td>
+                            </tr>
+                            <tr>
+                                <td><code>PaymentMethod</code></td>
+                                <td><span class="badge bg-primary">String</span></td>
+                                <td>Payment method used</td>
+                            </tr>
+                            <tr>
+                                <td><code>InternetService</code></td>
+                                <td><span class="badge bg-primary">String</span></td>
+                                <td>Type of internet service (DSL, Fiber optic, No)</td>
+                            </tr>
+                            <tr>
+                                <td><code>AdditionalServices</code></td>
+                                <td><span class="badge bg-primary">String</span></td>
+                                <td>Additional services (Yes, No)</td>
+                            </tr>
+                            <tr>
+                                <td><code>DiscountOfferUsed</code></td>
+                                <td><span class="badge bg-primary">String</span></td>
+                                <td>Whether discount offer was used (Yes, No)</td>
+                            </tr>
+                            <tr>
+                                <td><code>BillingIssuesReported</code></td>
+                                <td><span class="badge bg-success">Integer</span></td>
+                                <td>Number of billing issues reported</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 p-3 bg-light rounded">
+            <h6><i class="bi bi-info-circle me-2"></i>Usage Instructions:</h6>
+            <ul class="mb-0">
+                <li>Click anywhere on the header section to toggle the table</li>
+                <li>The button text and icon will change based on the state</li>
+                <li>Smooth animations provide a premium user experience</li>
+                <li>The table includes color-coded data types for better readability</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let isExpanded = false;
+
+        function toggleColumns() {
+            const content = document.getElementById('columnsContent');
+            const button = document.getElementById('toggleButton');
+            const icon = document.getElementById('toggleIcon');
+            const text = document.getElementById('toggleText');
+            const table = document.getElementById('requirementsTable');
+            
+            isExpanded = !isExpanded;
+            
+            if (isExpanded) {
+                // Expand
+                content.classList.add('expanded');
+                button.classList.add('expanded');
+                icon.className = 'bi bi-chevron-up me-1 toggle-icon';
+                text.textContent = 'Hide Requirements';
                 
-                <!-- Enhanced Churn Report -->
-                {% if report %}
-                    <div class="enhanced-card">
-                        <div class="card-header bg-info-gradient">
+                // Add loading effect
+                table.classList.add('table-loading');
+                setTimeout(() => {
+                    table.classList.remove('table-loading');
+                }, 1000);
+                
+                // Smooth scroll to table after expansion
+                setTimeout(() => {
+                    content.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest' 
+                    });
+                }, 200);
+                
+            } else {
+                // Collapse
+                content.classList.remove('expanded');
+                button.classList.remove('expanded');
+                icon.className = 'bi bi-chevron-down me-1 toggle-icon';
+                text.textContent = 'View Requirements';
+            }
+            
+            // Add subtle haptic feedback (if supported)
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        // Keyboard accessibility
+        document.getElementById('columnsHeader').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleColumns();
+            }
+        });
+
+        // Add tabindex for keyboard navigation
+        document.getElementById('columnsHeader').setAttribute('tabindex', '0');
+
+        // Optional: Auto-collapse after a certain time (uncomment if needed)
+        /*
+        let autoCollapseTimer;
+        function resetAutoCollapseTimer() {
+            clearTimeout(autoCollapseTimer);
+            if (isExpanded) {
+                autoCollapseTimer = setTimeout(() => {
+                    if (isExpanded) {
+                        toggleColumns();
+                    }
+                }, 30000); // Auto-collapse after 30 seconds
+            }
+        }
+        
+        document.addEventListener('click', resetAutoCollapseTimer);
+        document.addEventListener('scroll', resetAutoCollapseTimer);
+        */
+    </script>
+</body>
+</html>
+
+                                    <div class="action-buttons">
+                                        <button type="submit" class="btn btn-primary-gradient btn-lg px-5" id="batchSubmitBtn" disabled>
+                                            <i class="bi bi-rocket-takeoff me-2"></i>
+                                            <span>Process Batch Prediction</span>
+                                        </button>
+                                        <a href="{{ url_for('download_sample_csv') }}" class="btn btn-outline-secondary btn-lg px-4">
+                                            <i class="bi bi-download me-2"></i>Download Sample
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Results Column -->
+            <div class="col-lg-4">
+                {% if batch_results is defined %}
+                    <div class="enhanced-card mb-4 animate__animated animate__fadeInRight">
+                        <div class="card-header-gradient bg-info-gradient">
                             <h5 class="mb-0 text-white">
-                                <i class="bi bi-graph-up-arrow me-2"></i>Churn Analysis Report
+                                <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction Results
+                                <button class="btn btn-sm btn-light ms-auto" onclick="toggleForm()">Show Form</button>
                             </h5>
                         </div>
                         <div class="card-body p-4">
-                            <!-- Risk Factors -->
-                            {% if report.risk_factors %}
-                                <div class="report-section mb-4">
-                                    <h6 class="report-title danger">
-                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Risk Factors
-                                    </h6>
-                                    <div class="report-items">
-                                        {% for factor in report.risk_factors %}
-                                            <div class="report-item danger">
-                                                <i class="bi bi-arrow-right me-2"></i>{{ factor }}
-                                            </div>
-                                        {% endfor %}
+                            {% if batch_results %}
+                                {% set total_customers = batch_results|length %}
+                                {% set churn_count = batch_results|selectattr('prediction', 'equalto', 'Yes')|list|length %}
+                                {% set non_churn_count = batch_results|selectattr('prediction', 'equalto', 'No')|list|length %}
+                                {% set churn_percentage = (churn_count / total_customers * 100)|round(2) %}
+                                {% set non_churn_percentage = (non_churn_count / total_customers * 100)|round(2) %}
+
+                                <p>Total customers processed: {{ total_customers }}</p>
+                                <p>Customers predicted to churn: {{ churn_count }} ({{ churn_percentage }}%)</p>
+                                <p>Customers not predicted to churn: {{ non_churn_count }} ({{ non_churn_percentage }}%)</p>
+
+                                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                    <table class="table table-striped table-bordered table-hover custom-table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Customer ID</th>
+                                                <th scope="col">Prediction</th>
+                                                <th scope="col">Probability</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for result in batch_results %}
+                                            <tr>
+                                                <td>{{ result.customer_id }}</td>
+                                                <td class="{% if result.prediction == 'Yes' %}text-danger{% else %}text-success{% endif %}">{{ result.prediction }}</td>
+                                                <td>{{ (result.probability * 100)|round(2) }}%</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Insights and Recommendations -->
+                                <div class="mt-4">
+                                    <h6 class="text-primary"><i class="bi bi-bar-chart-fill me-2"></i>Insights & Recommendations</h6>
+                                    <div class="card bg-light p-3">
+                                        <h6 class="mb-2">Insights:</h6>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">Churn rate: {{ churn_percentage }}% of customers are at risk of churning.</li>
+                                            {% if churn_percentage > 30 %}
+                                                <li class="list-group-item text-warning">High churn rate detected (>30%). Immediate action is recommended.</li>
+                                            {% elif churn_percentage > 15 %}
+                                                <li class="list-group-item text-info">Moderate churn rate detected (>15%). Monitoring and targeted retention needed.</li>
+                                            {% else %}
+                                                <li class="list-group-item text-success">Low churn rate detected (<15%). Maintain current strategies.</li>
+                                            {% endif %}
+                                        </ul>
+
+                                        <h6 class="mt-3 mb-2">Recommendations:</h6>
+                                        <ul class="list-group list-group-flush">
+                                            {% if churn_percentage > 30 %}
+                                                <li class="list-group-item">Implement urgent retention campaigns with personalized discounts (e.g., 20% off for 3 months).</li>
+                                                <li class="list-group-item">Assign dedicated account managers to high-risk customers.</li>
+                                                <li class="list-group-item">Resolve all reported billing issues within 48 hours.</li>
+                                            {% elif churn_percentage > 15 %}
+                                                <li class="list-group-item">Offer targeted promotions to at-risk customers (e.g., free data bundles).</li>
+                                                <li class="list-group-item">Conduct satisfaction surveys to identify pain points.</li>
+                                                <li class="list-group-item">Enhance customer support availability.</li>
+                                            {% else %}
+                                                <li class="list-group-item">Continue current service quality and monitor trends monthly.</li>
+                                                <li class="list-group-item">Offer loyalty rewards to maintain customer satisfaction.</li>
+                                                <li class="list-group-item">Proactively check in with long-term customers.</li>
+                                            {% endif %}
+                                            <li class="list-group-item">Analyze customer data (e.g., tenure, complaints) for deeper insights into churn drivers.</li>
+                                        </ul>
                                     </div>
                                 </div>
-                            {% endif %}
-                            
-                            <!-- Retention Opportunities -->
-                            {% if report.retention_opportunities %}
-                                <div class="report-section mb-4">
-                                    <h6 class="report-title warning">
-                                        <i class="bi bi-lightbulb-fill me-2"></i>Retention Opportunities
-                                    </h6>
-                                    <div class="report-items">
-                                        {% for opp in report.retention_opportunities %}
-                                            <div class="report-item warning">
-                                                <i class="bi bi-arrow-right me-2"></i>{{ opp }}
-                                            </div>
-                                        {% endfor %}
+
+                                <!-- Download Link -->
+                                {% if batch_id %}
+                                    <div class="mt-3">
+                                        <a href="{{ url_for('download_batch_results', batch_id=batch_id) }}" class="btn btn-outline-primary btn-lg w-100">
+                                            <i class="bi bi-download me-2"></i>Download Full Results (CSV)
+                                        </a>
                                     </div>
-                                </div>
-                            {% endif %}
-                            
-                            <!-- Actionable Insights -->
-                            {% if report.actionable_insights %}
-                                <div class="report-section">
-                                    <h6 class="report-title success">
-                                        <i class="bi bi-check-circle-fill me-2"></i>Actionable Insights
-                                    </h6>
-                                    <div class="report-items">
-                                        {% for insight in report.actionable_insights %}
-                                            <div class="report-item success">
-                                                <i class="bi bi-arrow-right me-2"></i>{{ insight }}
-                                            </div>
-                                        {% endfor %}
-                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="alert alert-info-custom">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    No valid customers found in the uploaded CSV.
                                 </div>
                             {% endif %}
                         </div>
                     </div>
-                {% endif %}
-            {% else %}
-                <div class="enhanced-card">
-                    <div class="card-header bg-secondary-gradient">
-                        <h5 class="mb-0 text-white">
-                            <i class="bi bi-info-circle me-2"></i>Prediction Instructions
-                        </h5>
+                {% elif result %}
+                    <div class="enhanced-card mb-4 animate__animated animate__fadeInRight">
+                        <div class="card-header {% if result.prediction == 'Yes' %}bg-danger-gradient{% else %}bg-success-gradient{% endif %}">
+                            <h5 class="mb-0 text-white">
+                                <i class="bi bi-{% if result.prediction == 'Yes' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
+                                Prediction Result
+                                <button class="btn btn-sm btn-light ms-auto" onclick="toggleForm()">Show Form</button>
+                            </h5>
+                        </div>
+                        <div class="card-body text-center p-4">
+                            <div class="prediction-result">
+                                <div class="prediction-circle {% if result.prediction == 'Yes' %}danger{% else %}success{% endif %}">
+                                    <div class="prediction-text">{{ result.prediction }}</div>
+                                    <div class="prediction-prob">{{ (result.probability * 100)|round(2) }}%</div>
+                                </div>
+                            </div>
+                            
+                            <div class="recommendation-box {% if result.prediction == 'Yes' %}alert-danger{% else %}alert-success{% endif %}">
+                                <i class="bi bi-{% if result.prediction == 'Yes' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
+                                <strong>{{ result.recommendation }}</strong>
+                            </div>
+                            
+                            {% if prediction_id %}
+                                <div class="mt-3">
+                                    <a href="{{ url_for('download_pdf', prediction_id=prediction_id) }}" class="btn btn-outline-primary btn-lg w-100">
+                                        <i class="bi bi-download me-2"></i>Download Report (PDF)
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="card-body p-4">
-                        <div class="instruction-content">
-                            <div class="instruction-item">
-                                <i class="bi bi-1-circle-fill instruction-icon"></i>
-                                <div>
-                                    <strong>Single Prediction</strong>
-                                    <p>Enter individual customer details for immediate churn prediction</p>
-                                </div>
+                    
+                    <!-- Enhanced Churn Report -->
+                   <!-- Enhanced Churn Report -->
+{% if report %}
+    <div class="enhanced-card animate__animated animate__fadeInRight">
+        <div class="card-header bg-info-gradient">
+            <h5 class="mb-0 text-white">
+                <i class="bi bi-graph-up-arrow me-2"></i>Churn Analysis Report
+            </h5>
+        </div>
+        <div class="card-body p-4">
+            <!-- Risk Factors -->
+            {% if report.risk_factors %}
+                <div class="report-section mb-4">
+                    <h6 class="report-title danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Risk Factors
+                    </h6>
+                    <div class="report-items">
+                        {% for factor in report.risk_factors %}
+                            <div class="report-item danger">
+                                <i class="bi bi-arrow-right me-2"></i>{{ factor }}
                             </div>
-                            <div class="instruction-item">
-                                <i class="bi bi-2-circle-fill instruction-icon"></i>
-                                <div>
-                                    <strong>Batch Prediction</strong>
-                                    <p>Upload a CSV file for multiple customer predictions at once</p>
-                                </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Retention Opportunities -->
+            {% if report.retention_opportunities %}
+                <div class="report-section mb-4">
+                    <h6 class="report-title warning">
+                        <i class="bi bi-lightbulb-fill me-2"></i>Retention Opportunities
+                    </h6>
+                    <div class="report-items">
+                        {% for opp in report.retention_opportunities %}
+                            <div class="report-item warning">
+                                <i class="bi bi-arrow-right me-2"></i>{{ opp }}
                             </div>
-                        </div>
-                        <div class="alert alert-info-custom">
-                            <i class="bi bi-info-circle me-2"></i>
-                            All fields are required for accurate predictions. Ensure data quality for best results.
-                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Actionable Insights -->
+            {% if report.actionable_insights %}
+                <div class="report-section">
+                    <h6 class="report-title success">
+                        <i class="bi bi-check-circle-fill me-2"></i>Actionable Insights
+                    </h6>
+                    <div class="report-items">
+                        {% for insight in report.actionable_insights %}
+                            <div class="report-item success">
+                                <i class="bi bi-arrow-right me-2"></i>{{ insight }}
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             {% endif %}
         </div>
     </div>
-</div>
-
-<style>
-    :root {
-        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        --card-hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    }
-
-    body {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        min-height: 100vh;
-    }
-
-    .header-banner {
-        background: var(--primary-gradient);
-        padding: 2rem;
-        border-radius: 15px;
-        margin-bottom: 2rem;
-        box-shadow: var(--card-shadow);
-    }
-
-    .enhanced-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: var(--card-shadow);
-        border: none;
-        transition: all 0.3s ease;
-        overflow: hidden;
-    }
-
-    .enhanced-card:hover {
-        box-shadow: var(--card-hover-shadow);
-        transform: translateY(-2px);
-    }
-
-    .card-header-gradient {
-        background: var(--primary-gradient);
-        padding: 1.5rem;
-        border: none;
-    }
-
-    .bg-success-gradient {
-        background: var(--success-gradient) !important;
-    }
-
-    .bg-danger-gradient {
-        background: var(--danger-gradient) !important;
-    }
-
-    .bg-info-gradient {
-        background: var(--info-gradient) !important;
-    }
-
-    .bg-secondary-gradient {
-        background: var(--secondary-gradient) !important;
-    }
-
-    .prediction-tabs-container {
-        background: white;
-        border-radius: 15px;
-        padding: 1rem;
-        box-shadow: var(--card-shadow);
-    }
-
-    .nav-pills .nav-link {
-        border-radius: 25px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-    }
-
-    .nav-pills .nav-link.active {
-        background: var(--primary-gradient);
-        border-color: transparent;
-        transform: scale(1.05);
-    }
-
-    .nav-pills .nav-link:not(.active) {
-        color: #6c757d;
-        background: transparent;
-    }
-
-    .nav-pills .nav-link:not(.active):hover {
-        background: rgba(102, 126, 234, 0.1);
-        color: #667eea;
-        transform: scale(1.02);
-    }
-
-    .form-section {
-        position: relative;
-        padding: 1.5rem;
-        background: rgba(102, 126, 234, 0.03);
-        border-radius: 12px;
-        border-left: 4px solid #667eea;
-    }
-
-    .section-header {
-        margin-bottom: 1.5rem;
-    }
-
-    .section-title {
-        color: #667eea;
-        font-weight: 600;
-        font-size: 1.1rem;
-        margin: 0;
-    }
-
-    .form-floating {
-        position: relative;
-    }
-
-    .form-control, .form-select {
-        border: 2px solid #e9ecef;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-        height: calc(3.5rem + 2px);
-        font-size: 1rem;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        transform: scale(1.02);
-    }
-
-    .input-group-enhanced {
-        position: relative;
-        display: flex;
-        align-items: stretch;
-    }
-
-    .currency-badge, .unit-badge {
-        background: var(--primary-gradient);
-        color: white;
-        border: none;
-        font-weight: 600;
-        border-radius: 10px 0 0 10px;
-        display: flex;
-        align-items: center;
-        padding: 0 1rem;
-    }
-
-    .unit-badge {
-        border-radius: 0 10px 10px 0;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        flex-wrap: wrap;
-        padding: 2rem 0 1rem;
-    }
-
-    .btn-primary-gradient {
-        background: var(--primary-gradient);
-        border: none;
-        border-radius: 25px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-    }
-
-    .btn-primary-gradient:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-outline-primary {
-        border: 2px solid #667eea;
-        color: #667eea;
-        border-radius: 25px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-outline-primary:hover {
-        background: var(--primary-gradient);
-        border-color: transparent;
-        transform: translateY(-2px);
-    }
-
-    .upload-section {
-        margin-bottom: 2rem;
-    }
-
-    .upload-area {
-        border: 3px dashed #667eea;
-        border-radius: 15px;
-        padding: 3rem 2rem;
-        text-align: center;
-        background: rgba(102, 126, 234, 0.05);
-        transition: all 0.3s ease;
-    }
-
-    .upload-area:hover {
-        border-color: #5a6fd8;
-        background: rgba(102, 126, 234, 0.1);
-    }
-
-    .upload-icon {
-        font-size: 3rem;
-        color: #667eea;
-        margin-bottom: 1rem;
-    }
-
-    .upload-info {
-        margin-top: 1rem;
-    }
-
-    .required-columns {
-        background: rgba(102, 126, 234, 0.05);
-        padding: 1.5rem;
-        border-radius: 10px;
-        margin-bottom: 2rem;
-    }
-
-    .column-tag {
-        display: inline-block;
-        background: var(--primary-gradient);
-        color: white;
-        padding: 0.3rem 0.8rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-    }
-
-    .prediction-result {
-        margin: 2rem 0;
-    }
-
-    .prediction-circle {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-
-    .prediction-circle.success {
-        background: var(--success-gradient);
-    }
-
-    .prediction-circle.danger {
-        background: var(--danger-gradient);
-    }
-
-    .prediction-text {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: white;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .prediction-prob {
-        font-size: 1rem;
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 500;
-    }
-
-    .recommendation-box {
-        margin: 1.5rem 0;
-        padding: 1rem;
-        border-radius: 10px;
-        border: none;
-        font-size: 1rem;
-    }
-
-    .alert-success {
-        background: linear-gradient(135deg, rgba(74, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
-        color: #0c7cd5;
-        border: 1px solid rgba(74, 172, 254, 0.3);
-    }
-
-    .alert-danger {
-        background: linear-gradient(135deg, rgba(250, 112, 154, 0.1) 0%, rgba(254, 225, 64, 0.1) 100%);
-        color: #d63384;
-        border: 1px solid rgba(250, 112, 154, 0.3);
-    }
-
-    .report-section {
-        border-left: 4px solid #e9ecef;
-        padding-left: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .report-section .report-title {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
-
-    .report-title.danger {
-        color: #dc3545;
-        border-left-color: #dc3545;
-    }
-
-    .report-title.warning {
-        color: #fd7e14;
-        border-left-color: #fd7e14;
-    }
-
-    .report-title.success {
-        color: #198754;
-        border-left-color: #198754;
-    }
-
-    .report-items {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .report-item {
-        padding: 0.75rem;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        line-height: 1.4;
-        transition: all 0.3s ease;
-    }
-
-    .report-item:hover {
-        transform: translateX(5px);
-    }
-
-    .report-item.danger {
-        background: rgba(220, 53, 69, 0.1);
-        border-left: 3px solid #dc3545;
-        color: #721c24;
-    }
-
-    .report-item.warning {
-        background: rgba(253, 126, 20, 0.1);
-        border-left: 3px solid #fd7e14;
-        color: #653208;
-    }
-
-    .report-item.success {
-        background: rgba(25, 135, 84, 0.1);
-        border-left: 3px solid #198754;
-        color: #0f5132;
-    }
-
-    .instruction-content {
-        margin-bottom: 1.5rem;
-    }
-
-    .instruction-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-        padding: 1rem;
-        background: rgba(102, 126, 234, 0.05);
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-
-    .instruction-item:hover {
-        background: rgba(102, 126, 234, 0.1);
-        transform: translateX(5px);
-    }
-
-    .instruction-icon {
-        color: #667eea;
-        font-size: 1.5rem;
-        margin-top: 0.25rem;
-    }
-
-    .instruction-item strong {
-        color: #667eea;
-        font-size: 1.1rem;
-    }
-
-    .instruction-item p {
-        margin: 0.5rem 0 0 0;
-        color: #6c757d;
-        line-height: 1.4;
-    }
-
-    .alert-info-custom {
-        background: linear-gradient(135deg, rgba(74, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
-        color: #0c7cd5;
-        border: 1px solid rgba(74, 172, 254, 0.3);
-        border-radius: 10px;
-        padding: 1rem;
-        margin: 0;
-    }
-
-    .alert {
-        border-radius: 10px;
-        border: none;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .alert-dismissible .btn-close {
-        padding: 0.75rem;
-        margin: -0.375rem -0.375rem -0.375rem auto;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .container-fluid {
-            padding: 1rem;
+{% endif %}
+                {% else %}
+                    <div class="enhanced-card animate__animated animate__fadeInRight" id="instructionsCard">
+                        <div class="card-header-gradient">
+                            <h5 class="mb-0 text-white">
+                                <i class="bi bi-lightbulb me-2"></i>Getting Started
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="instruction-timeline">
+                                <div class="instruction-step active" data-step="1">
+                                    <div class="step-icon">
+                                        <i class="bi bi-1-circle-fill"></i>
+                                    </div>
+                                    <div class="step-content">
+                                        <h6>Choose Prediction Type</h6>
+                                        <p>Select single customer analysis or batch processing</p>
+                                    </div>
+                                </div>
+                                <div class="instruction-step" data-step="2">
+                                    <div class="step-icon">
+                                        <i class="bi bi-2-circle-fill"></i>
+                                    </div>
+                                    <div class="step-content">
+                                        <h6>Input Customer Data</h6>
+                                        <p>Fill in all required fields for accurate predictions</p>
+                                    </div>
+                                </div>
+                                <div class="instruction-step" data-step="3">
+                                    <div class="step-icon">
+                                        <i class="bi bi-3-circle-fill"></i>
+                                    </div>
+                                    <div class="step-content">
+                                        <h6>Get AI Insights</h6>
+                                        <p>Receive detailed churn analysis and recommendations</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-highlights mt-4">
+                                <h6 class="mb-3">
+                                    <i class="bi bi-star-fill me-2 text-warning"></i>Key Features
+                                </h6>
+                                <div class="feature-list">
+                                    <div class="feature-item">
+                                        <i class="bi bi-shield-check text-success"></i>
+                                        <span>94.2% Prediction Accuracy</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="bi bi-lightning-charge text-warning"></i>
+                                        <span>Real-time Processing</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="bi bi-graph-up text-primary"></i>
+                                        <span>Advanced Analytics</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="bi bi-file-earmark-pdf text-danger"></i>
+                                        <span>Detailed Reports</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle form visibility
+        function toggleForm() {
+            const formSection = document.getElementById('formSection');
+            formSection.style.display = formSection.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Form progress tracking
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('predictionForm');
+            const inputs = form.querySelectorAll('input, select');
+            const progressCircle = document.querySelector('.progress-circle');
+            const progressText = document.querySelector('.progress-text');
+            const sections = document.querySelectorAll('.form-section');
+
+            function updateProgress() {
+                const totalFields = inputs.length;
+                let filledFields = 0;
+
+                inputs.forEach(input => {
+                    if (input.value) filledFields++;
+                });
+
+                const progress = (filledFields / totalFields) * 100;
+                progressText.textContent = `${Math.round(progress)}%`;
+                progressCircle.style.background = `conic-gradient(#667eea ${progress * 3.6}deg, rgba(255, 255, 255, 0.3) ${progress * 3.6}deg)`;
+
+                sections.forEach(section => {
+                    const sectionInputs = section.querySelectorAll('input, select');
+                    const sectionFilled = Array.from(sectionInputs).every(input => input.value);
+                    const indicator = section.querySelector('.section-indicator');
+                    if (sectionFilled) {
+                        indicator.classList.remove('bi-circle');
+                        indicator.classList.add('bi-check-circle-fill');
+                        section.classList.add('completed');
+                    } else {
+                        indicator.classList.remove('bi-check-circle-fill');
+                        indicator.classList.add('bi-circle');
+                        section.classList.remove('completed');
+                    }
+                });
+            }
+
+            inputs.forEach(input => {
+                input.addEventListener('input', updateProgress);
+            });
+
+            // Clear form function
+            window.clearForm = function() {
+                form.reset();
+                updateProgress();
+                sections.forEach(section => {
+                    const indicator = section.querySelector('.section-indicator');
+                    indicator.classList.remove('bi-check-circle-fill');
+                    indicator.classList.add('bi-circle');
+                    section.classList.remove('completed');
+                });
+                progressText.textContent = '0%';
+                progressCircle.style.background = 'conic-gradient(#667eea 0deg, rgba(255, 255, 255, 0.3) 0deg)';
+            };
+
+            // File upload handling
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('csvFile');
+            const filePreview = document.getElementById('filePreview');
+            const fileName = document.querySelector('.file-name');
+            const fileSize = document.querySelector('.file-size');
+            const submitBtn = document.getElementById('batchSubmitBtn');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                handleFile(file);
+            });
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    handleFile(fileInput.files[0]);
+                }
+            });
+
+            function handleFile(file) {
+                if (file && file.type === 'text/csv' && file.size <= 50 * 1024 * 1024) {
+                    fileName.textContent = file.name;
+                    fileSize.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+                    filePreview.style.display = 'flex';
+                    submitBtn.disabled = false;
+                } else {
+                    fileName.textContent = 'Invalid file';
+                    fileSize.textContent = 'Please upload a CSV file (max 50MB)';
+                    filePreview.style.display = 'flex';
+                    submitBtn.disabled = true;
+                    fileInput.value = '';
+                }
+            }
+
+            window.removeFile = function() {
+                fileInput.value = '';
+                filePreview.style.display = 'none';
+                submitBtn.disabled = true;
+            };
+
+            // Initialize particles.js
+            particlesJS('particles-canvas', {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: '#ffffff' },
+                    shape: { type: 'circle' },
+                    opacity: { value: 0.5, random: true },
+                    size: { value: 3, random: true },
+                    line_linked: { enable: true, distance: 150, color: '#ffffff', opacity: 0.4, width: 1 },
+                    move: { enable: true, speed: 2, direction: 'none', random: true, out_mode: 'out' }
+                },
+                interactivity: {
+                    events: {
+                        onhover: { enable: true, mode: 'grab' },
+                        onclick: { enable: true, mode: 'push' }
+                    },
+                    modes: { grab: { distance: 140, line_linked: { opacity: 1 } }, push: { particles_nb: 4 } }
+                },
+                retina_detect: true
+            });
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --secondary-gradient: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            --card-hover-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            --glassmorphism: backdrop-filter: blur(20px);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .header-banner {
-            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 3rem 2rem;
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        #particles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
             text-align: center;
         }
 
-        .header-banner h1 {
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            color: white;
+        }
+
+        .stat-number {
             font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .action-buttons {
-            flex-direction: column;
-            align-items: stretch;
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
         }
 
-        .prediction-circle {
-            width: 120px;
-            height: 120px;
+        .enhanced-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow: hidden;
         }
 
-        .prediction-text {
-            font-size: 1.2rem;
+        .enhanced-card:hover {
+            box-shadow: var(--card-hover-shadow);
+            transform: translateY(-5px);
+        }
+
+        .card-header-gradient {
+            background: var(--primary-gradient);
+            padding: 1.5rem 2rem;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .prediction-tabs-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .nav-pills .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .nav-pills .nav-link.active {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-pills .nav-link.active .tab-indicator {
+            width: 80%;
         }
 
         .form-section {
-            padding: 1rem;
+            position: relative;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
 
-        .upload-area {
-            padding: 2rem 1rem;
+        .form-section:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
         }
 
-        .upload-icon {
-            font-size: 2rem;
+        .section-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
         }
 
-        .column-tag {
-            font-size: 0.8rem;
-            padding: 0.25rem 0.6rem;
+        .section-title {
+            color: #495057;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            margin: 0;
         }
 
-        .table-responsive {
-            font-size: 0.9rem;
+        .section-status {
+            margin-left: auto;
         }
-    }
 
-    @media (max-width: 576px) {
-        .nav-pills .nav-link {
-            padding: 0.75rem 1rem;
-            font-size: 0.9rem;
+        .section-indicator {
+            color: #dee2e6;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-section.completed .section-indicator {
+            color: #28a745;
+        }
+
+        .form-floating {
+            position: relative;
         }
 
         .form-control, .form-select {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            background: white;
+        }
+
+        .form-floating > label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .input-group-enhanced {
+            display: flex;
+            align-items: stretch;
+        }
+
+        .currency-badge, .unit-badge {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+        }
+
+        .currency-badge {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .unit-badge {
+            border-radius: 0 12px 12px 0;
+        }
+
+        .form-progress {
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: conic-gradient(#667eea 0deg, rgba(255, 255, 255, 0.3) 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .progress-circle::before {
+            content: '';
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+        }
+
+        .progress-text {
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #667eea;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary-gradient:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary-gradient:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-gradient.loading .btn-loader {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .btn-primary-gradient.loading .btn-text {
+            opacity: 0;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .upload-section {
+            margin-bottom: 2rem;
+        }
+
+        .upload-area {
+            border: 3px dashed rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .upload-area:hover {
+            border-color: rgba(102, 126, 234, 0.6);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.15);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .upload-info {
+            margin-top: 1rem;
+        }
+
+        .file-preview {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(40, 167, 69, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .file-icon {
+            font-size: 2rem;
+            color: #28a745;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .file-size {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .required-columns {
+            margin: 2rem 0;
+        }
+
+        .custom-table {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .custom-table th {
+            background: var(--primary-gradient);
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 1rem;
+        }
+
+        .custom-table td {
+            padding: 0.75rem 1rem;
+            border-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-table code {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .instruction-timeline {
+            position: relative;
+        }
+
+        .instruction-step {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+
+        .instruction-step.active {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            opacity: 1;
+        }
+
+        .step-icon {
+            flex-shrink: 0;
+        }
+
+        .step-icon i {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .step-content h6 {
+            margin: 0 0 0.5rem 0;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .step-content p {
+            margin: 0;
+            color: #6c757d;
             font-size: 0.9rem;
         }
 
-        .btn-lg {
-            padding: 0.75rem 1.5rem;
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .feature-item i {
+            font-size: 1.1rem;
+        }
+
+        .feature-item span {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .prediction-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .prediction-circle.success {
+            background: var(--success-gradient);
+        }
+
+        .prediction-circle.danger {
+            background: var(--danger-gradient);
+        }
+
+        .prediction-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .prediction-prob {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .recommendation-box {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-radius: 10px;
+            border: none;
             font-size: 1rem;
         }
 
-        .table th, .table td {
-            padding: 0.5rem;
-            font-size: 0.85rem;
+        .alert-success {
+            background: linear-gradient(135deg, rgba(74, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            color: #0c7cd5;
+            border: 1px solid rgba(74, 172, 254, 0.3);
         }
-    }
 
-    /* Animation Classes */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(250, 112, 154, 0.1) 0%, rgba(254, 225, 64, 0.1) 100%);
+            color: #d63384;
+            border: 1px solid rgba(250, 112, 154, 0.3);
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+
+        .report-section {
+            border-left: 4px solid #e9ecef;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
         }
-    }
 
-    .enhanced-card {
-        animation: fadeInUp 0.6s ease-out;
-    }
+        .report-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
 
-    .form-section:nth-child(odd) {
-        animation-delay: 0.1s;
-    }
+        .report-title.danger {
+            color: #dc3545;
+            border-left-color: #dc3545;
+        }
 
-    .form-section:nth-child(even) {
-        animation-delay: 0.2s;
-    }
+        .report-title.warning {
+            color: #fd7e14;
+            border-left-color: #fd7e14;
+        }
 
-    /* Focus and Accessibility Improvements */
-    .form-control:focus,
-    .form-select:focus,
-    .btn:focus {
-        outline: 2px solid #667eea;
-        outline-offset: 2px;
-    }
+        .report-title.success {
+            color: #198754;
+            border-left-color: #198754;
+        }
 
-    .btn-primary-gradient:focus {
-        outline-color: #5a6fd8;
-    }
+        .report-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
 
-    /* Loading States */
-    .btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
+        .report-item {
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            transition: all 0.3s ease;
+        }
 
-    .form-control:disabled,
-    .form-select:disabled {
-        background-color: rgba(102, 126, 234, 0.05);
-        opacity: 0.7;
-    }
+        .report-item:hover {
+            transform: translateX(5px);
+        }
 
-    /* Table Styling */
-    .table-responsive {
-        border-radius: 10px;
-        background: white;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    }
+        .report-item.danger {
+            background: rgba(220, 53, 69, 0.1);
+            border-left: 3px solid #dc3545;
+            color: #721c24;
+        }
 
-    .table th, .table td {
-        vertical-align: middle;
-        text-align: center;
-    }
+        .report-item.warning {
+            background: rgba(253, 126, 20, 0.1);
+            border-left: 3px solid #fd7e14;
+            color: #653208;
+        }
 
-    .table th {
-        background: var(--primary-gradient);
-        color: white;
-        font-weight: 600;
-    }
+        .report-item.success {
+            background: rgba(25, 135, 84, 0.1);
+            border-left: 3px solid #198754;
+            color: #0f5132;
+        }
 
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: rgba(102, 126, 234, 0.05);
-    }
+        .alert-info-custom {
+            background: linear-gradient(135deg, rgba(74, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            color: #0c7cd5;
+            border: 1px solid rgba(74, 172, 254, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0;
+        }
 
-    .table-bordered {
-        border: 2px solid #e9ecef;
-    }
+        @media (max-width: 768px) {
+            .stats-row {
+                gap: 1.5rem;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .nav-pills .nav-link {
+                padding: 1rem 2rem;
+            }
+            
+            .enhanced-card {
+                margin-bottom: 1rem;
+            }
+            
+            .prediction-circle {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .prediction-text {
+                font-size: 1.2rem;
+            }
+        }
 
-    .table-bordered th, .table-bordered td {
-        border: 1px solid #e9ecef;
-    }
-</style>
+        @media (max-width: 576px) {
+            .header-banner {
+                padding: 2rem 1rem;
+            }
+            
+            .container-fluid {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .form-section {
+                padding: 1rem;
+            }
+            
+            .upload-area {
+                padding: 2rem 1rem;
+            }
+            
+            .upload-icon {
+                font-size: 2rem;
+            }
+            
+            .custom-table th, .custom-table td {
+                font-size: 0.85rem;
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</body>
+</html>
 {% endblock %}

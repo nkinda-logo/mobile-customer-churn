@@ -23,8 +23,6 @@ import base64
 from utils.data_processing import preprocess_data
 from utils.visualization import create_visualizations
 import config
-from flask import send_file
-
 
 app = Flask(__name__)
 app.config.from_object(config.Config)
@@ -407,17 +405,20 @@ def batch_predict():
     try:
         if 'file' not in request.files:
             flash('No file uploaded', 'danger')
-            return render_template('predict.html', form=form)
+            return render_template('predict.html', form=form, show_results=False)
+
         file = request.files['file']
         if file.filename == '':
             flash('No file selected', 'danger')
-            return render_template('predict.html', form=form)
+            return render_template('predict.html', form=form, show_results=False)
+
         if file and file.filename.endswith('.csv'):
             try:
                 df = pd.read_csv(file)
             except Exception as e:
                 flash(f'Error reading CSV file: {str(e)}', 'danger')
-                return render_template('predict.html', form=form)
+                return render_template('predict.html', form=form, show_results=False)
+
             required_columns = [
                 'TelecomCompany', 'Region', 'Age', 'Gender', 'ContractType',
                 'ContractDuration', 'TenureMonths', 'MonthlyCharges', 'DataUsageGB',
@@ -428,23 +429,26 @@ def batch_predict():
             missing_columns = [col for col in required_columns if col not in df.columns]
             if missing_columns:
                 flash(f'Missing required columns: {", ".join(missing_columns)}', 'danger')
-                return render_template('predict.html', form=form)
+                return render_template('predict.html', form=form, show_results=False)
+
             for col in required_columns:
                 if df[col].isnull().any():
                     if df[col].dtype in ['float64', 'int64']:
                         df[col] = df[col].fillna(df[col].median())
                     else:
                         df[col] = df[col].fillna(df[col].mode()[0])
+
             processed_data = preprocess_data(df)
             predictions = model.predict(processed_data)
             probabilities = model.predict_proba(processed_data)[:, 1]
             batch_id = str(uuid.uuid4())
             batch_results = []
+
             for idx, (pred, prob) in enumerate(zip(predictions, probabilities)):
                 new_prediction = Prediction(
                     user_id=current_user.id,
                     batch_id=batch_id,
-                    customer_id=str(idx + 1),  # Sequential ID starting from 1
+                    customer_id=str(idx + 1),
                     telecom_company=df.iloc[idx]['TelecomCompany'],
                     region=df.iloc[idx]['Region'],
                     age=df.iloc[idx]['Age'],
@@ -488,7 +492,7 @@ def batch_predict():
                     'billing_issues_reported': df.iloc[idx]['BillingIssuesReported'],
                     'prediction': 'Yes' if pred == 1 else 'No',
                     'probability': prob
-                    })
+                })
 
             db.session.commit()
             output_df = df.copy()
@@ -497,19 +501,30 @@ def batch_predict():
             with tempfile.NamedTemporaryFile(delete=False, suffix='.csv', mode='w') as temp_file:
                 output_df.to_csv(temp_file, index=False)
                 temp_file_path = temp_file.name
+
             if not hasattr(app, 'batch_files'):
                 app.batch_files = {}
             app.batch_files[batch_id] = temp_file_path
+
             flash('Batch prediction completed successfully', 'success')
-            return render_template('predict.html', form=form, batch_results=batch_results, batch_id=batch_id)
+            return render_template(
+                'predict.html',
+                form=form,
+                batch_results=batch_results,
+                batch_id=batch_id,
+                show_results=True  # 👈 Flag for UI to hide form initially
+            )
+
         else:
             flash('Invalid file format. Please upload a CSV file.', 'danger')
-            return render_template('predict.html', form=form)
+            return render_template('predict.html', form=form, show_results=False)
+
     except Exception as e:
         db.session.rollback()
         app.logger.error(f"Batch prediction error: {str(e)}")
         flash(f'Batch prediction failed: {str(e)}', 'danger')
-        return render_template('predict.html', form=form)
+        return render_template('predict.html', form=form, show_results=False)
+
 
 @app.route('/download_batch_results/<batch_id>')
 @login_required
