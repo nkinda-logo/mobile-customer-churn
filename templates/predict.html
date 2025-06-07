@@ -65,29 +65,21 @@
         <div class="row g-4">
             <!-- Enhanced Main Form Section -->
             <div class="col-lg-8" id="formSection" {% if result or batch_results is defined %}style="display: none;"{% endif %}>
-                <!-- Premium Tabs with Glassmorphism -->
-                <div class="prediction-tabs-container mb-4 animate__animated animate__fadeInUp">
-                    <ul class="nav nav-pills justify-content-center" id="predictionTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active px-5 py-3" id="single-tab" data-bs-toggle="tab" data-bs-target="#single-prediction" type="button" role="tab">
-                                <i class="bi bi-person-fill me-2"></i>
-                                <span>Single Prediction</span>
-                                <div class="tab-indicator"></div>
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link px-5 py-3" id="batch-tab" data-bs-toggle="tab" data-bs-target="#batch-prediction" type="button" role="tab">
-                                <i class="bi bi-file-earmark-spreadsheet me-2"></i>
-                                <span>Batch Prediction</span>
-                                <div class="tab-indicator"></div>
-                            </button>
-                        </li>
-                    </ul>
+                <!-- Prediction Mode Toggle -->
+                <div class="mode-toggle-container mb-4 animate__animated animate__fadeInUp">
+                    <div class="btn-group w-100" role="group">
+                        <button type="button" class="btn btn-primary-gradient active" id="singleModeBtn" onclick="showSinglePrediction()">
+                            <i class="bi bi-person-fill me-2"></i>Single Prediction
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="batchModeBtn" onclick="showBatchPrediction()">
+                            <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction
+                        </button>
+                    </div>
                 </div>
 
                 <div class="tab-content" id="predictionTabContent">
                     <!-- Enhanced Single Prediction Form -->
-                    <div class="tab-pane fade show active" id="single-prediction" role="tabpanel">
+                    <div class="tab-pane fade show active" id="single-prediction">
                         <div class="enhanced-card animate__animated animate__fadeInUp">
                             <div class="card-header-gradient">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -310,7 +302,7 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Enhancedúr Enhanced Action Buttons -->
+                                    <!-- Enhanced Action Buttons -->
                                     <div class="action-buttons">
                                         <button type="submit" name="predict" class="btn btn-primary-gradient btn-lg px-5">
                                             <i class="bi bi-cpu me-2"></i>
@@ -330,7 +322,7 @@
                     </div>
 
                     <!-- Enhanced Batch Prediction -->
-                    <div class="tab-pane fade" id="batch-prediction" role="tabpanel">
+                    <div class="tab-pane fade" id="batch-prediction">
                         <div class="enhanced-card animate__animated animate__fadeInUp">
                             <div class="card-header-gradient">
                                 <h5 class="mb-0 text-white">
@@ -364,449 +356,56 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inline Columns Functionality</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <style>
-        body {
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 2rem;
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .demo-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-        }
-
-        .required-columns {
-            margin: 2rem 0;
-        }
-
-        .columns-header {
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 1rem;
-            border-radius: 12px;
-            background: rgba(102, 126, 234, 0.05);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-        }
-
-        .columns-header:hover {
-            background: rgba(102, 126, 234, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-        }
-
-        .columns-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-
-        .columns-content.expanded {
-            max-height: 800px;
-            opacity: 1;
-            transform: translateY(0);
-            margin-top: 1rem;
-        }
-
-        .toggle-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .toggle-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-        }
-
-        .toggle-button:focus {
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-
-        .toggle-icon {
-            transition: transform 0.3s ease;
-        }
-
-        .toggle-button.expanded .toggle-icon {
-            transform: rotate(180deg);
-        }
-
-        .custom-table {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            animation: slideInUp 0.4s ease-out;
-        }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .custom-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-weight: 600;
-            border: none;
-            padding: 1rem;
-            position: relative;
-        }
-
-        .custom-table th::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-        }
-
-        .custom-table td {
-            padding: 0.75rem 1rem;
-            border-color: rgba(0, 0, 0, 0.05);
-            transition: background-color 0.2s ease;
-        }
-
-        .custom-table tbody tr:hover {
-            background-color: rgba(102, 126, 234, 0.05);
-        }
-
-        .custom-table code {
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
-            padding: 0.25rem 0.5rem;
-            border-radius: 6px;
-            font-weight: 600;
-            font-family: 'Courier New', monospace;
-        }
-
-        .section-title {
-            color: #495057;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            background: rgba(40, 167, 69, 0.1);
-            color: #28a745;
-            border: 1px solid rgba(40, 167, 69, 0.3);
-        }
-
-        .column-count {
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
-            padding: 0.25rem 0.75rem;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-left: 1rem;
-        }
-
-        /* Smooth scrolling for focus */
-        .columns-content:focus-within {
-            scroll-behavior: smooth;
-        }
-
-        /* Loading animation for table */
-        .table-loading {
-            position: relative;
-        }
-
-        .table-loading::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #667eea, transparent);
-            animation: loading 1.5s infinite;
-            border-radius: 2px;
-        }
-
-        @keyframes loading {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-    </style>
-</head>
-<body>
-    <div class="demo-container">
-        <h2 class="text-center mb-4">
-            <i class="bi bi-table me-2"></i>
-            Required CSV Columns Demo
-        </h2>
-        
-        <div class="required-columns">
-            <div class="columns-header" onclick="toggleColumns()" id="columnsHeader">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                        <h6 class="section-title">
-                            <i class="bi bi-list-check me-2"></i>
-                            Required CSV Columns
-                        </h6>
-                        <span class="column-count">18 columns</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="status-indicator">
-                            <i class="bi bi-check-circle-fill"></i>
-                            Ready
-                        </span>
-                        <button type="button" class="btn btn-sm toggle-button" id="toggleButton">
-                            <i class="bi bi-chevron-down me-1 toggle-icon" id="toggleIcon"></i>
-                            <span id="toggleText">View Requirements</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="columns-content" id="columnsContent">
-                <div class="table-responsive">
-                    <table class="table table-hover custom-table table-loading" id="requirementsTable">
-                        <thead>
-                            <tr>
-                                <th style="width: 25%;">Column Name</th>
-                                <th style="width: 15%;">Type</th>
-                                <th style="width: 60%;">Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><code>CustomerID</code></td>
-                                <td><span class="badge bg-primary">String</span></td>
-                                <td>Unique customer identifier</td>
-                            </tr>
-                            <tr>
-                                <td><code>TelecomCompany</code></td>
-                                <td><span class="badge bg-primary">String</span></td>
-                                <td>Service provider name (Vodacom, Airtel, Tigo, Halotel)</td>
-                            </tr>
-                            <tr>
-                                <td><code>Region</code></td>
-                                <td><span class="badge bg-primary">String</span></td>
-                                <td>Customer's geographical region</td>
-                            </tr>
-                            <tr>
-                                <td><code>Age</code></td>
-                                <td><span class="badge bg-success">Integer</span></td>
-                                <td>Customer age (18-100)</td>
-                            </tr>
-                            <tr>
-                                <td><code>Gender</code></td>
-                                <td><span class="badge bg-primary">String</span></td>
-                                <td>Customer gender (Male, Female, Other)</td>
-                            </tr>
-                            <tr>
-                                <td><code>ContractType</code></td>
-                                <td><span class="badge bg-primary">String</span></td>
-                                <td>Prepaid or Postpaid</td>
-                            </tr>
-                            <tr>
-                                <td><code>ContractDuration</code></td>
-                                <td><span class="badge bg-primary">String</span></td>
-                                <td>Duration of contract (Month-to-month, One year, Two year)</td>
-                            </tr>
-                            <tr>
-                                <td><code>TenureMonths</code></td>
-                                <td><span class="badge bg-success">Integer</span></td>
-                                <td>Number of months with company</td>
-                            </tr>
-                            <tr>
-                                <td><code>MonthlyCharges</code></td>
-                                <td><span class="badge bg-warning">Float</span></td>
-                                <td>Monthly billing amount in TZS</td>
-                            </tr>
-                            <tr>
-                                <td><code>DataUsageGB</code></td>
-                                <td><span class="badge bg-warning">Float</span></td>
-                                <td>Data consumption in GB</td>
-                            </tr>
-                            <tr>
-                                <td><code>CallDurationMinutes</code></td>
-                                <td><span class="badge bg-success">Integer</span></td>
-                                <td>Total call duration in minutes</td>
-                            </tr>
-                            <tr>
-                                <td><code>ComplaintsFiled</code></td>
-                                <td><span class="badge bg-success">Integer</span></td>
-                                <td>Number of complaints filed</td>
-                            </tr>
-                            <tr>
-                                <td><code>CustomerSupportCalls</code></td>
-                                <td><span class="badge bg-success">Integer</span></td>
-                                <td>Number of customer support calls</td>
-                            </tr>
-                            <tr>
-                                <td><code>PaymentMethod</code></td>
-                                <td><span class="badge bg-primary">String</span></td>
-                                <td>Payment method used</td>
-                            </tr>
-                            <tr>
-                                <td><code>InternetService</code></td>
-                                <td><span class="badge bg-primary">String</span></td>
-                                <td>Type of internet service (DSL, Fiber optic, No)</td>
-                            </tr>
-                            <tr>
-                                <td><code>AdditionalServices</code></td>
-                                <td><span class="badge bg-primary">String</span></td>
-                                <td>Additional services (Yes, No)</td>
-                            </tr>
-                            <tr>
-                                <td><code>DiscountOfferUsed</code></td>
-                                <td><span class="badge bg-primary">String</span></td>
-                                <td>Whether discount offer was used (Yes, No)</td>
-                            </tr>
-                            <tr>
-                                <td><code>BillingIssuesReported</code></td>
-                                <td><span class="badge bg-success">Integer</span></td>
-                                <td>Number of billing issues reported</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-4 p-3 bg-light rounded">
-            <h6><i class="bi bi-info-circle me-2"></i>Usage Instructions:</h6>
-            <ul class="mb-0">
-                <li>Click anywhere on the header section to toggle the table</li>
-                <li>The button text and icon will change based on the state</li>
-                <li>Smooth animations provide a premium user experience</li>
-                <li>The table includes color-coded data types for better readability</li>
-            </ul>
-        </div>
-    </div>
-
-    <script>
-        let isExpanded = false;
-
-        function toggleColumns() {
-            const content = document.getElementById('columnsContent');
-            const button = document.getElementById('toggleButton');
-            const icon = document.getElementById('toggleIcon');
-            const text = document.getElementById('toggleText');
-            const table = document.getElementById('requirementsTable');
-            
-            isExpanded = !isExpanded;
-            
-            if (isExpanded) {
-                // Expand
-                content.classList.add('expanded');
-                button.classList.add('expanded');
-                icon.className = 'bi bi-chevron-up me-1 toggle-icon';
-                text.textContent = 'Hide Requirements';
-                
-                // Add loading effect
-                table.classList.add('table-loading');
-                setTimeout(() => {
-                    table.classList.remove('table-loading');
-                }, 1000);
-                
-                // Smooth scroll to table after expansion
-                setTimeout(() => {
-                    content.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'nearest' 
-                    });
-                }, 200);
-                
-            } else {
-                // Collapse
-                content.classList.remove('expanded');
-                button.classList.remove('expanded');
-                icon.className = 'bi bi-chevron-down me-1 toggle-icon';
-                text.textContent = 'View Requirements';
-            }
-            
-            // Add subtle haptic feedback (if supported)
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
-        }
-
-        // Keyboard accessibility
-        document.getElementById('columnsHeader').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleColumns();
-            }
-        });
-
-        // Add tabindex for keyboard navigation
-        document.getElementById('columnsHeader').setAttribute('tabindex', '0');
-
-        // Optional: Auto-collapse after a certain time (uncomment if needed)
-        /*
-        let autoCollapseTimer;
-        function resetAutoCollapseTimer() {
-            clearTimeout(autoCollapseTimer);
-            if (isExpanded) {
-                autoCollapseTimer = setTimeout(() => {
-                    if (isExpanded) {
-                        toggleColumns();
-                    }
-                }, 30000); // Auto-collapse after 30 seconds
-            }
-        }
-        
-        document.addEventListener('click', resetAutoCollapseTimer);
-        document.addEventListener('scroll', resetAutoCollapseTimer);
-        */
-    </script>
-</body>
-</html>
-
                                     <div class="action-buttons">
-                                        <button type="submit" class="btn btn-primary-gradient btn-lg px-5" id="batchSubmitBtn" disabled>
+                                     <button type="submit" class="btn btn-primary-gradient btn-lg px-5" id="batchSubmitBtn" disabled>
                                             <i class="bi bi-rocket-takeoff me-2"></i>
                                             <span>Process Batch Prediction</span>
                                         </button>
+                                       </div>
+                                    <div class="required-columns">
+                                        <h6 class="d-flex justify-content-between align-items-center mb-3">
+                                            <span><i class="bi bi-list-check me-2"></i>Required CSV Columns</span>
+                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#columnsTable">
+                                                <i class="bi bi-eye me-1"></i>View Requirements
+                                            </button>
+                                        </h6>
+                                        <div class="collapse" id="columnsTable">
+                                            <div class="table-responsive">
+                                                <table class="table table-hover custom-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Column Name</th>
+                                                            <th>Type</th>
+                                                            <th>Description</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr><td><code>CustomerID</code></td><td>String</td><td>Unique customer identifier</td></tr>
+                                                        <tr><td><code>TelecomCompany</code></td><td>String</td><td>Service provider name</td></tr>
+                                                        <tr><td><code>Region</code></td><td>String</td><td>Customer's geographical region</td></tr>
+                                                        <tr><td><code>Age</code></td><td>Integer</td><td>Customer age (18-100)</td></tr>
+                                                        <tr><td><code>Gender</code></td><td>String</td><td>Customer gender</td></tr>
+                                                        <tr><td><code>ContractType</code></td><td>String</td><td>Prepaid or Postpaid</td></tr>
+                                                        <tr><td><code>ContractDuration</code></td><td>String</td><td>Duration of contract</td></tr>
+                                                        <tr><td><code>TenureMonths</code></td><td>Integer</td><td>Months with company</td></tr>
+                                                        <tr><td><code>MonthlyCharges</code></td><td>Float</td><td>Monthly billing amount</td></tr>
+                                                        <tr><td><code>DataUsageGB</code></td><td>Float</td><td>Data consumption in GB</td></tr>
+                                                        <tr><td><code>CallDurationMinutes</code></td><td>Integer</td><td>Total call duration</td></tr>
+                                                        <tr><td><code>ComplaintsFiled</code></td><td>Integer</td><td>Number of complaints</td></tr>
+                                                        <tr><td><code>CustomerSupportCalls</code></td><td>Integer</td><td>Number of support calls</td></tr>
+                                                        <tr><td><code>PaymentMethod</code></td><td>String</td><td>Payment method</td></tr>
+                                                        <tr><td><code>InternetService</code></td><td>String</td><td>Type of internet service</td></tr>
+                                                        <tr><td><code>AdditionalServices</code></td><td>String</td><td>Additional services</td></tr>
+                                                        <tr><td><code>DiscountOfferUsed</code></td><td>String</td><td>Discount usage</td></tr>
+                                                        <tr><td><code>BillingIssuesReported</code></td><td>Integer</td><td>Billing issues reported</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="action-buttons">
+                    
                                         <a href="{{ url_for('download_sample_csv') }}" class="btn btn-outline-secondary btn-lg px-4">
                                             <i class="bi bi-download me-2"></i>Download Sample
                                         </a>
@@ -946,65 +545,64 @@
                     </div>
                     
                     <!-- Enhanced Churn Report -->
-                   <!-- Enhanced Churn Report -->
-{% if report %}
-    <div class="enhanced-card animate__animated animate__fadeInRight">
-        <div class="card-header bg-info-gradient">
-            <h5 class="mb-0 text-white">
-                <i class="bi bi-graph-up-arrow me-2"></i>Churn Analysis Report
-            </h5>
-        </div>
-        <div class="card-body p-4">
-            <!-- Risk Factors -->
-            {% if report.risk_factors %}
-                <div class="report-section mb-4">
-                    <h6 class="report-title danger">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Risk Factors
-                    </h6>
-                    <div class="report-items">
-                        {% for factor in report.risk_factors %}
-                            <div class="report-item danger">
-                                <i class="bi bi-arrow-right me-2"></i>{{ factor }}
+                    {% if report %}
+                        <div class="enhanced-card animate__animated animate__fadeInRight">
+                            <div class="card-header bg-info-gradient">
+                                <h5 class="mb-0 text-white">
+                                    <i class="bi bi-graph-up-arrow me-2"></i>Churn Analysis Report
+                                </h5>
                             </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-            
-            <!-- Retention Opportunities -->
-            {% if report.retention_opportunities %}
-                <div class="report-section mb-4">
-                    <h6 class="report-title warning">
-                        <i class="bi bi-lightbulb-fill me-2"></i>Retention Opportunities
-                    </h6>
-                    <div class="report-items">
-                        {% for opp in report.retention_opportunities %}
-                            <div class="report-item warning">
-                                <i class="bi bi-arrow-right me-2"></i>{{ opp }}
+                            <div class="card-body p-4">
+                                <!-- Risk Factors -->
+                                {% if report.risk_factors %}
+                                    <div class="report-section mb-4">
+                                        <h6 class="report-title danger">
+                                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Risk Factors
+                                        </h6>
+                                        <div class="report-items">
+                                            {% for factor in report.risk_factors %}
+                                                <div class="report-item danger">
+                                                    <i class="bi bi-arrow-right me-2"></i>{{ factor }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Retention Opportunities -->
+                                {% if report.retention_opportunities %}
+                                    <div class="report-section mb-4">
+                                        <h6 class="report-title warning">
+                                            <i class="bi bi-lightbulb-fill me-2"></i>Retention Opportunities
+                                        </h6>
+                                        <div class="report-items">
+                                            {% for opp in report.retention_opportunities %}
+                                                <div class="report-item warning">
+                                                    <i class="bi bi-arrow-right me-2"></i>{{ opp }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Actionable Insights -->
+                                {% if report.actionable_insights %}
+                                    <div class="report-section">
+                                        <h6 class="report-title success">
+                                            <i class="bi bi-check-circle-fill me-2"></i>Actionable Insights
+                                        </h6>
+                                        <div class="report-items">
+                                            {% for insight in report.actionable_insights %}
+                                                <div class="report-item success">
+                                                    <i class="bi bi-arrow-right me-2"></i>{{ insight }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-            
-            <!-- Actionable Insights -->
-            {% if report.actionable_insights %}
-                <div class="report-section">
-                    <h6 class="report-title success">
-                        <i class="bi bi-check-circle-fill me-2"></i>Actionable Insights
-                    </h6>
-                    <div class="report-items">
-                        {% for insight in report.actionable_insights %}
-                            <div class="report-item success">
-                                <i class="bi bi-arrow-right me-2"></i>{{ insight }}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-    </div>
-{% endif %}
+                        </div>
+                    {% endif %}
                 {% else %}
                     <div class="enhanced-card animate__animated animate__fadeInRight" id="instructionsCard">
                         <div class="card-header-gradient">
@@ -1053,7 +651,7 @@
                                         <span>94.2% Prediction Accuracy</span>
                                     </div>
                                     <div class="feature-item">
-                                        <i class="bi bi-lightning-charge text-warning"></i>
+                                        <i class="bi-lightning-charge text-warning"></i>
                                         <span>Real-time Processing</span>
                                     </div>
                                     <div class="feature-item">
@@ -1078,6 +676,22 @@
         function toggleForm() {
             const formSection = document.getElementById('formSection');
             formSection.style.display = formSection.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Show Single Prediction
+        function showSinglePrediction() {
+            document.getElementById('single-prediction').classList.add('show', 'active');
+            document.getElementById('batch-prediction').classList.remove('show', 'active');
+            document.getElementById('singleModeBtn').classList.add('active');
+            document.getElementById('batchModeBtn').classList.remove('active');
+        }
+
+        // Show Batch Prediction
+        function showBatchPrediction() {
+            document.getElementById('batch-prediction').classList.add('show', 'active');
+            document.getElementById('single-prediction').classList.remove('show', 'active');
+            document.getElementById('batchModeBtn').classList.add('active');
+            document.getElementById('singleModeBtn').classList.remove('active');
         }
 
         // Form progress tracking
@@ -1327,42 +941,25 @@
             100% { left: 100%; }
         }
 
-        .prediction-tabs-container {
+        .mode-toggle-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 20px;
-            padding: 1.5rem;
+            padding: 1rem;
             box-shadow: var(--card-shadow);
         }
 
-        .nav-pills .nav-link:hover {
-            background: rgba(102, 126, 234, 0.1);
-            border-color: rgba(102, 126, 234, 0.5);
-            transform: translateY(-2px);
+        .btn-group .btn {
+            border-radius: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
-        .nav-pills .nav-link.active {
+        .btn-group .btn.active {
             background: var(--primary-gradient);
-            border-color: transparent;
             color: white;
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .tab-indicator {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 3px;
-            background: white;
-            border-radius: 2px;
-            transition: width 0.3s ease;
-        }
-
-        .nav-pills .nav-link.active .tab-indicator {
-            width: 80%;
         }
 
         .form-section {
@@ -1382,7 +979,7 @@
 
         .section-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
@@ -1847,67 +1444,123 @@
             margin: 0;
         }
 
-        @media (max-width: 768px) {
-            .stats-row {
-                gap: 1.5rem;
+        /* Enhanced Mobile and Desktop Responsiveness */
+        @media (max-width: 992px) {
+            .col-lg-8, .col-lg-4 {
+                flex: 0 0 100%;
+                max-width: 100%;
             }
-            
-            .stat-number {
-                font-size: 1.5rem;
-            }
-            
+
             .action-buttons {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
-            .nav-pills .nav-link {
-                padding: 1rem 2rem;
+
+            .mode-toggle-container {
+                padding: 0.5rem;
             }
-            
-            .enhanced-card {
-                margin-bottom: 1rem;
+
+            .btn-group .btn {
+                padding: 0.75rem;
+                font-size: 0.9rem;
             }
-            
+
+            .header-banner {
+                padding: 2rem 1rem;
+            }
+
+            .stats-row {
+                gap: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+
+            .form-section {
+                padding: 1rem;
+            }
+
+            .card-body {
+                padding: 1.5rem;
+            }
+
+            .upload-area {
+                padding: 2rem 1rem;
+            }
+
+            .upload-icon {
+                font-size: 2rem;
+            }
+
             .prediction-circle {
                 width: 120px;
                 height: 120px;
             }
-            
+
             .prediction-text {
                 font-size: 1.2rem;
+            }
+
+            .custom-table th, .custom-table td {
+                font-size: 0.85rem;
+                padding: 0.5rem;
+            }
+
+            .form-floating > label {
+                font-size: 0.9rem;
+            }
+
+            .form-control, .form-select {
+                font-size: 0.9rem;
             }
         }
 
         @media (max-width: 576px) {
             .header-banner {
-                padding: 2rem 1rem;
+                padding: 1.5rem 0.5rem;
             }
-            
-            .container-fluid {
-                padding-left: 1rem;
-                padding-right: 1rem;
+
+            .header-content h1 {
+                font-size: 1.8rem;
             }
-            
-            .card-body {
-                padding: 1.5rem;
+
+            .header-content p {
+                font-size: 0.9rem;
             }
-            
+
+            .btn-primary-gradient, .btn-outline-primary, .btn-outline-secondary {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+
             .form-section {
-                padding: 1rem;
+                margin-bottom: 1rem;
             }
-            
-            .upload-area {
-                padding: 2rem 1rem;
+
+            .section-title {
+                font-size: 1rem;
             }
-            
-            .upload-icon {
-                font-size: 2rem;
+
+            .progress-circle {
+                width: 50px;
+                height: 50px;
             }
-            
-            .custom-table th, .custom-table td {
-                font-size: 0.85rem;
-                padding: 0.5rem;
+
+            .progress-circle::before {
+                width: 35px;
+                height: 35px;
+            }
+
+            .progress-text {
+                font-size: 0.8rem;
             }
         }
     </style>
