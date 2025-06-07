@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -10,9 +11,12 @@ import os
 import pandas as pd
 import numpy as np
 import joblib
+import xgboost as xgb
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import io
+import uuid
+import tempfile
 import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
@@ -28,6 +32,7 @@ db_dir = os.path.join(os.path.dirname(__file__), 'database')
 os.makedirs(db_dir, exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///' + os.path.join(db_dir, 'app.db'))
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
@@ -43,7 +48,8 @@ class User(UserMixin, db.Model):
 class Prediction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    customer_id = db.Column(db.Integer)
+    batch_id = db.Column(db.String(36), nullable=True)
+    customer_id = db.Column(db.String(50), nullable=True)
     telecom_company = db.Column(db.String(50))
     region = db.Column(db.String(50))
     age = db.Column(db.Integer)
@@ -66,7 +72,6 @@ class Prediction(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     report_generated = db.Column(db.Boolean, default=False)
 
-
 # Forms
 class RegistrationForm(FlaskForm):
     username = StringField('Username', [validators.Length(min=4, max=25)])
@@ -83,14 +88,13 @@ class LoginForm(FlaskForm):
 
 class PredictionForm(FlaskForm):
     telecom_company = SelectField('Telecom Company', choices=[
-        ('Airtel', 'Airtel'), 
-        ('Tigo', 'Tigo'), 
+        ('Airtel', 'Airtel'),
+        ('Tigo', 'Tigo'),
         ('Vodacom', 'Vodacom'),
         ('Halotel', 'Halotel'),
         ('TTCL', 'TTCL'),
         ('Zantel', 'Zantel'),
     ], validators=[validators.DataRequired()])
-    
     region = SelectField('Region', choices=[
         ('Arusha', 'Arusha'),
         ('Dar es Salaam', 'Dar es Salaam'),
@@ -123,16 +127,13 @@ class PredictionForm(FlaskForm):
         ('Unguja North', 'Unguja North'),
         ('Unguja South', 'Unguja South')
     ], validators=[validators.DataRequired()])
-    
     age = IntegerField('Age', [validators.NumberRange(min=18, max=110)])
     gender = SelectField('Gender', choices=[('Male', 'Male'), ('Female', 'Female')], validators=[validators.DataRequired()])
-    
     contract_type = SelectField('Contract Type', choices=[
-        ('Prepaid', 'Prepaid'), 
+        ('Prepaid', 'Prepaid'),
         ('Postpaid', 'Postpaid'),
         ('Hybrid', 'Hybrid')
     ], validators=[validators.DataRequired()])
-    
     contract_duration = SelectField('Contract Duration', choices=[
         ('1 Month', '1 Month'),
         ('3 Months', '3 Months'),
@@ -140,14 +141,12 @@ class PredictionForm(FlaskForm):
         ('12 Months', '12 Months'),
         ('24 Months', '24 Months')
     ], validators=[validators.DataRequired()])
-    
     tenure_months = IntegerField('Tenure (Months)', [validators.NumberRange(min=1, max=120)])
     monthly_charges = FloatField('Monthly Charges', [validators.NumberRange(min=0)])
     data_usage_gb = FloatField('Data Usage (GB)', [validators.NumberRange(min=0)])
     call_duration_minutes = IntegerField('Call Duration (Minutes)', [validators.NumberRange(min=0)])
     complaints_filed = IntegerField('Complaints Filed', [validators.NumberRange(min=0)])
     customer_support_calls = IntegerField('Customer Support Calls', [validators.NumberRange(min=0)])
-    
     payment_method = SelectField('Payment Method', choices=[
         ('Credit Card', 'Credit Card'),
         ('Bank Transfer', 'Bank Transfer'),
@@ -156,7 +155,6 @@ class PredictionForm(FlaskForm):
         ('Voucher', 'Voucher'),
         ('Other', 'Other')
     ], validators=[validators.DataRequired()])
-    
     internet_service = SelectField('Internet Service', choices=[
         ('Mobile Data', 'Mobile Data'),
         ('Fiber', 'Fiber'),
@@ -164,7 +162,6 @@ class PredictionForm(FlaskForm):
         ('WiMAX', 'WiMAX'),
         ('None', 'None'),
     ], validators=[validators.DataRequired()])
-    
     additional_services = SelectField('Additional Services', choices=[
         ('Streaming', 'Streaming'),
         ('VPN', 'VPN'),
@@ -172,12 +169,10 @@ class PredictionForm(FlaskForm):
         ('Gaming', 'Gaming'),
         ('None', 'None'),
     ], validators=[validators.DataRequired()])
-    
     discount_offer_used = SelectField('Discount Offer Used', choices=[
         ('Yes', 'Yes'),
         ('No', 'No')
     ], validators=[validators.DataRequired()])
-    
     billing_issues_reported = IntegerField('Billing Issues Reported', [validators.NumberRange(min=0)])
 
 @login_manager.user_loader
@@ -186,15 +181,27 @@ def load_user(user_id):
 
 def load_model():
     """Load the ML model with robust error handling and fallback"""
+    model_path = 'models/churn_model.pkl'
+    backup_path = 'models/backup_churn_model.pkl'
     try:
-        model = joblib.load('models/churn_model.pkl')
+        model = joblib.load(model_path)
         app.logger.info("Loaded primary churn prediction model")
+        if isinstance(model, xgb.Booster):
+            app.logger.warning("Detected XGBoost Booster model. Re-saving to ensure compatibility.")
+            model.save_model('models/churn_model.json')
+            model = xgb.Booster(model_file='models/churn_model.json')
+            joblib.dump(model, model_path)
         return model
     except Exception as e:
         app.logger.error(f"Failed to load primary model: {str(e)}")
         try:
-            model = joblib.load('models/backup_churn_model.pkl')
+            model = joblib.load(backup_path)
             app.logger.warning("Using backup churn prediction model")
+            if isinstance(model, xgb.Booster):
+                app.logger.warning("Detected XGBoost Booster model in backup. Re-saving.")
+                model.save_model('models/backup_churn_model.json')
+                model = xgb.Booster(model_file='models/backup_churn_model.json')
+                joblib.dump(model, backup_path)
             return model
         except Exception as e:
             app.logger.critical(f"Failed to load backup model: {str(e)}")
@@ -233,17 +240,14 @@ def register():
             if User.query.filter_by(username=form.username.data).first():
                 flash('Username already exists', 'danger')
                 return redirect(url_for('register'))
-
             if User.query.filter_by(email=form.email.data).first():
                 flash('Email already exists', 'danger')
                 return redirect(url_for('register'))
-
             hashed_password = generate_password_hash(
                 form.password.data,
                 method='pbkdf2:sha256',
                 salt_length=16
             )
-
             new_user = User(
                 username=form.username.data,
                 email=form.email.data,
@@ -251,10 +255,8 @@ def register():
             )
             db.session.add(new_user)
             db.session.commit()
-
             flash('Registration successful! Please log in.', 'success')
             return redirect(url_for('login'))
-
         except Exception as e:
             db.session.rollback()
             app.logger.error(f"Registration error: {e}")
@@ -266,15 +268,12 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        
         if not user:
             flash('Username not found', 'danger')
             return redirect(url_for('login'))
-            
         if not check_password_hash(user.password_hash, form.password.data):
             flash('Incorrect password', 'danger')
             return redirect(url_for('login'))
-
         login_user(user)
         next_page = request.args.get('next')
         return redirect(next_page) if next_page else redirect(url_for('index'))
@@ -293,36 +292,26 @@ def generate_churn_report(prediction):
         'retention_opportunities': [],
         'actionable_insights': []
     }
-    
     if prediction.probability > 0.7:
         report['risk_factors'].append("High churn probability (>70%)")
     elif prediction.probability > 0.5:
         report['risk_factors'].append("Moderate churn probability (>50%)")
-    
     if prediction.complaints_filed > 3:
         report['risk_factors'].append(f"High number of complaints ({prediction.complaints_filed})")
-    
     if prediction.customer_support_calls > 5:
         report['risk_factors'].append(f"Frequent support calls ({prediction.customer_support_calls})")
-    
     if prediction.tenure_months < 6:
         report['risk_factors'].append("Short customer tenure (less than 6 months)")
-    
     if prediction.contract_type == 'Prepaid':
         report['retention_opportunities'].append("Offer postpaid conversion with benefits")
-    
     if prediction.additional_services == 'None':
         report['retention_opportunities'].append("Recommend value-added services")
-    
     if prediction.discount_offer_used == 'No':
         report['retention_opportunities'].append("Target with personalized discount offers")
-    
     if prediction.billing_issues_reported > 0:
         report['actionable_insights'].append("Resolve billing issues immediately")
-    
     if prediction.data_usage_gb < 1 and prediction.internet_service != 'None':
         report['actionable_insights'].append("Offer data usage guidance or packages")
-    
     return report
 
 @app.route('/predict', methods=['GET', 'POST'])
@@ -332,7 +321,6 @@ def predict():
     result = None
     prediction_id = None
     report = None
-    
     if form.validate_on_submit():
         try:
             input_data = {
@@ -354,15 +342,13 @@ def predict():
                 'DiscountOfferUsed': form.discount_offer_used.data,
                 'BillingIssuesReported': form.billing_issues_reported.data
             }
-            
             input_df = pd.DataFrame([input_data])
             processed_data = preprocess_data(input_df)
-            
             prediction = model.predict(processed_data)[0]
             probability = model.predict_proba(processed_data)[0][1]
-            
             new_prediction = Prediction(
                 user_id=current_user.id,
+                customer_id=None,
                 telecom_company=form.telecom_company.data,
                 region=form.region.data,
                 age=form.age.data,
@@ -384,21 +370,15 @@ def predict():
                 probability=probability,
                 report_generated=True
             )
-            
             db.session.add(new_prediction)
             db.session.commit()
-            
             report = generate_churn_report(new_prediction)
-            
             result = {
                 'prediction': 'Yes' if prediction == 1 else 'No',
-                'probability': f"{probability * 100:.2f}%",
-                'recommendation': 'High risk of churn. Consider retention strategies.' if prediction == 1 else 'Low risk of churn.',
-                'report': report
+                'probability': probability,
+                'recommendation': 'High risk of churn. Consider retention strategies.' if prediction == 1 else 'Low risk of churn.'
             }
-            
             prediction_id = new_prediction.id
-            
             if 'add_another' in request.form:
                 new_form = PredictionForm(
                     telecom_company=form.telecom_company.data,
@@ -412,36 +392,30 @@ def predict():
                     discount_offer_used=form.discount_offer_used.data
                 )
                 return render_template('predict.html', form=new_form, result=result, prediction_id=prediction_id, report=report)
-            
         except Exception as e:
             db.session.rollback()
             app.logger.error(f"Prediction error: {str(e)}")
             flash(f'Prediction failed: {str(e)}', 'danger')
-    
     return render_template('predict.html', form=form, result=result, prediction_id=prediction_id, report=report)
 
 @app.route('/batch_predict', methods=['POST'])
 @login_required
 def batch_predict():
+    form = PredictionForm()
     try:
-        # Check if a file was uploaded
         if 'file' not in request.files:
             flash('No file uploaded', 'danger')
-            return redirect(url_for('predict'))
-
+            return render_template('predict.html', form=form)
         file = request.files['file']
         if file.filename == '':
             flash('No file selected', 'danger')
-            return redirect(url_for('predict'))
-
+            return render_template('predict.html', form=form)
         if file and file.filename.endswith('.csv'):
-            # Read and validate CSV file
             try:
                 df = pd.read_csv(file)
             except Exception as e:
                 flash(f'Error reading CSV file: {str(e)}', 'danger')
-                return redirect(url_for('predict'))
-
+                return render_template('predict.html', form=form)
             required_columns = [
                 'TelecomCompany', 'Region', 'Age', 'Gender', 'ContractType',
                 'ContractDuration', 'TenureMonths', 'MonthlyCharges', 'DataUsageGB',
@@ -449,25 +423,26 @@ def batch_predict():
                 'PaymentMethod', 'InternetService', 'AdditionalServices',
                 'DiscountOfferUsed', 'BillingIssuesReported'
             ]
-
-            # Validate columns
             missing_columns = [col for col in required_columns if col not in df.columns]
             if missing_columns:
                 flash(f'Missing required columns: {", ".join(missing_columns)}', 'danger')
-                return redirect(url_for('predict'))
-
-            # Preprocess data
+                return render_template('predict.html', form=form)
+            for col in required_columns:
+                if df[col].isnull().any():
+                    if df[col].dtype in ['float64', 'int64']:
+                        df[col] = df[col].fillna(df[col].median())
+                    else:
+                        df[col] = df[col].fillna(df[col].mode()[0])
             processed_data = preprocess_data(df)
-
-            # Make batch predictions
             predictions = model.predict(processed_data)
             probabilities = model.predict_proba(processed_data)[:, 1]
-
-            # Save predictions to database
-            prediction_ids = []
+            batch_id = str(uuid.uuid4())
+            batch_results = []
             for idx, (pred, prob) in enumerate(zip(predictions, probabilities)):
                 new_prediction = Prediction(
                     user_id=current_user.id,
+                    batch_id=batch_id,
+                    customer_id=str(idx + 1),  # Sequential ID starting from 1
                     telecom_company=df.iloc[idx]['TelecomCompany'],
                     region=df.iloc[idx]['Region'],
                     age=df.iloc[idx]['Age'],
@@ -490,37 +465,74 @@ def batch_predict():
                     report_generated=True
                 )
                 db.session.add(new_prediction)
-                prediction_ids.append(new_prediction.id)
+                batch_results.append({
+                    'customer_id': str(idx + 1),
+                    'telecom_company': df.iloc[idx]['TelecomCompany'],
+                    'region': df.iloc[idx]['Region'],
+                    'age': df.iloc[idx]['Age'],
+                    'gender': df.iloc[idx]['Gender'],
+                    'contract_type': df.iloc[idx]['ContractType'],
+                    'contract_duration': df.iloc[idx]['ContractDuration'],
+                    'tenure_months': df.iloc[idx]['TenureMonths'],
+                    'monthly_charges': df.iloc[idx]['MonthlyCharges'],
+                    'data_usage_gb': df.iloc[idx]['DataUsageGB'],
+                    'call_duration_minutes': df.iloc[idx]['CallDurationMinutes'],
+                    'complaints_filed': df.iloc[idx]['ComplaintsFiled'],
+                    'customer_support_calls': df.iloc[idx]['CustomerSupportCalls'],
+                    'payment_method': df.iloc[idx]['PaymentMethod'],
+                    'internet_service': df.iloc[idx]['InternetService'],
+                    'additional_services': df.iloc[idx]['AdditionalServices'],
+                    'discount_offer_used': df.iloc[idx]['DiscountOfferUsed'],
+                    'billing_issues_reported': df.iloc[idx]['BillingIssuesReported'],
+                    'prediction': 'Yes' if pred == 1 else 'No',
+                    'probability': prob
+                    })
 
             db.session.commit()
-
-            # Create output DataFrame with predictions
             output_df = df.copy()
             output_df['Prediction'] = ['Yes' if pred == 1 else 'No' for pred in predictions]
             output_df['Probability'] = probabilities
-            output_df['PredictionID'] = prediction_ids
-
-            # Generate CSV output
-            output = BytesIO()
-            output_df.to_csv(output, index=False)
-            output.seek(0)
-
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.csv', mode='w') as temp_file:
+                output_df.to_csv(temp_file, index=False)
+                temp_file_path = temp_file.name
+            if not hasattr(app, 'batch_files'):
+                app.batch_files = {}
+            app.batch_files[batch_id] = temp_file_path
             flash('Batch prediction completed successfully', 'success')
-            return send_file(
-                output,
-                mimetype='text/csv',
-                as_attachment=True,
-                download_name='batch_predictions.csv'
-            )
-
+            return render_template('predict.html', form=form, batch_results=batch_results, batch_id=batch_id)
         else:
             flash('Invalid file format. Please upload a CSV file.', 'danger')
-            return redirect(url_for('predict'))
-
+            return render_template('predict.html', form=form)
     except Exception as e:
         db.session.rollback()
         app.logger.error(f"Batch prediction error: {str(e)}")
         flash(f'Batch prediction failed: {str(e)}', 'danger')
+        return render_template('predict.html', form=form)
+
+@app.route('/download_batch_results/<batch_id>')
+@login_required
+def download_batch_results(batch_id):
+    try:
+        if not hasattr(app, 'batch_files') or batch_id not in app.batch_files:
+            flash('Batch results not found', 'danger')
+            return redirect(url_for('predict'))
+        temp_file_path = app.batch_files[batch_id]
+        if not os.path.exists(temp_file_path):
+            flash('Batch results file not found', 'danger')
+            del app.batch_files[batch_id]
+            return redirect(url_for('predict'))
+        response = send_file(
+            temp_file_path,
+            mimetype='text/csv',
+            as_attachment=True,
+            download_name=f'batch_predictions_{batch_id}.csv'
+        )
+        os.remove(temp_file_path)
+        del app.batch_files[batch_id]
+        return response
+    except Exception as e:
+        app.logger.error(f"Download batch results error: {str(e)}")
+        flash(f'Failed to download results: {str(e)}', 'danger')
         return redirect(url_for('predict'))
 
 @app.route('/predictions')
@@ -534,22 +546,20 @@ def predictions():
 def analysis():
     viz_data = create_visualizations()
     return render_template('analysis.html', viz_data=viz_data)
-  
 
 @app.route('/export_predictions/<format>')
 @login_required
 def export_predictions(format):
     try:
         predictions = Prediction.query.filter_by(user_id=current_user.id).all()
-        
         if not predictions:
             flash('No predictions found to export', 'warning')
             return redirect(url_for('predictions'))
-        
         data = []
         for pred in predictions:
             data.append({
                 'Timestamp': pred.timestamp,
+                'CustomerID': pred.customer_id,
                 'Telecom Company': pred.telecom_company,
                 'Region': pred.region,
                 'Age': pred.age,
@@ -570,9 +580,7 @@ def export_predictions(format):
                 'Prediction': pred.prediction,
                 'Probability': pred.probability
             })
-        
         df = pd.DataFrame(data)
-        
         if format == 'csv':
             output = BytesIO()
             df.to_csv(output, index=False)
@@ -597,7 +605,6 @@ def export_predictions(format):
         else:
             flash('Invalid export format', 'danger')
             return redirect(url_for('predictions'))
-            
     except Exception as e:
         flash('Export failed. Please try again.', 'danger')
         app.logger.error(f"Export error: {str(e)}")
@@ -607,18 +614,16 @@ def generate_pdf_report(prediction, report):
     """Generate a detailed PDF report"""
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
-    
     p.setFont("Helvetica-Bold", 16)
     p.drawString(100, 750, "Tanzania Telecom Churn Prediction Report")
     p.setFont("Helvetica", 12)
     p.drawString(100, 730, f"Report Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}")
     p.drawString(100, 710, f"Prediction ID: {prediction.id}")
-    
     p.setFont("Helvetica-Bold", 14)
     p.drawString(100, 680, "Customer Details:")
     p.setFont("Helvetica", 12)
-    
     details = [
+        f"Customer ID: {prediction.customer_id or 'N/A'}",
         f"Telecom Company: {prediction.telecom_company}",
         f"Region: {prediction.region}",
         f"Age: {prediction.age}",
@@ -637,18 +642,15 @@ def generate_pdf_report(prediction, report):
         f"Discount Offer Used: {prediction.discount_offer_used}",
         f"Billing Issues Reported: {prediction.billing_issues_reported}"
     ]
-    
     y_position = 660
     for detail in details:
         p.drawString(120, y_position, detail)
         y_position -= 20
-    
     p.setFont("Helvetica-Bold", 14)
     p.drawString(100, y_position - 20, "Prediction Results:")
     p.setFont("Helvetica", 12)
     p.drawString(120, y_position - 40, f"Churn Prediction: {prediction.prediction}")
     p.drawString(120, y_position - 60, f"Probability: {prediction.probability * 100:.2f}%")
-    
     if report['risk_factors']:
         p.setFont("Helvetica-Bold", 14)
         p.drawString(100, y_position - 100, "Risk Analysis:")
@@ -661,7 +663,6 @@ def generate_pdf_report(prediction, report):
     else:
         p.drawString(120, y_position - 120, "No significant risk factors identified")
         y_position -= 140
-    
     if prediction.prediction == 'Yes':
         recommendations = [
             "Immediate retention actions recommended:",
@@ -679,15 +680,12 @@ def generate_pdf_report(prediction, report):
             "- Offer loyalty rewards",
             "- Proactive customer check-ins"
         ]
-    
     p.setFont("Helvetica-Bold", 14)
     p.drawString(100, y_position - 20, "Recommendations:")
     p.setFont("Helvetica", 12)
-    
     for rec in recommendations:
         p.drawString(120, y_position - 40, rec)
         y_position -= 20
-    
     if report['retention_opportunities']:
         p.setFont("Helvetica-Bold", 14)
         p.drawString(100, y_position - 40, "Retention Opportunities:")
@@ -696,7 +694,6 @@ def generate_pdf_report(prediction, report):
         for opp in report['retention_opportunities']:
             p.drawString(120, y_position, f"- {opp}")
             y_position -= 20
-    
     if report['actionable_insights']:
         p.setFont("Helvetica-Bold", 14)
         p.drawString(100, y_position - 20, "Actionable Insights:")
@@ -705,7 +702,6 @@ def generate_pdf_report(prediction, report):
         for insight in report['actionable_insights']:
             p.drawString(120, y_position, f"- {insight}")
             y_position -= 20
-    
     p.showPage()
     p.save()
     buffer.seek(0)
@@ -718,10 +714,8 @@ def download_pdf(prediction_id):
     if prediction.user_id != current_user.id:
         flash('Unauthorized access', 'danger')
         return redirect(url_for('predictions'))
-    
     report = generate_churn_report(prediction)
     pdf_buffer = generate_pdf_report(prediction, report)
-    
     return send_file(
         pdf_buffer,
         mimetype='application/pdf',
@@ -733,42 +727,6 @@ def download_pdf(prediction_id):
 def api_predict():
     try:
         data = request.get_json()
-        
-        required_fields = [
-            'TelecomCompany', 'Region', 'Age', 'Gender', 'ContractType', 
-            'ContractDuration', 'TenureMonths', 'MonthlyCharges', 'DataUsageGB',
-            'CallDurationMinutes', 'ComplaintsFiled', 'CustomerSupportCalls',
-            'PaymentMethod', 'InternetService', 'AdditionalServices',
-            'DiscountOfferUsed', 'BillingIssuesReported'
-        ]
-        
-        for field in required_fields:
-            if field not in data:
-                return jsonify({'error': f'Missing required field: {field}'}), 400
-        
-        input_df = pd.DataFrame([data])
-        processed_data = preprocess_data(input_df)
-        
-        prediction = model.predict(processed_data)[0]
-        probability = model.predict_proba(processed_data)[0][1]
-        
-        return jsonify({
-            'prediction': 'Yes' if prediction == 1 else 'No',
-            'probability': float(probability),
-            'status': 'success'
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e), 'status': 'error'}), 500
-
-@app.route('/api/batch_predict', methods=['POST'])
-def api_batch_predict():
-    try:
-        data = request.get_json()
-        
-        if not isinstance(data, list):
-            return jsonify({'error': 'Input must be a list of records'}), 400
-
         required_fields = [
             'TelecomCompany', 'Region', 'Age', 'Gender', 'ContractType',
             'ContractDuration', 'TenureMonths', 'MonthlyCharges', 'DataUsageGB',
@@ -776,32 +734,53 @@ def api_batch_predict():
             'PaymentMethod', 'InternetService', 'AdditionalServices',
             'DiscountOfferUsed', 'BillingIssuesReported'
         ]
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        input_df = pd.DataFrame([data])
+        processed_data = preprocess_data(input_df)
+        prediction = model.predict(processed_data)[0]
+        probability = model.predict_proba(processed_data)[0][1]
+        return jsonify({
+            'prediction': 'Yes' if prediction == 1 else 'No',
+            'probability': float(probability),
+            'status': 'success'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e), 'status': 'error'}), 500
 
-        # Validate each record
+@app.route('/api/batch_predict', methods=['POST'])
+def api_batch_predict():
+    try:
+        data = request.get_json()
+        if not isinstance(data, list):
+            return jsonify({'error': 'Input must be a list of records'}), 400
+        required_fields = [
+            'CustomerID', 'TelecomCompany', 'Region', 'Age', 'Gender', 'ContractType',
+            'ContractDuration', 'TenureMonths', 'MonthlyCharges', 'DataUsageGB',
+            'CallDurationMinutes', 'ComplaintsFiled', 'CustomerSupportCalls',
+            'PaymentMethod', 'InternetService', 'AdditionalServices',
+            'DiscountOfferUsed', 'BillingIssuesReported'
+        ]
         for record in data:
             missing_fields = [field for field in required_fields if field not in record]
             if missing_fields:
                 return jsonify({'error': f'Missing required fields in record: {", ".join(missing_fields)}'}), 400
-
         input_df = pd.DataFrame(data)
         processed_data = preprocess_data(input_df)
-
         predictions = model.predict(processed_data)
         probabilities = model.predict_proba(processed_data)[:, 1]
-
         results = []
         for idx, (pred, prob) in enumerate(zip(predictions, probabilities)):
             results.append({
-                'record_index': idx,
+                'customer_id': str(input_df.iloc[idx]['CustomerID']),
                 'prediction': 'Yes' if pred == 1 else 'No',
                 'probability': float(prob)
             })
-
         return jsonify({
             'results': results,
             'status': 'success'
         })
-
     except Exception as e:
         return jsonify({'error': str(e), 'status': 'error'}), 500
 
@@ -817,6 +796,4 @@ if __name__ == '__main__':
             )
             db.session.add(admin)
             db.session.commit()
-    
     app.run(debug=True)
-    
