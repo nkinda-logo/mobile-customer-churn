@@ -19,7 +19,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -28,7 +28,7 @@
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)),
                         url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><linearGradient id="a" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23667eea;stop-opacity:0.1"/><stop offset="100%" style="stop-color:%23764ba2;stop-opacity:0.1"/></linearGradient></defs><path d="M0,0 L1000,0 L1000,800 Q500,600 0,800 Z" fill="url(%23a)"/></svg>');
             color: white;
-            padding: 100px 0;
+            padding: 6rem 1rem;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -51,20 +51,20 @@
         }
 
         .hero-title {
-            font-size: 3.5rem;
+            font-size: clamp(2rem, 5vw, 3rem);
             font-weight: 700;
             margin-bottom: 1rem;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .hero-subtitle {
-            font-size: 1.3rem;
+            font-size: clamp(1rem, 3vw, 1.2rem);
             opacity: 0.9;
             margin-bottom: 2rem;
         }
 
         .main-content {
-            margin-top: -50px;
+            margin-top: -3rem;
             position: relative;
             z-index: 10;
         }
@@ -73,7 +73,7 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
+            border-radius: 1rem;
             box-shadow: var(--card-shadow);
             transition: all 0.3s ease;
             overflow: hidden;
@@ -87,7 +87,7 @@
         .gradient-header {
             background: var(--primary-gradient);
             color: white;
-            padding: 2rem;
+            padding: 1.5rem;
             text-align: center;
             position: relative;
         }
@@ -102,10 +102,10 @@
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
         }
 
-        .benefit-card {
+        .benefit-card, .team-card {
             background: white;
-            border-radius: 15px;
-            padding: 2rem;
+            border-radius: 1rem;
+            padding: 1.5rem;
             box-shadow: var(--card-shadow);
             transition: all 0.3s ease;
             height: 100%;
@@ -114,7 +114,7 @@
             overflow: hidden;
         }
 
-        .benefit-card::before {
+        .benefit-card::before, .team-card::before {
             content: '';
             position: absolute;
             top: 0;
@@ -123,50 +123,6 @@
             height: 4px;
             background: var(--primary-gradient);
             transition: height 0.3s ease;
-        }
-
-        .benefit-card:hover::before {
-            height: 100%;
-            opacity: 0.1;
-        }
-
-        .benefit-card:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--hover-shadow);
-        }
-
-        .benefit-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--primary-gradient);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        .team-card {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s ease;
-            border: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .team-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            transition: all 0.3s ease;
         }
 
         .team-card.supervisor::before {
@@ -181,21 +137,44 @@
             background: var(--info-gradient);
         }
 
-        .team-card:hover {
+        .benefit-card:hover, .team-card:hover {
             transform: translateY(-5px);
             box-shadow: var(--hover-shadow);
+        }
+
+        .benefit-card:hover::before, .team-card:hover::before {
+            height: 100%;
+            opacity: 0.1;
+        }
+
+        .benefit-icon, .team-icon {
+            width: 3rem;
+            height: 3rem;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.2rem;
         }
 
         .collapse-button {
             background: var(--primary-gradient);
             border: none;
             color: white;
-            padding: 1rem 2rem;
+            padding: 0.8rem 1.5rem;
             border-radius: 50px;
             font-weight: 600;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+        }
+
+        .collapse-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
 
         .collapse-button::before {
@@ -212,47 +191,37 @@
         }
 
         .collapse-button:hover::before {
-            width: 300px;
-            height: 300px;
+            width: 15rem;
+            height: 15rem;
         }
 
-        .collapse-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        .contact-section {
+            background: var(--dark-bg);
+            color: white;
+            padding: 3rem 1rem;
+            margin-top: 3rem;
+            border-radius: 1rem 1rem 0 0;
         }
 
-        .stats-section {
-            background: white;
-            border-radius: 20px;
-            padding: 3rem;
-            margin: 3rem 0;
-            box-shadow: var(--card-shadow);
-        }
-
-        .stat-item {
+        .contact-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
             text-align: center;
-            padding: 1rem;
+            transition: all 0.3s ease;
         }
 
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 700;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            font-size: 1.1rem;
-            color: #666;
-            margin-top: 0.5rem;
+        .contact-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .section-title {
-            font-size: 2.5rem;
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
             font-weight: 700;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             text-align: center;
             position: relative;
         }
@@ -260,10 +229,10 @@
         .section-title::after {
             content: '';
             position: absolute;
-            bottom: -10px;
+            bottom: -8px;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
+            width: 5rem;
             height: 4px;
             background: var(--primary-gradient);
             border-radius: 2px;
@@ -275,7 +244,7 @@
         }
 
         .feature-list li {
-            padding: 0.75rem 0;
+            padding: 0.5rem 0;
             position: relative;
             padding-left: 2rem;
         }
@@ -287,30 +256,7 @@
             position: absolute;
             left: 0;
             color: #28a745;
-            font-size: 1.1rem;
-        }
-
-        .contact-section {
-            background: var(--dark-bg);
-            color: white;
-            padding: 4rem 0;
-            margin-top: 4rem;
-            border-radius: 20px 20px 0 0;
-        }
-
-        .contact-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .contact-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.15);
+            font-size: 1rem;
         }
 
         .pulse-animation {
@@ -325,7 +271,7 @@
 
         .fade-in {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px);
             transition: all 0.6s ease;
         }
 
@@ -334,17 +280,56 @@
             transform: translateY(0);
         }
 
+        /* Mobile-specific styles */
         @media (max-width: 768px) {
+            .hero-section {
+                padding: 3rem 1rem;
+            }
+
             .hero-title {
-                font-size: 2.5rem;
+                font-size: clamp(1.8rem, 6vw, 2.2rem);
             }
-            
+
             .hero-subtitle {
-                font-size: 1.1rem;
+                font-size: clamp(0.9rem, 3vw, 1rem);
             }
-            
+
             .section-title {
-                font-size: 2rem;
+                font-size: clamp(1.5rem, 4vw, 1.8rem);
+            }
+
+            .team-card, .benefit-card, .contact-card {
+                padding: 1rem;
+            }
+
+            .team-icon {
+                width: 2.5rem;
+                height: 2.5rem;
+                font-size: 1rem;
+            }
+
+            .collapse-button {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+
+            .contact-section .row {
+                display: grid;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .team-card, .benefit-card {
+                max-width: 100%;
+            }
+
+            .glass-card {
+                padding: 1rem;
+            }
+
+            .gradient-header {
+                padding: 1rem;
             }
         }
     </style>
@@ -364,37 +349,38 @@
     <!-- Main Content -->
     <div class="container main-content">
         <!-- About Section -->
-        <div class="glass-card mb-5" data-aos="fade-up">
+        <div class="glass-card mb-5 fade-in" data-aos="fade-up">
             <div class="gradient-header">
-                <h2><i class="fas fa-info-circle me-3"></i>About Our System</h2>
+                <h2><i class="fas fa-info-circle me-2"></i>About Our System</h2>
             </div>
             <div class="p-4">
                 <p class="lead">
                     The Tanzania Telecom Churn Prediction System is an advanced analytics platform designed to help
-                    telecom companies in Tanzania identify customers who are at risk of churning (leaving their service).
-                    By leveraging machine learning and data analytics, our system provides actionable insights to improve
-                    customer retention and reduce churn rates.
+                    telecom companies in Tanzania identify customers at risk of churning. By leveraging machine learning
+                    and data analytics, our system provides actionable insights to improve customer retention and reduce
+                    churn rates.
                 </p>
             </div>
         </div>
+
         <!-- Mission Section -->
-        <div class="glass-card mb-5" data-aos="fade-up">
+        <div class="glass-card mb-5 fade-in" data-aos="fade-up">
             <div class="p-4">
                 <h3 class="section-title">Our Mission</h3>
                 <p class="lead text-center">
                     Our mission is to empower telecom companies with data-driven decision-making tools that enhance
-                    customer satisfaction, reduce churn, and ultimately improve profitability in Tanzania's competitive
+                    customer satisfaction, reduce churn, and improve profitability in Tanzania's competitive
                     telecommunications market.
                 </p>
             </div>
         </div>
 
         <!-- How It Works Section -->
-        <div class="glass-card mb-5" data-aos="fade-up">
+        <div class="glass-card mb-5 fade-in" data-aos="fade-up">
             <div class="p-4">
                 <h3 class="section-title">How It Works</h3>
                 <p class="lead text-center mb-4">
-                    The system uses historical customer data to train machine learning models that can predict churn
+                    The system uses historical customer data to train machine learning models that predict churn
                     with high accuracy. Key features include:
                 </p>
                 <ul class="feature-list">
@@ -411,8 +397,8 @@
         <div class="mb-5">
             <h3 class="section-title" data-aos="fade-up">Key Benefits</h3>
             <div class="row">
-                <div class="col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="benefit-card">
+                <div class="col-md-6 col-12 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="benefit-card fade-in">
                         <div class="benefit-icon">
                             <i class="fas fa-dollar-sign"></i>
                         </div>
@@ -423,8 +409,8 @@
                         </p>
                     </div>
                 </div>
-                <div class="col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="benefit-card">
+                <div class="col-md-6 col-12 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="benefit-card fade-in">
                         <div class="benefit-icon">
                             <i class="fas fa-smile"></i>
                         </div>
@@ -435,8 +421,8 @@
                         </p>
                     </div>
                 </div>
-                <div class="col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
-                    <div class="benefit-card">
+                <div class="col-md-6 col-12 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="benefit-card fade-in">
                         <div class="benefit-icon">
                             <i class="fas fa-chart-bar"></i>
                         </div>
@@ -447,8 +433,8 @@
                         </p>
                     </div>
                 </div>
-                <div class="col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
-                    <div class="benefit-card">
+                <div class="col-md-6 col-12 mb-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="benefit-card fade-in">
                         <div class="benefit-icon">
                             <i class="fas fa-trophy"></i>
                         </div>
@@ -463,11 +449,11 @@
         </div>
 
         <!-- Contributors Section -->
-        <div class="glass-card mb-5" data-aos="fade-up">
+        <div class="glass-card mb-5 fade-in" data-aos="fade-up">
             <div class="p-4">
                 <h3 class="section-title">Project Contributors & Acknowledgments</h3>
                 <div class="text-center mb-4">
-                    <button class="collapse-button" type="button" data-bs-toggle="collapse" data-bs-target="#contributorsCollapse" aria-expanded="false" aria-controls="contributorsCollapse" id="contributorsButton">
+                    <button class="collapse-button" type="button" data-bs-toggle="collapse" data-bs-target="#contributorsCollapse" aria-expanded="false" aria-controls="contributorsCollapse" id="contributorsButton" aria-label="Toggle contributors section">
                         <i class="fas fa-chevron-down me-2" id="chevronIcon"></i>
                         View Project Team & Contributors Details
                     </button>
@@ -478,345 +464,294 @@
                         Tanzanian mobile telecommunications represents our four-member team's collective effort. We extend 
                         heartfelt gratitude to all who made this collaborative endeavor possible.
                     </p>
-                    
-                   <!-- Research Supervisor -->
-    <!-- Research Project Supervisor -->
-    <div style="margin-bottom: 2rem;">
-        <h5 style="text-align: center; margin-bottom: 1.5rem; font-size: 1.25rem; color: #343a40; font-weight: 600;">
-            <i class="fas fa-user-tie" style="margin-right: 0.5rem; color: #007bff;"></i>Research Project Supervisor
-        </h5>
-        <div style="display: flex; justify-content: center;">
-            <div style="width: 100%; max-width: 600px;">
-                <div style="background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 1.5rem; text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';">
-                    <div style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; overflow: hidden; border: 2px solid #28a745; background: linear-gradient(135deg, #28a745, #218838);">
-                        <img src="{{ url_for('static', filename='images/neema_kullian.png') }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #28a745, #218838)'; this.parentNode.innerHTML='<span style=\'color: #fff; font-size: 1rem; font-weight: 600;\'>NK</span>';">
-                    </div>
-                    <h6 style="font-size: 1.1rem; color: #007bff; font-weight: 600; margin-bottom: 0.5rem;">
-                        Ms. NEEMA KULLIAN<br>
-                        <span style="font-size: 0.9rem; color: #6c757d;">
-                            Telephone: <a href="tel:+255717151436" style="color: #007bff; text-decoration: none;">+255 717 151 436</a><br>
-                            Email: <a href="mailto:kullian@gmail.com" style="color: #007bff; text-decoration: none;">kullian@gmail.com</a>
-                        </span>
-                    </h6>
-                    <p style="margin-bottom: 0.5rem; font-size: 0.95rem; color: #6c757d;">
-                        <strong style="color: #343a40;">Role:</strong> Research Project Supervisor
-                    </p>
-                    <p style="margin: 0; font-size: 0.95rem; color: #6c757d; line-height: 1.6;">
-                        <strong style="color: #343a40;">Contribution:</strong> 
-                        <span style="font-weight: 600; color: #007bff;">Exceptional leadership</span> and 
-                        <span style="font-weight: 600; color: #007bff;">expertise</span> throughout the three-month journey, 
-                        <span style="font-style: italic; color: #007bff;">instrumental</span> in coordinating team efforts and 
-                        shaping this work's <span style="font-weight: 600; color: #007bff;">quality</span>.
-                    </p>
-                </div>
-3960
 
+                    <!-- Research Project Supervisor -->
+                    <div class="mb-4">
+                        <h5 class="text-center mb-3 fs-5 fw-bold text-dark">
+                            <i class="fas fa-user-tie me-2 text-primary"></i>Research Project Supervisor
+                        </h5>
+                        <div class="d-flex justify-content-center">
+                            <div class="team-card supervisor" style="max-width: 600px;">
+                               <div class="team-icon">
+                                    <img src="{{ url_for('static', filename='images/NEEMA.png') }}" alt="NEEMA" style="width: 100%; height: 100%; object-fit: cover; clip-path: circle();" loading="lazy" srcset="{{ url_for('static', filename='images/NEEMA.png') }} 1x, {{ url_for('static', filename='images/NEEMA.png') }} 2x" sizes="(max-width: 768px) 48px, 60px" onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #28a745, #218838)'; this.parentNode.innerHTML='<span style=\'color: #fff; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;\'>AS</span>';">
+                                 </div>
+                                <h6 class="fs-6 fw-bold text-primary mb-2">Ms. NEEMA KULLIAN</h6>
+                                <p class="text-muted small">
+                                    Telephone: <a href="tel:+255717151436" class="text-primary text-decoration-none">+255 717 151 436</a><br>
+                                    Email: <a href="mailto:nkullian@gmail.com" class="text-primary text-decoration-none">nkullian@gmail.com</a>
+                                </p>
+                                <p class="text-muted small mb-2">
+                                    <strong class="text-dark">Role:</strong> Research Project Supervisor
+                                </p>
+                                <p class="text-muted small">
+                                    <strong class="text-dark">Contribution:</strong> 
+                                    <span class="fw-bold text-primary">Exceptional leadership</span> and 
+                                    <span class="fw-bold text-primary">expertise</span> throughout the three-month journey, 
+                                    <span class="fst-italic text-primary">instrumental</span> in coordinating team efforts and 
+                                    shaping this work's <span class="fw-bold text-primary">quality</span>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Research Team Members -->
+                    <div class="mb-4">
+                        <h5 class="text-center mb-3 fs-5 fw-bold text-dark">
+                            <i class="fas fa-users me-2 text-success"></i>Research Team Members
+                        </h5>
+                        <div class="row row-cols-1 row-cols-md-2 g-3">
+                            <!-- Team Member 1 -->
+                            <div class="col">
+                                <div class="team-card member fade-in">
+                                   <div class="team-icon">
+                                    <img src="{{ url_for('static', filename='images/Nachuli.jpg') }}" alt="Nachuli" style="width: 100%; height: 100%; object-fit: cover; clip-path: circle();" loading="lazy" srcset="{{ url_for('static', filename='images/Nachuli.jpg') }} 1x, {{ url_for('static', filename='images/Nachuli.jpg') }} 2x" sizes="(max-width: 768px) 48px, 60px" onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #28a745, #218838)'; this.parentNode.innerHTML='<span style=\'color: #fff; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;\'>AS</span>';">
+                                 </div>
+                                    <h6 class="fs-6 fw-bold text-success mb-2">RAMADHANI JABILI NACHULI</h6>
+                                    <p class="text-muted small">
+                                        Telephone: <a href="tel:+255785392787" class="text-primary text-decoration-none">+255 785 392 787</a><br>
+                                        Email: <a href="mailto:nachuli0114@gmail.com" class="text-primary text-decoration-none">nachuli0114@gmail.com</a>
+                                    </p>
+                                    <p class="text-muted small mb-2">
+                                        <strong class="text-dark">Specialization:</strong> Data Preprocessing
+                                    </p>
+                                    <p class="text-muted small">
+                                        <strong class="text-dark">Key Contributions:</strong> Led <span class="fw-bold text-success">data cleaning</span>, <span class="fw-bold text-success">preprocessing</span>, <span class="fw-bold text-success">feature engineering</span>, and <span class="fw-bold text-success">data quality assurance</span>.
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- Team Member 2 -->
+                            <div class="col">
+                                <div class="team-card member fade-in">
+                                 <div class="team-icon">
+                                    <img src="{{ url_for('static', filename='images/nkinda1.jpg') }}" alt="Nkinda" style="width: 100%; height: 100%; object-fit: cover; clip-path: circle();" loading="lazy" srcset="{{ url_for('static', filename='images/nkinda1.jpg') }} 1x, {{ url_for('static', filename='images/nkinda.jpg') }} 2x" sizes="(max-width: 768px) 48px, 60px" onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #28a745, #218838)'; this.parentNode.innerHTML='<span style=\'color: #fff; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;\'>AS</span>';">
+                                 </div>
+                                    <h6 class="fs-6 fw-bold text-success mb-2">NKINDA SAYI HENGWE</h6>
+                                    <p class="text-muted small">
+                                        Telephone: <a href="tel:+255692715204" class="text-primary text-decoration-none">+255 692 715 204</a><br>
+                                        Email: <a href="mailto:nkinda.hengwe90@gmail.com" class="text-primary text-decoration-none">nkinda.hengwe90@gmail.com</a>
+                                    </p>
+                                    <p class="text-muted small mb-2">
+                                        <strong class="text-dark">Specialization:</strong> Machine Learning Implementation & Flask Application Development
+                                    </p>
+                                    <p class="text-muted small">
+                                        <strong class="text-dark">Key Contributions:</strong> Led the development of <span class="fw-bold text-success">ML algorithms</span> and <span class="fw-bold text-success">Flask application implementation</span>.
+                                    </p>
+                                </div>
+                               
+                            </div>
+                             
+                            <!-- Team Member 3 -->
+                            <div class="col">
+                                <div class="team-card member fade-in">
+                                    <div class="team-icon">
+                                    <img src="{{ url_for('static', filename='images/Accly.png') }}" alt="Achileus Shija Profile Picture" style="width: 100%; height: 100%; object-fit: cover; clip-path: circle();" loading="lazy" srcset="{{ url_for('static', filename='images/Accly.png') }} 1x, {{ url_for('static', filename='images/Accly.png') }} 2x" sizes="(max-width: 768px) 48px, 60px" onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #28a745, #218838)'; this.parentNode.innerHTML='<span style=\'color: #fff; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;\'>AS</span>';">
+                                 </div>
+                                    <h6 class="fs-6 fw-bold text-success mb-2">ACHILEUS SHIJA JUSTINIAN</h6>
+                                    <p class="text-muted small">
+                                        Telephone: <a href="tel:+255754081610" class="text-primary text-decoration-none">+255 754 081 610</a><br>
+                                        Email: <a href="mailto:achileusshija@gmail.com" class="text-primary text-decoration-none">achileusshija@gmail.com</a>
+                                    </p>
+                                    <p class="text-muted small mb-2">
+                                        <strong class="text-dark">Specialization:</strong> Machine Learning Implementation & Flask Application Development
+                                    </p>
+                                    <p class="text-muted small">
+                                        <strong class="text-dark">Key Contributions:</strong> Co-led <span class="fw-bold text-success">ML algorithm development</span> and <span class="fw-bold text-success">web application architecture</span>.
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- Team Member 4 -->
+                            <div class="col">
+                                <div class="team-card member fade-in">
+                                   <div class="team-icon">
+                                    <img src="{{ url_for('static', filename='images/Ibrah.jpg') }}" alt="Ibrah" style="width: 100%; height: 100%; object-fit: cover; clip-path: circle();" loading="lazy" srcset="{{ url_for('static', filename='images/Ibrah.jpg') }} 1x, {{ url_for('static', filename='images/Ibrah.jpg') }} 2x" sizes="(max-width: 768px) 48px, 60px" onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #28a745, #218838)'; this.parentNode.innerHTML='<span style=\'color: #fff; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;\'>AS</span>';">
+                                 </div>
+                                    <h6 class="fs-6 fw-bold text-success mb-2">IBRAHIMU PONSIAN SWAGARA</h6>
+                                    <p class="text-muted small">
+                                        Telephone: <a href="tel:+255678038199" class="text-primary text-decoration-none">+255 678 038 199</a><br>
+                                        Email: <a href="mailto:ibrahimuswagara@gmail.com" class="text-primary text-decoration-none">ibrahimuswagara@gmail.com</a>
+                                    </p>
+                                    <p class="text-muted small mb-2">
+                                        <strong class="text-dark">Specialization:</strong> Statistical Analysis & Validation
+                                    </p>
+                                    <p class="text-muted small">
+                                        <strong class="text-dark">Key Contributions:</strong> Focused on <span class="fw-bold text-success">statistical analysis</span>, <span class="fw-bold text-success">model validation</span>, and <span class="fw-bold text-success">performance metrics evaluation</span>.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Special Acknowledgments -->
+                    <div class="mb-4">
+                        <h5 class="text-center mb-3 fs-5 fw-bold text-dark">
+                            <i class="fas fa-handshake me-2 text-info"></i>Special Acknowledgments
+                        </h5>
+                        <div class="row row-cols-1 row-cols-md-2 g-3">
+                            <!-- Acknowledgment 1 -->
+                            <div class="col">
+                                <div class="team-card acknowledgment fade-in">
+                                    <div class="team-icon">
+                                    <img src="{{ url_for('static', filename='images/TCRA.png') }}" alt="TCRA" style="width: 100%; height: 100%; object-fit: cover; clip-path: circle();" loading="lazy" srcset="{{ url_for('static', filename='images/TCRA.png') }} 1x, {{ url_for('static', filename='images/TCRA.png') }} 2x" sizes="(max-width: 768px) 48px, 60px" onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #28a745, #218838)'; this.parentNode.innerHTML='<span style=\'color: #fff; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;\'>AS</span>';">
+                                 </div>
+                                    <h6 class="fs-6 fw-bold text-info mb-2">Tanzania Communications Regulatory Authority (TCRA)</h6>
+                                    <p class="text-muted small">
+                                        We are <span class="fw-bold text-info">profoundly grateful</span> to the Tanzania Communications Regulatory Authority (TCRA) and TCRA Manager for providing <span class="fw-bold text-info">comprehensive telecommunications data</span> while ensuring <span class="fw-bold text-info">privacy compliance</span>.
+                                    </p>
+                                </div>
+                                <br><a href="https://www.tcra.go.tz/">Click Here to Visit TCRA Website</a>
+                            </div>
+                            <!-- Acknowledgment 2 -->
+                            <div class="col">
+                                <div class="team-card acknowledgment fade-in">
+                                   <div class="team-icon">
+                                    <img src="{{ url_for('static', filename='images/Eastc.png') }}" alt="EASTC" style="width: 100%; height: 100%; object-fit: cover; clip-path: circle();" loading="lazy" srcset="{{ url_for('static', filename='images/Eastc.png') }} 1x, {{ url_for('static', filename='images/Eastc.png') }} 2x" sizes="(max-width: 768px) 48px, 60px" onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #28a745, #218838)'; this.parentNode.innerHTML='<span style=\'color: #fff; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;\'>AS</span>';">
+                                 </div>
+                                    <h6 class="fs-6 fw-bold text-info mb-2">EASTC Department of Computer Science</h6>
+                                    <p class="text-muted small">
+                                        We acknowledge <span class="fw-bold text-info">technical support</span> from EASTC Department of Computer Science and Data Analytics Laboratory. Access to <span class="fw-bold text-info">high-performance computing resources</span> was essential for processing large datasets.
+                                        
+                                    </p>
+                                </div>
+                                <br><a href="https://www.eastc.ac.tz/">Click Here to Visit EASTC Website</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Research Team Members -->
-    <div style="margin-bottom: 2rem;">
-        <h5 style="text-align: center; margin-bottom: 1.5rem; font-size: 1.25rem; color: #343a40; font-weight: 600;">
-            <i class="fas fa-users" style="margin-right: 0.5rem; color: #28a745;"></i>Research Team Members
-        </h5>
-        <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
-            <!-- Team Member 1 -->
-            <div style="flex: 1 1 300px; max-width: 400px;">
-                <div style="background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 1.5rem; text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';">
-                    <div style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; overflow: hidden; border: 2px solid #28a745; background: linear-gradient(135deg, #28a745, #218838);">
-                        <img src="{{ url_for('static', filename='images/ramadhani_nachuli.png') }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #28a745, #218838)'; this.parentNode.innerHTML='<span style=\'color: #fff; font-size: 1rem; font-weight: 600;\'>RN</span>';">
-                    </div>
-                    <h6 style="font-size: 1.1rem; color: #28a745; font-weight: 600; margin-bottom: 0.5rem;">RAMADHANI JABILI NACHULI
-                        <span style="font-size: 0.9rem; color: #6c757d;">
-                            <br>Telephone: <a href="tel:+255785392787" style="color: #007bff; text-decoration: none;">+255 785 392 787</a><br>
-                            Email: <a href="mailto:nachuli0114@gmail.com" style="color: #007bff; text-decoration: none;">nachuli0114@gmail.com</a>
-                        </span>
-                    </h6>
-                    <p style="margin-bottom: 0.5rem; font-size: 0.95rem; color: #6c757d;">
-                        <strong style="color: #343a40;">Specialization:</strong> Data Preprocessing
-                    </p>
-                    <p style="margin: 0; font-size: 0.95rem; color: #6c757d; line-height: 1.6;">
-                        <strong style="color: #343a40;">Key Contributions:</strong> Led <span style="font-weight: 600; color: #28a745;">data cleaning</span>, <span style="font-weight: 600; color: #28a745;">preprocessing</span>, <span style="font-weight: 600; color: #28a745;">feature engineering</span>, and <span style="font-weight: 600; color: #28a745;">data quality assurance</span>.
-                    </p>
-                </div>
-            </div>
-            <!-- Team Member 2 -->
-            <div style="flex: 1 1 300px; max-width: 400px;">
-                <div style="background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 1.5rem; text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';">
-                    <div style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; overflow: hidden; border: 2px solid #28a745; background: linear-gradient(135deg, #28a745, #218838);">
-                        <img src="{{ url_for('static', filename='images/nkinda1.jpg') }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #28a745, #218838)'; this.parentNode.innerHTML='<span style=\'color: #fff; font-size: 1rem; font-weight: 600;\'>NS</span>';">
-                    </div>
-                    <h6 style="font-size: 1.1rem; color: #28a745; font-weight: 600; margin-bottom: 0.5rem;">NKINDA SAYI HENGWE
-                        <span style="font-size: 0.9rem; color: #6c757d;">
-                            <br>Telephone: <a href="tel:+255692715204" style="color: #007bff; text-decoration: none;">+255 692 715 204</a><br>
-                            Email: <a href="mailto:nkinda.hengwe90@gmail.com" style="color: #007bff; text-decoration: none;">nkinda.hengwe90@gmail.com</a>
-                        </span>
-                    </h6>
-                    <p style="margin-bottom: 0.5rem; font-size: 0.95rem; color: #6c757d;">
-                        <strong style="color: #343a40;">Specialization:</strong> Machine Learning Implementation & Flask Application Development
-                    </p>
-                    <p style="margin: 0; font-size: 0.95rem; color: #6c757d; line-height: 1.6;">
-                        <strong style="color: #343a40;">Key Contributions:</strong> Led the development of <span style="font-weight: 600; color: #28a745;">ML algorithms</span> and <span style="font-weight: 600; color: #28a745;">Flask application implementation</span>.
-                    </p>
-                </div>
-            </div>
-            <!-- Team Member 3 -->
-             
-            <div style="flex: 1 1 300px; max-width: 400px;">
-                <div style="background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 1.5rem; text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';">
-                    <div style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; overflow: hidden; border: 2px solid #28a745; background: linear-gradient(135deg, #28a745, #218838);">
-                        <img src="{{ url_for('static', filename='images/achileus_shija.png') }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #28a745, #218838)'; this.parentNode.innerHTML='<span style=\'color: #fff; font-size: 1rem; font-weight: 600;\'>AS</span>';">
-                    </div>
-                    <h6 style="font-size: 1.1rem; color: #28a745; font-weight: 600; margin-bottom: 0.5rem;">ACHILEUS SHIJA JUSTINIAN
-                        <span style="font-size: 0.9rem; color: #6c757d;">
-                            <br>Telephone: <a href="tel:+255754081610" style="color: #007bff; text-decoration: none;">+255 754 081 610</a><br>
-                            Email: <a href="mailto:achileusshija@gmail.com" style="color: #007bff; text-decoration: none;">achileusshija@gmail.com</a>
-                        </span>
-                    </h6>
-                    <p style="margin-bottom: 0.5rem; font-size: 0.95rem; color: #6c757d;">
-                        <strong style="color: #343a40;">Specialization:</strong> Machine Learning Implementation & Flask Application Development
-                    </p>
-                    <p style="margin: 0; font-size: 0.95rem; color: #6c757d; line-height: 1.6;">
-                        <strong style="color: #343a40;">Key Contributions:</strong> Co-led <span style="font-weight: 600; color: #28a745;">ML algorithm development</span> and <span style="font-weight: 600; color: #28a745;">web application architecture</span>.
-                    </p>
-                </div>
-            </div>
-            <!-- Team Member 4 -->
-            <div style="flex: 1 1 300px; max-width: 400px;">
-                <div style="background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 1.5rem; text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';">
-                    <div style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; overflow: hidden; border: 2px solid #28a745; background: linear-gradient(135deg, #28a745, #218838);">
-                        <img src="{{ url_for('static', filename='images/ibrahimu_ponsian.png') }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #28a745, #218838)'; this.parentNode.innerHTML='<span style=\'color: #fff; font-size: 1rem; font-weight: 600;\'>IP</span>';">
-                    </div>
-                    <h6 style="font-size: 1.1rem; color: #28a745; font-weight: 600; margin-bottom: 0.5rem;">IBRAHIMU PONSIAN SWAGARA
-                        <span style="font-size: 0.9rem; color: #6c757d;">
-                            Telephone: <a href="tel:+255678038199" style="color: #007bff; text-decoration: none;">+255 678 038 199</a><br>
-                            Email: <a href="mailto:ibrahimuswagara@gmail.com" style="color: #007bff; text-decoration: none;">ibrahimuswagara@gmail.com</a>
-                        </span>
-                    </h6>
-                    <p style="margin-bottom: 0.5rem; font-size: 0.95rem; color: #6c757d;">
-                        <strong style="color: #343a40;">Specialization:</strong> Statistical Analysis & Validation
-                    </p>
-                    <p style="margin: 0; font-size: 0.95rem; color: #6c757d; line-height: 1.6;">
-                        <strong style="color: #343a40;">Key Contributions:</strong> Focused on <span style="font-weight: 600; color: #28a745;">statistical analysis</span>, <span style="font-weight: 600; color: #28a745;">model validation</span>, and <span style="font-weight: 600; color: #28a745;">performance metrics evaluation</span>.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-<!-- Special Acknowledgments -->
-<div style="margin-bottom: 2rem;">
-    <h5 style="text-align: center; margin-bottom: 1.5rem; font-size: 1.25rem; color: #343a40; font-weight: 600;">
-        <i class="fas fa-handshake" style="margin-right: 0.5rem; color: #17a2b8;"></i>Special Acknowledgments
-    </h5>
-    <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
-        <!-- Acknowledgment 1 -->
-        <div style="flex: 1 1 300px; max-width: 400px;">
-            <div style="background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 1.5rem; text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';">
-                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #17a2b8, #117a8b); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-                    <i class="fas fa-building" style="color: #fff; font-size: 1.5rem;"></i>
-                </div>
-                <h6 style="font-size: 1.1rem; color: #17a2b8; font-weight: 600; margin-bottom: 0.5rem;">Tanzania Communications Regulatory Authority (TCRA)</h6>
-                <p style="margin: 0; font-size: 0.95rem; color: #6c757d; line-height: 1.6;">
-                    We are <span style="font-weight: 600; color: #17a2b8;">profoundly grateful</span> to the Tanzania Communications Regulatory Authority (TCRA) and TCRA Manager for providing <span style="font-weight: 600; color: #17a2b8;">comprehensive telecommunications data</span> while ensuring <span style="font-weight: 600; color: #17a2b8;">privacy compliance</span>.
+        <!-- Contact Section -->
+        <div class="contact-section">
+            <div class="container">
+                <h3 class="section-title text-white" data-aos="fade-up">Contact Us</h3>
+                <p class="lead text-center mb-5" data-aos="fade-up" data-aos-delay="100">
+                    For more information about our churn prediction system or to discuss how it can be customized for
+                    your specific needs, please contact us:
                 </p>
-            </div>
-        </div>
-        <!-- Acknowledgment 2 -->
-        <div style="flex: 1 1 300px; max-width: 400px;">
-            <div style="background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 1.5rem; text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';">
-                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #17a2b8, #117a8b); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-                    <i class="fas fa-university" style="color: #fff; font-size: 1.5rem;"></i>
-                </div>
-                <h6 style="font-size: 1.1rem; color: #17a2b8; font-weight: 600; margin-bottom: 0.5rem;">EASTC Department of Computer Science</h6>
-                <p style="margin: 0; font-size: 0.95rem; color: #6c757d; line-height: 1.6;">
-                    We acknowledge <span style="font-weight: 600; color: #17a2b8;">technical support</span> from EASTC Department of Computer Science and Data Analytics Laboratory. Access to <span style="font-weight: 600; color: #17a2b8;">high-performance computing resources</span> was essential for processing large datasets.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
-    <!-- Contact Section -->
-    <div class="contact-section">
-        <div class="container">
-            <h3 class="section-title text-white" data-aos="fade-up">Contact Us</h3>
-            <p class="lead text-center mb-5" data-aos="fade-up" data-aos-delay="100">
-                For more information about our churn prediction system or to discuss how it can be customized for
-                your specific needs, please contact us:
-            </p>
-            <div class="row">
-                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="contact-card">
-                        <i class="fas fa-envelope fa-2x mb-3"></i>
-                        <h5>Email</h5>
-                        <p>info@tanzaniatelecomchurn.com</p>
+                <div class="row row-cols-1 row-cols-md-3 g-3">
+                    <div class="col" data-aos="fade-up" data-aos-delay="200">
+                        <div class="contact-card fade-in">
+                            <i class="fas fa-envelope fa-2x mb-3"></i>
+                            <h5>Email</h5>
+                            <p><a href="mailto:info@tanzaniatelecomchurn.com" class="text-white text-decoration-none">info@tanzaniatelecomchurn.com</a></p>
+                            
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
-                    <div class="contact-card">
-                        <i class="fas fa-phone fa-2x mb-3"></i>
-                        <h5>Phone</h5>
-                        <p>+255 754 0810</p>
+                    <div class="col" data-aos="fade-up" data-aos-delay="300">
+                        <div class="contact-card fade-in">
+                            <i class="fas fa-phone fa-2x mb-3"></i>
+                            <h5>Phone</h5>
+                            <p>
+                                <a href="tel:+255754081610" class="text-white text-decoration-none">+255 754 081 610</a><br>
+                                <a href="tel:+255692715204" class="text-white text-decoration-none">+255 692 715 204</a>
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="400">
-                    <div class="contact-card">
-                        <i class="fas fa-map-marker-alt fa-2x mb-3"></i>
-                        <h5>Address</h5>
-                        <p>EASTC CHANGANYIKENI<br>Dar es Salaam, Tanzania</p>
+                    <div class="col" data-aos="fade-up" data-aos-delay="400">
+                        <div class="contact-card fade-in">
+                            <i class="fas fa-map-marker-alt fa-2x mb-3"></i>
+                            <h5>Address</h5>
+                            <p>EASTC CHANGANYIKENI<br>Dar es Salaam, Tanzania</p>
+                            
+                        </div>
                     </div>
                 </div>
             </div>
+            <br>
+                           <div style="text-align: center;">
+                           <a href="https://nkinda.duckdns.org/" style="display: inline-block; background: linear-gradient(135deg, #4CAF50, #45a049); color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3); transition: all 0.3s ease; border: 2px solid transparent;">🔒 Click Here to secure datasets predicted and other files</a>
+                           </div>
+                          <style>a:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); border-color: #4CAF50; }</style>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" defer></script>
     <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 800,
-            easing: 'ease-in-out',
-            once: true,
-            mirror: false
-        });
-    </script>
-</body>
-</html>
-
-      <script>  // Enhanced JavaScript for better compatibility
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS with mobile-friendly settings
+            AOS.init({
+                duration: window.innerWidth < 768 ? 600 : 800,
+                easing: 'ease-in-out',
+                once: true,
+                mirror: false
+            });
+
+            // Collapse button functionality
             const collapseElement = document.getElementById('contributorsCollapse');
             const button = document.getElementById('contributorsButton');
             const chevronIcon = document.getElementById('chevronIcon');
-            
+
             if (collapseElement && button && chevronIcon) {
-                // Function to rotate chevron
                 function rotateChevron(isExpanded) {
+                    chevronIcon.style.transition = 'transform 0.3s ease';
                     if (isExpanded) {
                         chevronIcon.style.transform = 'rotate(180deg)';
-                        chevronIcon.classList.remove('fa-chevron-down');
-                        chevronIcon.classList.add('fa-chevron-up');
+                        chevronIcon.classList.replace('fa-chevron-down', 'fa-chevron-up');
                     } else {
                         chevronIcon.style.transform = 'rotate(0deg)';
-                        chevronIcon.classList.remove('fa-chevron-up');
-                        chevronIcon.classList.add('fa-chevron-down');
+                        chevronIcon.classList.replace('fa-chevron-up', 'fa-chevron-down');
                     }
                 }
-                
-                // Bootstrap 5 event listeners
-                collapseElement.addEventListener('show.bs.collapse', function() {
-                    rotateChevron(true);
-                });
-                
-                collapseElement.addEventListener('hide.bs.collapse', function() {
-                    rotateChevron(false);
-                });
-                
-                // Fallback: Manual toggle if Bootstrap events don't work
-                button.addEventListener('click', function() {
-                    setTimeout(function() {
-                        const isExpanded = collapseElement.classList.contains('show');
-                        rotateChevron(isExpanded);
-                    }, 50);
+
+                collapseElement.addEventListener('show.bs.collapse', () => rotateChevron(true));
+                collapseElement.addEventListener('hide.bs.collapse', () => rotateChevron(false));
+                button.addEventListener('click', () => {
+                    setTimeout(() => rotateChevron(collapseElement.classList.contains('show')), 50);
                 });
             }
 
-            // Add scroll-based animations
+            // Intersection Observer for fade-in animations
             const observerOptions = {
                 threshold: 0.1,
-                rootMargin: '0px 0px -100px 0px'
+                rootMargin: '0px 0px -50px 0px'
             };
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
                     }
                 });
             }, observerOptions);
 
-            // Observe all fade-in elements
-            document.querySelectorAll('.fade-in').forEach(el => {
-                observer.observe(el);
-            });
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-            // Add counter animation for stats
-            const animateCounter = (element, target) => {
-                let current = 0;
-                const increment = target / 100;
-                const timer = setInterval(() => {
-                    current += increment;
-                    if (current >= target) {
-                        current = target;
-                        clearInterval(timer);
-                    }
-                    element.textContent = Math.floor(current) + (element.dataset.suffix || '');
-                }, 20);
-            };
-
-            // Animate stats when they come into view
-            const statsObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const statNumbers = entry.target.querySelectorAll('.stat-number');
-                        statNumbers.forEach(stat => {
-                            const text = stat.textContent;
-                            let target = parseInt(text.replace(/\D/g, ''));
-                            if (text.includes('%')) {
-                                stat.dataset.suffix = '%';
-                            } else if (text.includes('M+')) {
-                                stat.dataset.suffix = 'M+';
-                            } else if (text.includes('/7')) {
-                                target = 24;
-                                stat.dataset.suffix = '/7';
-                            }
-                            animateCounter(stat, target);
-                        });
-                        statsObserver.unobserve(entry.target);
-                    }
-                });
-            });
-
-            const statsSection = document.querySelector('.stats-section');
-            if (statsSection) {
-                statsObserver.observe(statsSection);
-            }
-
-            // Add parallax effect to hero section
-            window.addEventListener('scroll', () => {
-                const scrolled = window.pageYOffset;
-                const heroSection = document.querySelector('.hero-section');
-                if (heroSection) {
-                    heroSection.style.transform = `translateY(${scrolled * 0.5}px)`;
-                }
-            });
-
-            // Add smooth scrolling for any anchor links
+            // Smooth scrolling for anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
+                anchor.addEventListener('click', function(e) {
                     e.preventDefault();
                     const target = document.querySelector(this.getAttribute('href'));
                     if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 });
             });
 
-            // Add loading animation
-            const cards = document.querySelectorAll('.glass-card, .benefit-card, .team-card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                setTimeout(() => {
-                    card.style.transition = 'all 0.6s ease';
-                    card.style.opacity = '1';
+            // Touch support for hover effects
+            document.querySelectorAll('.team-card, .benefit-card, .contact-card').forEach(card => {
+                card.addEventListener('touchstart', () => {
+                    card.style.transform = 'translateY(-5px)';
+                    card.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.15)';
+                });
+                card.addEventListener('touchend', () => {
                     card.style.transform = 'translateY(0)';
-                }, index * 100);
+                    card.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.1)';
+                });
             });
+
+            // Parallax effect (disabled on mobile for performance)
+            if (window.innerWidth > 768) {
+                window.addEventListener('scroll', () => {
+                    const scrolled = window.pageYOffset;
+                    const heroSection = document.querySelector('.hero-section');
+                    if (heroSection) {
+                        heroSection.style.transform = `translateY(${scrolled * 0.3}px)`;
+                    }
+                });
+            }
         });
-        </script>
+    </script>
+</body>
+</html>
