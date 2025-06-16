@@ -1,0 +1,836 @@
+{% extends "base.html" %}
+{% block title %}Customer Churn Prediction{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <!-- Enhanced Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="header-banner">
+                <div class="header-content animate__animated animate__fadeInDown">
+                    <h1 class="display-4 fw-bold text-white mb-2">
+                        <i class="bi bi-graph-up-arrow me-3"></i>Customer Churn Prediction
+                    </h1>
+                    <p class="lead text-white-75">AI-powered customer retention analytics with real-time insights</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --info-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  --dark-bg: #1a1a2e;
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--primary-gradient);
+  min-height: 100vh;
+  line-height: 1.6;
+  color: #333;
+}
+
+.header-banner {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)),
+              url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><linearGradient id="a" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23667eea;stop-opacity:0.1"/><stop offset="100%" style="stop-color:%23764ba2;stop-opacity:0.1"/></linearGradient></defs><path d="M0,0 L1000,0 L1000,800 Q500,600 0,800 Z" fill="url(%23a)"/></svg>');
+  color: white;
+  padding: 4rem 1rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  margin: -1rem -1rem 2rem -1rem;
+  border-radius: 0 0 20px 20px;
+}
+
+.header-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+  animation: float 20s infinite linear;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-100px) rotate(360deg); }
+}
+
+.header-content h1 {
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-content p {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  opacity: 0.9;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--hover-shadow);
+}
+
+.card-header {
+  background: var(--primary-gradient);
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+  border-bottom: none;
+}
+
+.card-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+}
+
+.card-header.bg-danger {
+  background: var(--secondary-gradient) !important;
+}
+
+.card-header.bg-success {
+  background: var(--success-gradient) !important;
+}
+
+.card-header.bg-info {
+  background: var(--info-gradient) !important;
+}
+
+.form-control, .form-select {
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+  background-color: white;
+}
+
+.btn {
+  border-radius: 50px;
+  padding: 0.8rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: none;
+}
+
+.btn-primary {
+  background: var(--primary-gradient);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd1 0%, #6741a1 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-outline-primary {
+  border: 2px solid #667eea;
+  color: #667eea;
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background: #667eea;
+  color: white;
+}
+
+.btn-danger {
+  background: var(--secondary-gradient);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #d983f0 0%, #e34d63 100%);
+}
+
+.prediction-result {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.prediction-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+.bg-danger {
+  background: var(--secondary-gradient) !important;
+}
+
+.bg-success {
+  background: var(--success-gradient) !important;
+}
+
+.alert {
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: none;
+}
+
+.alert-danger {
+  background: rgba(220, 53, 69, 0.15);
+  color: #dc3545;
+}
+
+.alert-success {
+  background: rgba(25, 135, 84, 0.15);
+  color: #198754;
+}
+
+.table {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table th {
+  background: var(--primary-gradient);
+  color: white;
+  font-weight: 500;
+}
+
+.mode-toggle-container .btn-group {
+  border-radius: 50px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.mode-toggle-container .btn {
+  border: none;
+  padding: 0.8rem;
+  font-weight: 500;
+}
+
+.mode-toggle-container .btn.active {
+  background: var(--primary-gradient);
+  color: white;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.list-group-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-left: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+  border-left: 3px solid #667eea;
+  transform: translateX(5px);
+}
+
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.2rem);
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5rem;
+  height: 4px;
+  background: var(--primary-gradient);
+  border-radius: 2px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+#formSection, .results-column {
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .header-banner {
+    padding: 3rem 1rem;
+  }
+  
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  .prediction-circle {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-buttons .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .header-banner {
+    padding: 2rem 1rem;
+  }
+  
+  .card-header {
+    padding: 1rem;
+  }
+  
+  .btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  
+  .form-control, .form-select {
+    padding: 0.5rem;
+  }
+}
+
+/* New styles for file input group */
+.input-group .btn-outline-danger {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: none;
+}
+
+.input-group .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Stats cards */
+.card-stat {
+  border-radius: 10px;
+  color: white;
+  padding: 1rem;
+  height: 100%;
+}
+
+.card-stat .card-title {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-stat .card-text {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+    </style>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row g-4">
+        <!-- Main Form Section -->
+        <div class="col-lg-8" id="formSection" {% if result or batch_results %}style="display: none;"{% endif %}>
+            <!-- Prediction Mode Toggle -->
+            <div class="mode-toggle-container mb-4">
+                <div class="btn-group w-100" role="group">
+                    <button type="button" class="btn btn-primary active" id="singleModeBtn" onclick="showSinglePrediction()">
+                        <i class="bi bi-person-fill me-2"></i>Single Prediction
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="batchModeBtn" onclick="showBatchPrediction()">
+                        <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction
+                    </button>
+                </div>
+            </div>
+
+            <div class="tab-content" id="predictionTabContent">
+                <!-- Single Prediction Form -->
+                <div class="tab-pane fade show active" id="single-prediction">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-person-plus me-2"></i>Customer Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('predict') }}" id="predictionForm">
+                                {{ form.hidden_tag() }}
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.telecom_company.label(class="form-label") }}
+                                            {{ form.telecom_company(class="form-select") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.region.label(class="form-label") }}
+                                            {{ form.region(class="form-select") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.age.label(class="form-label") }}
+                                            {{ form.age(class="form-control") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.gender.label(class="form-label") }}
+                                            {{ form.gender(class="form-select") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.contract_type.label(class="form-label") }}
+                                            {{ form.contract_type(class="form-select") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.contract_duration.label(class="form-label") }}
+                                            {{ form.contract_duration(class="form-select") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.tenure_months.label(class="form-label") }}
+                                            {{ form.tenure_months(class="form-control") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.monthly_charges.label(class="form-label") }}
+                                            {{ form.monthly_charges(class="form-control") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.data_usage_gb.label(class="form-label") }}
+                                            {{ form.data_usage_gb(class="form-control") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.call_duration_minutes.label(class="form-label") }}
+                                            {{ form.call_duration_minutes(class="form-control") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.complaints_filed.label(class="form-label") }}
+                                            {{ form.complaints_filed(class="form-control") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.customer_support_calls.label(class="form-label") }}
+                                            {{ form.customer_support_calls(class="form-control") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.payment_method.label(class="form-label") }}
+                                            {{ form.payment_method(class="form-select") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.internet_service.label(class="form-label") }}
+                                            {{ form.internet_service(class="form-select") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.additional_services.label(class="form-label") }}
+                                            {{ form.additional_services(class="form-select") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.discount_offer_used.label(class="form-label") }}
+                                            {{ form.discount_offer_used(class="form-select") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ form.billing_issues_reported.label(class="form-label") }}
+                                            {{ form.billing_issues_reported(class="form-control") }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="action-buttons mt-4">
+                                    <button type="submit" name="predict" class="btn btn-primary">
+                                        <i class="bi bi-cpu me-2"></i>Predict Churn
+                                    </button>
+                                    <button type="submit" name="add_another" class="btn btn-outline-primary">
+                                        <i class="bi bi-plus-circle me-2"></i>Predict & Add Another
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="clearForm()">
+                                        <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Batch Prediction -->
+                <div class="tab-pane fade" id="batch-prediction">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-cloud-upload me-2"></i>Batch Prediction
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('batch_predict') }}" enctype="multipart/form-data" id="batchForm">
+                                {{ form.hidden_tag() }}
+                                <div class="mb-3">
+                                    <label for="file" class="form-label">Upload CSV File</label>
+                                    <div class="input-group">
+                                        <input class="form-control" type="file" id="file" name="file" accept=".csv" required>
+                                        <button type="button" class="btn btn-outline-danger" id="clearFileBtn" style="display: none;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Maximum file size: 50MB | Supported format: CSV
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#requirementsModal">View required fields</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="action-buttons">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-rocket-takeoff me-2"></i>Process Batch Prediction
+                                    </button>
+                                    <a href="{{ url_for('download_sample_csv') }}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-download me-2"></i>Download Sample CSV
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Column -->
+        <div class="col-lg-4">
+            {% if batch_results %}
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction Results
+                            <button class="btn btn-sm btn-light float-end" onclick="toggleForm()">Show Form</button>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if batch_results %}
+                            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer ID</th>
+                                            <th>Prediction</th>
+                                            <th>Probability</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for result in batch_results %}
+                                        <tr>
+                                            <td>{{ result.customer_id }}</td>
+                                            <td class="{% if result.prediction == 'Yes' %}text-danger{% else %}text-success{% endif %}">
+                                                {{ result.prediction }}
+                                            </td>
+                                            <td>{{ (result.probability * 100)|round(2) }}%</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <a href="{{ url_for('download_batch_results', batch_id=batch_id) }}" class="btn btn-danger w-100">
+                                    <i class="bi bi-file-earmark-arrow-down me-2"></i>Download Full Results
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% elif result %}
+                <div class="card mb-4">
+                    <div class="card-header {% if result.prediction == 'Yes' %}bg-danger{% else %}bg-success{% endif %} text-white">
+                        <h5 class="mb-0">
+                            <i class="bi {% if result.prediction == 'Yes' %}bi-exclamation-triangle{% else %}bi-check-circle{% endif %} me-2"></i>
+                            Prediction Result
+                            <button class="btn btn-sm btn-light float-end" onclick="toggleForm()">Show Form</button>
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="prediction-result mb-3">
+                            <div class="prediction-circle {% if result.prediction == 'Yes' %}bg-danger{% else %}bg-success{% endif %} text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                <div>
+                                    <div class="fw-bold fs-4">{{ result.prediction }}</div>
+                                    <div class="fs-6">{{ (result.probability * 100)|round(2) }}%</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert {% if result.prediction == 'Yes' %}alert-danger{% else %}alert-success{% endif %}">
+                            <i class="bi {% if result.prediction == 'Yes' %}bi-exclamation-triangle{% else %}bi-check-circle{% endif %} me-2"></i>
+                            <strong>{{ result.recommendation }}</strong>
+                        </div>
+                        
+                        {% if prediction_id %}
+                            <div class="mt-3">
+                                <a href="{{ url_for('download_pdf', prediction_id=prediction_id) }}" class="btn btn-danger w-100">
+                                    <i class="bi bi-file-earmark-pdf me-2"></i>Download Report (PDF)
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Churn Report -->
+                {% if report %}
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-graph-up-arrow me-2"></i>Churn Analysis
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Risk Factors -->
+                            {% if report.risk_factors %}
+                                <div class="mb-3">
+                                    <h6 class="text-danger">
+                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Risk Factors
+                                    </h6>
+                                    <ul class="list-group">
+                                        {% for factor in report.risk_factors %}
+                                            <li class="list-group-item">{{ factor }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Retention Opportunities -->
+                            {% if report.retention_opportunities %}
+                                <div class="mb-3">
+                                    <h6 class="text-warning">
+                                        <i class="bi bi-lightbulb-fill me-2"></i>Retention Opportunities
+                                    </h6>
+                                    <ul class="list-group">
+                                        {% for opp in report.retention_opportunities %}
+                                            <li class="list-group-item">{{ opp }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Actionable Insights -->
+                            {% if report.actionable_insights %}
+                                <div>
+                                    <h6 class="text-success">
+                                        <i class="bi bi-check-circle-fill me-2"></i>Actionable Insights
+                                    </h6>
+                                    <ul class="list-group">
+                                        {% for insight in report.actionable_insights %}
+                                            <li class="list-group-item">{{ insight }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-lightbulb me-2"></i>Instructions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="list-group list-group-numbered">
+                            <li class="list-group-item">Select prediction type (single or batch)</li>
+                            <li class="list-group-item">Fill in all required fields</li>
+                            <li class="list-group-item">Click "Predict Churn" button</li>
+                            <li class="list-group-item">View results and recommendations</li>
+                        </ol>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Requirements Modal -->
+<div class="modal fade" id="requirementsModal" tabindex="-1" aria-labelledby="requirementsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="requirementsModalLabel">Batch Prediction Requirements</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Your CSV file must include these columns with valid data:</p>
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>TelecomCompany</strong>: Airtel, Tigo, Vodacom, Halotel, TTCL, Zantel</li>
+                    <li class="list-group-item"><strong>Region</strong>: One of Tanzania's regions (e.g., Dar es Salaam, Mwanza, etc.)</li>
+                    <li class="list-group-item"><strong>Age</strong>: Number between 18-110</li>
+                    <li class="list-group-item"><strong>Gender</strong>: Male or Female</li>
+                    <li class="list-group-item"><strong>ContractType</strong>: Prepaid, Postpaid, Hybrid</li>
+                    <li class="list-group-item"><strong>ContractDuration</strong>: 1 Month, 3 Months, 6 Months, 12 Months, 24 Months</li>
+                    <li class="list-group-item"><strong>TenureMonths</strong>: Number between 1-120</li>
+                    <li class="list-group-item"><strong>MonthlyCharges</strong>: Positive number</li>
+                    <li class="list-group-item"><strong>DataUsageGB</strong>: Positive number</li>
+                    <li class="list-group-item"><strong>CallDurationMinutes</strong>: Positive number</li>
+                    <li class="list-group-item"><strong>ComplaintsFiled</strong>: Positive integer</li>
+                    <li class="list-group-item"><strong>CustomerSupportCalls</strong>: Positive integer</li>
+                    <li class="list-group-item"><strong>PaymentMethod</strong>: Credit Card, Bank Transfer, Mobile Money, Cash, Voucher, Other</li>
+                    <li class="list-group-item"><strong>InternetService</strong>: Mobile Data, Fiber, DSL, WiMAX, None</li>
+                    <li class="list-group-item"><strong>AdditionalServices</strong>: Streaming, VPN, Cloud Storage, Gaming, None</li>
+                    <li class="list-group-item"><strong>DiscountOfferUsed</strong>: Yes or No</li>
+                    <li class="list-group-item"><strong>BillingIssuesReported</strong>: Positive integer</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle form visibility
+function toggleForm() {
+    const formSection = document.getElementById('formSection');
+    formSection.style.display = formSection.style.display === 'none' ? 'block' : 'none';
+}
+
+// Show Single Prediction
+function showSinglePrediction() {
+    document.getElementById('single-prediction').classList.add('show', 'active');
+    document.getElementById('batch-prediction').classList.remove('show', 'active');
+    document.getElementById('singleModeBtn').classList.add('active');
+    document.getElementById('batchModeBtn').classList.remove('active');
+}
+
+// Show Batch Prediction
+function showBatchPrediction() {
+    document.getElementById('batch-prediction').classList.add('show', 'active');
+    document.getElementById('single-prediction').classList.remove('show', 'active');
+    document.getElementById('batchModeBtn').classList.add('active');
+    document.getElementById('singleModeBtn').classList.remove('active');
+}
+
+// Clear form function
+function clearForm() {
+    document.getElementById('predictionForm').reset();
+}
+
+// File input handling
+document.getElementById('file').addEventListener('change', function(e) {
+    const clearBtn = document.getElementById('clearFileBtn');
+    clearBtn.style.display = e.target.files.length > 0 ? 'block' : 'none';
+});
+
+document.getElementById('clearFileBtn').addEventListener('click', function() {
+    document.getElementById('file').value = '';
+    this.style.display = 'none';
+});
+
+// Initialize form mode based on URL or other condition
+document.addEventListener('DOMContentLoaded', function() {
+    // Option 1: Check URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('batch') === 'true') {
+        showBatchPrediction();
+    }
+    
+    // Option 2: Check for existence of batch results element
+    // if (document.getElementById('batch-results-container')) {
+    //     showBatchPrediction();
+    // }
+    
+    // Option 3: Check a data attribute or global variable
+    // if (window.hasBatchResults) {
+    //     showBatchPrediction();
+    // }
+});
+</script>
+
+{% endblock %}
