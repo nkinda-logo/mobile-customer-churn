@@ -3,1567 +3,1912 @@
 {% block title %}Customer Churn Prediction{% endblock %}
 
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Churn Prediction - Advanced Analytics</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
-</head>
-<body>
-    <div class="container-fluid px-4 py-3">
-        <!-- Enhanced Header Section with Particles Background -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="header-banner">
-                    <canvas id="particles-canvas"></canvas>
-                    <div class="header-content animate__animated animate__fadeInDown">
-                        <h1 class="display-4 fw-bold text-white mb-2">
-                            <i class="bi bi-graph-up-arrow me-3"></i>Customer Churn Prediction
-                        </h1>
-                        <p class="lead text-white-75">AI-powered customer retention analytics with real-time insights</p>
-                        <div class="stats-row mt-4">
-                            <div class="stat-item">
-                                <div class="stat-number">91.2%</div>
-                                <div class="stat-label">Accuracy</div>
+<div class="container-fluid px-4 py-3">
+    <!-- Enhanced Header Section with Particles Background -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="header-banner">
+                <canvas id="particles-canvas"></canvas>
+                <div class="header-content animate__animated animate__fadeInDown">
+                    <h1 class="display-4 fw-bold text-white mb-2">
+                        <i class="bi bi-graph-up-arrow me-3"></i>Customer Churn Prediction
+                    </h1>
+                    <p class="lead text-white-75">AI-powered customer retention analytics with real-time insights</p>
+                    <div class="stats-row mt-4">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="alert alert-success alert-dismissible fade show shadow-sm animate__animated animate__slideInDown" role="alert" id="successAlert">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <span id="successMessage">
+                            {% for category, message in messages %}
+                                {{ message }}
+                            {% endfor %}
+                        </span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="row g-4">
+        <!-- Enhanced Main Form Section -->
+        <div class="col-lg-8" id="formSection" {% if result or batch_results is defined %}style="display: none;"{% endif %}>
+            <!-- Prediction Mode Toggle -->
+            <div class="mode-toggle-container mb-4 animate__animated animate__fadeInUp">
+                <div class="btn-group w-100" role="group">
+                    <button type="button" class="btn btn-primary-gradient active" id="singleModeBtn" onclick="showSinglePrediction()">
+                        <i class="bi bi-person-fill me-2"></i>Single Prediction
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="batchModeBtn" onclick="showBatchPrediction()">
+                        <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction
+                    </button>
+                </div>
+            </div>
+
+            <div class="tab-content" id="predictionTabContent">
+                <!-- Enhanced Single Prediction Form -->
+                <div class="tab-pane fade show active" id="single-prediction">
+                    <div class="enhanced-card animate__animated animate__fadeInUp">
+                        <div class="card-header-gradient">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 text-white">
+                                    <i class="bi bi-person-plus me-2"></i>Customer Intelligence Form
+                                </h5>
+                                <div class="form-progress">
+                                    <div class="progress-circle">
+                                        <div class="progress-text">0%</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="stat-item">
-                                <div class="stat-number">15K+</div>
-                                <div class="stat-label">Predictions</div>
-                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <form method="POST" action="{{ url_for('predict') }}" id="predictionForm">
+                                {{ form.hidden_tag() }}
+                                
+                                <!-- Personal Information Section -->
+                                <div class="form-section mb-5" data-section="1">
+                                    <div class="section-header">
+                                        <h6 class="section-title">
+                                            <i class="bi bi-person-circle me-2"></i>Personal Information
+                                            <div class="section-status">
+                                                <i class="bi bi-circle section-indicator"></i>
+                                            </div>
+                                        </h6>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.telecom_company(class="form-select", required="required") }}
+                                                {{ form.telecom_company.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-0">
+                                                {{ form.region.label(class="form-label") }}
+                                                {{ form.region(class="form-select searchable", required="required") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.age(class="form-control", placeholder="Age", min="18", max="100", required="required") }}
+                                                {{ form.age.label(class="form-label") }}
+                                                {% for error in form.age.errors %}
+                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.gender(class="form-select", required="required") }}
+                                                {{ form.gender.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Contract Details Section -->
+                                <div class="form-section mb-5" data-section="2">
+                                    <div class="section-header">
+                                        <h6 class="section-title">
+                                            <i class="bi bi-file-text me-2"></i>Contract Details
+                                            <div class="section-status">
+                                                <i class="bi bi-circle section-indicator"></i>
+                                            </div>
+                                        </h6>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.contract_type(class="form-select", required="required") }}
+                                                {{ form.contract_type.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.contract_duration(class="form-select", required="required") }}
+                                                {{ form.contract_duration.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.tenure_months(class="form-control", placeholder="Tenure in Months", min="1", max="100", required="required") }}
+                                                {{ form.tenure_months.label(class="form-label") }}
+                                                {% for error in form.tenure_months.errors %}
+                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group-enhanced">
+                                                <span class="input-group-text currency-badge">TZS</span>
+                                                <div class="form-floating">
+                                                    {{ form.monthly_charges(class="form-control", placeholder="Monthly Charges", step="0.01", min="0", required="required") }}
+                                                    {{ form.monthly_charges.label(class="form-label") }}
+                                                </div>
+                                            </div>
+                                            {% for error in form.monthly_charges.errors %}
+                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Usage Information Section -->
+                                <div class="form-section mb-5" data-section="3">
+                                    <div class="section-header">
+                                        <h6 class="section-title">
+                                            <i class="bi bi-graph-up me-2"></i>Usage Information
+                                            <div class="section-status">
+                                                <i class="bi bi-circle section-indicator"></i>
+                                            </div>
+                                        </h6>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="input-group-enhanced">
+                                                <div class="form-floating">
+                                                    {{ form.data_usage_gb(class="form-control", placeholder="Data Usage", step="0.1", min="0", required="required") }}
+                                                    {{ form.data_usage_gb.label(class="form-label") }}
+                                                </div>
+                                                <span class="input-group-text unit-badge">GB</span>
+                                            </div>
+                                            {% for error in form.data_usage_gb.errors %}
+                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group-enhanced">
+                                                <div class="form-floating">
+                                                    {{ form.call_duration_minutes(class="form-control", placeholder="Call Duration", min="0", required="required") }}
+                                                    {{ form.call_duration_minutes.label(class="form-label") }}
+                                                </div>
+                                                <span class="input-group-text unit-badge">mins</span>
+                                            </div>
+                                            {% for error in form.call_duration_minutes.errors %}
+                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Customer Support Section -->
+                                <div class="form-section mb-5" data-section="4">
+                                    <div class="section-header">
+                                        <h6 class="section-title">
+                                            <i class="bi bi-headset me-2"></i>Customer Support
+                                            <div class="section-status">
+                                                <i class="bi bi-circle section-indicator"></i>
+                                            </div>
+                                        </h6>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.complaints_filed(class="form-control", placeholder="Complaints Filed", min="0", required="required") }}
+                                                {{ form.complaints_filed.label(class="form-label") }}
+                                                {% for error in form.complaints_filed.errors %}
+                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.customer_support_calls(class="form-control", placeholder="Support Calls", min="0", required="required") }}
+                                                {{ form.customer_support_calls.label(class="form-label") }}
+                                                {% for error in form.customer_support_calls.errors %}
+                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Payment and Services Section -->
+                                <div class="form-section mb-5" data-section="5">
+                                    <div class="section-header">
+                                        <h6 class="section-title">
+                                            <i class="bi bi-credit-card me-2"></i>Payment & Services
+                                            <div class="section-status">
+                                                <i class="bi bi-circle section-indicator"></i>
+                                            </div>
+                                        </h6>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.payment_method(class="form-select", required="required") }}
+                                                {{ form.payment_method.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.internet_service(class="form-select", required="required") }}
+                                                {{ form.internet_service.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.additional_services(class="form-select", required="required") }}
+                                                {{ form.additional_services.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.discount_offer_used(class="form-select", required="required") }}
+                                                {{ form.discount_offer_used.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.billing_issues_reported(class="form-control", placeholder="Billing Issues", min="0", required="required") }}
+                                                {{ form.billing_issues_reported.label(class="form-label") }}
+                                                {% for error in form.billing_issues_reported.errors %}
+                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Enhanced Action Buttons -->
+                                <div class="action-buttons">
+                                    <button type="submit" name="predict" class="btn btn-primary-gradient btn-lg px-5">
+                                        <i class="bi bi-cpu me-2"></i>
+                                        <span class="btn-text">Predict Churn</span>
+                                        <div class="btn-loader"></div>
+                                    </button>
+                                    <button type="submit" name="add_another" class="btn btn-outline-primary btn-lg px-4">
+                                        <i class="bi bi-plus-circle me-2"></i>Predict & Add Another
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary btn-lg px-4" onclick="clearForm()">
+                                        <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Batch Prediction -->
+                <div class="tab-pane fade" id="batch-prediction">
+                    <div class="enhanced-card animate__animated animate__fadeInUp">
+                        <div class="card-header-gradient">
+                            <h5 class="mb-0 text-white">
+                                <i class="bi bi-cloud-upload me-2"></i>Batch Prediction Analytics
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <form id="batchForm" method="POST" action="{{ url_for('batch_predict') }}" enctype="multipart/form-data">
+                                {{ form.hidden_tag() }}
+                                <div class="upload-section">
+                                    <div class="upload-area" id="uploadArea">
+                                        <i class="bi bi-cloud-upload upload-icon"></i>
+                                        <h6>Drag & Drop CSV File or Click to Browse</h6>
+                                        <input type="file" class="form-control" id="csvFile" name="file" accept=".csv" style="display: none;" required>
+                                        <div class="upload-info">
+                                            <small class="text-muted">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                Maximum file size: 50MB | Supported format: CSV
+                                            </small>
+                                        </div>
+                                        <div class="file-preview" id="filePreview" style="display: none;">
+                                            <div class="file-info">
+                                                <i class="bi bi-file-earmark-spreadsheet file-icon"></i>
+                                                <div class="file-details">
+                                                    <div class="file-name"></div>
+                                                    <div class="file-size"></div>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="removeFile()">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="action-buttons">
+                                    <button type="submit" class="btn btn-primary-gradient btn-lg px-5" id="batchSubmitBtn" disabled>
+                                        <i class="bi bi-rocket-takeoff me-2"></i>
+                                        <span>Process Batch Prediction</span>
+                                    </button>
+                                    <a href="{{ url_for('download_sample_csv') }}" class="btn btn-outline-secondary btn-lg px-4">
+                                        <i class="bi bi-download me-2"></i>Download Sample
+                                    </a>
+                                </div>
+                                <div class="required-columns">
+                                    <h6 class="d-flex justify-content-between align-items-center mb-3">
+                                        <span><i class="bi bi-list-check me-2"></i>Required CSV Columns</span>
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#columnsTable">
+                                            <i class="bi bi-eye me-1"></i>View Requirements
+                                        </button>
+                                    </h6>
+                                    <div class="collapse" id="columnsTable">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover custom-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Column Name</th>
+                                                        <th>Type</th>
+                                                        <th>Description</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr><td><code>CustomerID</code></td><td>String</td><td>Unique customer identifier</td></tr>
+                                                    <tr><td><code>TelecomCompany</code></td><td>String</td><td>Service provider name</td></tr>
+                                                    <tr><td><code>Region</code></td><td>String</td><td>Customer's geographical region</td></tr>
+                                                    <tr><td><code>Age</code></td><td>Integer</td><td>Customer age (18-100)</td></tr>
+                                                    <tr><td><code>Gender</code></td><td>String</td><td>Customer gender</td></tr>
+                                                    <tr><td><code>ContractType</code></td><td>String</td><td>Prepaid or Postpaid</td></tr>
+                                                    <tr><td><code>ContractDuration</code></td><td>String</td><td>Duration of contract</td></tr>
+                                                    <tr><td><code>TenureMonths</code></td><td>Integer</td><td>Months with company</td></tr>
+                                                    <tr><td><code>MonthlyCharges</code></td><td>Float</td><td>Monthly billing amount</td></tr>
+                                                    <tr><td><code>DataUsageGB</code></td><td>Float</td><td>Data consumption in GB</td></tr>
+                                                    <tr><td><code>CallDurationMinutes</code></td><td>Integer</td><td>Total call duration</td></tr>
+                                                    <tr><td><code>ComplaintsFiled</code></td><td>Integer</td><td>Number of complaints</td></tr>
+                                                    <tr><td><code>CustomerSupportCalls</code></td><td>Integer</td><td>Number of support calls</td></tr>
+                                                    <tr><td><code>PaymentMethod</code></td><td>String</td><td>Payment method</td></tr>
+                                                    <tr><td><code>InternetService</code></td><td>String</td><td>Type of internet service</td></tr>
+                                                    <tr><td><code>AdditionalServices</code></td><td>String</td><td>Additional services</td></tr>
+                                                    <tr><td><code>DiscountOfferUsed</code></td><td>String</td><td>Discount usage</td></tr>
+                                                    <tr><td><code>BillingIssuesReported</code></td><td>Integer</td><td>Billing issues reported</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="alert alert-success alert-dismissible fade show shadow-sm animate__animated animate__slideInDown" role="alert" id="successAlert">
-                            <i class="bi bi-check-circle me-2"></i>
-                            <span id="successMessage">
-                                {% for category, message in messages %}
-                                    {{ message }}
-                                {% endfor %}
-                            </span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+        <!-- Enhanced Results Column -->
+        <div class="col-lg-4">
+            {% if batch_results is defined %}
+                <div class="enhanced-card mb-4 animate__animated animate__fadeInRight">
+                    <div class="card-header-gradient bg-info-gradient">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction Results
+                            <button class="btn btn-sm btn-light ms-auto" onclick="toggleForm()">Show Form</button>
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if batch_results %}
+                            {% set total_customers = batch_results|length %}
+                            {% set churn_count = batch_results|selectattr('prediction', 'equalto', 'Yes')|list|length %}
+                            {% set non_churn_count = batch_results|selectattr('prediction', 'equalto', 'No')|list|length %}
+                            {% set churn_percentage = (churn_count / total_customers * 100)|round(2) %}
+                            {% set non_churn_percentage = (non_churn_count / total_customers * 100)|round(2) %}
+
+                            <p>Total customers processed: {{ total_customers }}</p>
+                            <p>Customers predicted to churn: {{ churn_count }} ({{ churn_percentage }}%)</p>
+                            <p>Customers not predicted to churn: {{ non_churn_count }} ({{ non_churn_percentage }}%)</p>
+
+                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-striped table-bordered table-hover custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Customer ID</th>
+                                            <th scope="col">Prediction</th>
+                                            <th scope="col">Probability</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for result in batch_results %}
+                                        <tr>
+                                            <td>{{ result.customer_id }}</td>
+                                            <td class="{% if result.prediction == 'Yes' %}text-danger{% else %}text-success{% endif %}">{{ result.prediction }}</td>
+                                            <td>{{ (result.probability * 100)|round(2) }}%</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Insights and Recommendations -->
+                            <div class="mt-4">
+                                <h6 class="text-primary"><i class="bi bi-bar-chart-fill me-2"></i>Insights & Recommendations</h6>
+                                <div class="card bg-light p-3">
+                                    <h6 class="mb-2">Insights:</h6>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">Churn rate: {{ churn_percentage }}% of customers are at risk of churning.</li>
+                                        {% if churn_percentage > 30 %}
+                                            <li class="list-group-item text-warning">High churn rate detected (>30%). Immediate action is recommended.</li>
+                                        {% elif churn_percentage > 15 %}
+                                            <li class="list-group-item text-info">Moderate churn rate detected (>15%). Monitoring and targeted retention needed.</li>
+                                        {% else %}
+                                            <li class="list-group-item text-success">Low churn rate detected (<15%). Maintain current strategies.</li>
+                                        {% endif %}
+                                    </ul>
+
+                                    <h6 class="mt-3 mb-2">Recommendations:</h6>
+                                    <ul class="list-group list-group-flush">
+                                        {% if churn_percentage > 30 %}
+                                            <li class="list-group-item">Implement urgent retention campaigns with personalized discounts (e.g., 20% off for 3 months).</li>
+                                            <li class="list-group-item">Assign dedicated account managers to high-risk customers.</li>
+                                            <li class="list-group-item">Resolve all reported billing issues within 48 hours.</li>
+                                        {% elif churn_percentage > 15 %}
+                                            <li class="list-group-item">Offer targeted promotions to at-risk customers (e.g., free data bundles).</li>
+                                            <li class="list-group-item">Conduct satisfaction surveys to identify pain points.</li>
+                                            <li class="list-group-item">Enhance customer support availability.</li>
+                                        {% else %}
+                                            <li class="list-group-item">Continue current service quality and monitor trends monthly.</li>
+                                            <li class="list-group-item">Offer loyalty rewards to maintain customer satisfaction.</li>
+                                            <li class="list-group-item">Proactively check in with long-term customers.</li>
+                                        {% endif %}
+                                        <li class="list-group-item">Analyze customer data (e.g., tenure, complaints) for deeper insights into churn drivers.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Download Link -->
+                            {% if batch_id %}
+                                <div class="mt-3">
+                                    <a href="{{ url_for('download_batch_results', batch_id=batch_id) }}" class="btn btn-outline-primary btn-lg w-100">
+                                        <i class="bi bi-download me-2"></i>Download Full Results (CSV)
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="alert alert-info-custom">
+                                <i class="bi bi-info-circle me-2"></i>
+                                No valid customers found in the uploaded CSV.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% elif result %}
+                <div class="enhanced-card mb-4 animate__animated animate__fadeInRight">
+                    <div class="card-header {% if result.prediction == 'Yes' %}bg-danger-gradient{% else %}bg-success-gradient{% endif %}">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-{% if result.prediction == 'Yes' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
+                            Prediction Result
+                            <button class="btn btn-sm btn-light ms-auto" onclick="toggleForm()">Show Form</button>
+                        </h5>
+                    </div>
+                    <div class="card-body text-center p-4">
+                        <div class="prediction-result">
+                            <div class="prediction-circle {% if result.prediction == 'Yes' %}danger{% else %}success{% endif %}">
+                                <div class="prediction-text">{{ result.prediction }}</div>
+                                <div class="prediction-prob">{{ (result.probability * 100)|round(2) }}%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="recommendation-box {% if result.prediction == 'Yes' %}alert-danger{% else %}alert-success{% endif %}">
+                            <i class="bi bi-{% if result.prediction == 'Yes' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
+                            <strong>{{ result.recommendation }}</strong>
+                        </div>
+                        
+                        {% if prediction_id %}
+                            <div class="mt-3">
+                                <a href="{{ url_for('download_pdf', prediction_id=prediction_id) }}" class="btn btn-outline-primary btn-lg w-100">
+                                    <i class="bi bi-download me-2"></i>Download Report (PDF)
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Enhanced Churn Report -->
+                {% if report %}
+                    <div class="enhanced-card animate__animated animate__fadeInRight">
+                        <div class="card-header bg-info-gradient">
+                            <h5 class="mb-0 text-white">
+                                <i class="bi bi-graph-up-arrow me-2"></i>Churn Analysis Report
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Risk Factors -->
+                            {% if report.risk_factors %}
+                                <div class="report-section mb-4">
+                                    <h6 class="report-title danger">
+                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Risk Factors
+                                    </h6>
+                                    <div class="report-items">
+                                        {% for factor in report.risk_factors %}
+                                            <div class="report-item danger">
+                                                <i class="bi bi-arrow-right me-2"></i>{{ factor }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Retention Opportunities -->
+                            {% if report.retention_opportunities %}
+                                <div class="report-section mb-4">
+                                    <h6 class="report-title warning">
+                                        <i class="bi bi-lightbulb-fill me-2"></i>Retention Opportunities
+                                    </h6>
+                                    <div class="report-items">
+                                        {% for opp in report.retention_opportunities %}
+                                            <div class="report-item warning">
+                                                <i class="bi bi-arrow-right me-2"></i>{{ opp }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Actionable Insights -->
+                            {% if report.actionable_insights %}
+                                <div class="report-section">
+                                    <h6 class="report-title success">
+                                        <i class="bi bi-check-circle-fill me-2"></i>Actionable Insights
+                                    </h6>
+                                    <div class="report-items">
+                                        {% for insight in report.actionable_insights %}
+                                            <div class="report-item success">
+                                                <i class="bi bi-arrow-right me-2"></i>{{ insight }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="enhanced-card animate__animated animate__fadeInRight" id="instructionsCard">
+                    <div class="card-header-gradient">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-lightbulb me-2"></i>Getting Started
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="instruction-timeline">
+                            <div class="instruction-step active" data-step="1">
+                                <div class="step-icon">
+                                    <i class="bi bi-1-circle-fill"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h6>Choose Prediction Type</h6>
+                                    <p>Select single customer analysis or batch processing</p>
+                                </div>
+                            </div>
+                            <div class="instruction-step" data-step="2">
+                                <div class="step-icon">
+                                    <i class="bi bi-2-circle-fill"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h6>Input Customer Data</h6>
+                                    <p>Fill in all required fields for accurate predictions</p>
+                                </div>
+                            </div>
+                            <div class="instruction-step" data-step="3">
+                                <div class="step-icon">
+                                    <i class="bi bi-3-circle-fill"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h6>Get AI Insights</h6>
+                                    <p>Receive detailed churn analysis and recommendations</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-highlights mt-4">
+                            <h6 class="mb-3">
+                                <i class="bi bi-star-fill me-2 text-warning"></i>Key Features
+                            </h6>
+                            <div class="feature-list">
+                                <div class="feature-item">
+                                    <i class="bi-lightning-charge text-warning"></i>
+                                    <span>Real-time Processing</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="bi bi-graph-up text-primary"></i>
+                                    <span>Advanced Analytics</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="bi bi-file-earmark-pdf text-danger"></i>
+                                    <span>Detailed Reports</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             {% endif %}
-        {% endwith %}
-
-        <div class="row g-4">
-            <!-- Enhanced Main Form Section -->
-            <div class="col-lg-8" id="formSection" {% if result or batch_results is defined %}style="display: none;"{% endif %}>
-                <!-- Prediction Mode Toggle -->
-                <div class="mode-toggle-container mb-4 animate__animated animate__fadeInUp">
-                    <div class="btn-group w-100" role="group">
-                        <button type="button" class="btn btn-primary-gradient active" id="singleModeBtn" onclick="showSinglePrediction()">
-                            <i class="bi bi-person-fill me-2"></i>Single Prediction
-                        </button>
-                        <button type="button" class="btn btn-outline-primary" id="batchModeBtn" onclick="showBatchPrediction()">
-                            <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction
-                        </button>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="predictionTabContent">
-                    <!-- Enhanced Single Prediction Form -->
-                    <div class="tab-pane fade show active" id="single-prediction">
-                        <div class="enhanced-card animate__animated animate__fadeInUp">
-                            <div class="card-header-gradient">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0 text-white">
-                                        <i class="bi bi-person-plus me-2"></i>Customer Intelligence Form
-                                    </h5>
-                                    <div class="form-progress">
-                                        <div class="progress-circle">
-                                            <div class="progress-text">0%</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body p-4">
-                                <form method="POST" action="{{ url_for('predict') }}" id="predictionForm">
-                                    {{ form.hidden_tag() }}
-                                    
-                                    <!-- Personal Information Section -->
-                                    <div class="form-section mb-5" data-section="1">
-                                        <div class="section-header">
-                                            <h6 class="section-title">
-                                                <i class="bi bi-person-circle me-2"></i>Personal Information
-                                                <div class="section-status">
-                                                    <i class="bi bi-circle section-indicator"></i>
-                                                </div>
-                                            </h6>
-                                        </div>
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.telecom_company(class="form-select", required="required") }}
-                                                    {{ form.telecom_company.label(class="form-label") }}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.region(class="form-select", required="required") }}
-                                                    {{ form.region.label(class="form-label") }}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.age(class="form-control", placeholder="Age", min="18", max="100", required="required") }}
-                                                    {{ form.age.label(class="form-label") }}
-                                                    {% for error in form.age.errors %}
-                                                        <div class="invalid-feedback d-block">{{ error }}</div>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.gender(class="form-select", required="required") }}
-                                                    {{ form.gender.label(class="form-label") }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Contract Details Section -->
-                                    <div class="form-section mb-5" data-section="2">
-                                        <div class="section-header">
-                                            <h6 class="section-title">
-                                                <i class="bi bi-file-text me-2"></i>Contract Details
-                                                <div class="section-status">
-                                                    <i class="bi bi-circle section-indicator"></i>
-                                                </div>
-                                            </h6>
-                                        </div>
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.contract_type(class="form-select", required="required") }}
-                                                    {{ form.contract_type.label(class="form-label") }}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.contract_duration(class="form-select", required="required") }}
-                                                    {{ form.contract_duration.label(class="form-label") }}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.tenure_months(class="form-control", placeholder="Tenure in Months", min="1", max="100", required="required") }}
-                                                    {{ form.tenure_months.label(class="form-label") }}
-                                                    {% for error in form.tenure_months.errors %}
-                                                        <div class="invalid-feedback d-block">{{ error }}</div>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="input-group-enhanced">
-                                                    <span class="input-group-text currency-badge">TZS</span>
-                                                    <div class="form-floating">
-                                                        {{ form.monthly_charges(class="form-control", placeholder="Monthly Charges", step="0.01", min="0", required="required") }}
-                                                        {{ form.monthly_charges.label(class="form-label") }}
-                                                    </div>
-                                                </div>
-                                                {% for error in form.monthly_charges.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Usage Information Section -->
-                                    <div class="form-section mb-5" data-section="3">
-                                        <div class="section-header">
-                                            <h6 class="section-title">
-                                                <i class="bi bi-graph-up me-2"></i>Usage Information
-                                                <div class="section-status">
-                                                    <i class="bi bi-circle section-indicator"></i>
-                                                </div>
-                                            </h6>
-                                        </div>
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <div class="input-group-enhanced">
-                                                    <div class="form-floating">
-                                                        {{ form.data_usage_gb(class="form-control", placeholder="Data Usage", step="0.1", min="0", required="required") }}
-                                                        {{ form.data_usage_gb.label(class="form-label") }}
-                                                    </div>
-                                                    <span class="input-group-text unit-badge">GB</span>
-                                                </div>
-                                                {% for error in form.data_usage_gb.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                                {% endfor %}
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="input-group-enhanced">
-                                                    <div class="form-floating">
-                                                        {{ form.call_duration_minutes(class="form-control", placeholder="Call Duration", min="0", required="required") }}
-                                                        {{ form.call_duration_minutes.label(class="form-label") }}
-                                                    </div>
-                                                    <span class="input-group-text unit-badge">mins</span>
-                                                </div>
-                                                {% for error in form.call_duration_minutes.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Customer Support Section -->
-                                    <div class="form-section mb-5" data-section="4">
-                                        <div class="section-header">
-                                            <h6 class="section-title">
-                                                <i class="bi bi-headset me-2"></i>Customer Support
-                                                <div class="section-status">
-                                                    <i class="bi bi-circle section-indicator"></i>
-                                                </div>
-                                            </h6>
-                                        </div>
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.complaints_filed(class="form-control", placeholder="Complaints Filed", min="0", required="required") }}
-                                                    {{ form.complaints_filed.label(class="form-label") }}
-                                                    {% for error in form.complaints_filed.errors %}
-                                                        <div class="invalid-feedback d-block">{{ error }}</div>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.customer_support_calls(class="form-control", placeholder="Support Calls", min="0", required="required") }}
-                                                    {{ form.customer_support_calls.label(class="form-label") }}
-                                                    {% for error in form.customer_support_calls.errors %}
-                                                        <div class="invalid-feedback d-block">{{ error }}</div>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Payment and Services Section -->
-                                    <div class="form-section mb-5" data-section="5">
-                                        <div class="section-header">
-                                            <h6 class="section-title">
-                                                <i class="bi bi-credit-card me-2"></i>Payment & Services
-                                                <div class="section-status">
-                                                    <i class="bi bi-circle section-indicator"></i>
-                                                </div>
-                                            </h6>
-                                        </div>
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.payment_method(class="form-select", required="required") }}
-                                                    {{ form.payment_method.label(class="form-label") }}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.internet_service(class="form-select", required="required") }}
-                                                    {{ form.internet_service.label(class="form-label") }}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.additional_services(class="form-select", required="required") }}
-                                                    {{ form.additional_services.label(class="form-label") }}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.discount_offer_used(class="form-select", required="required") }}
-                                                    {{ form.discount_offer_used.label(class="form-label") }}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    {{ form.billing_issues_reported(class="form-control", placeholder="Billing Issues", min="0", required="required") }}
-                                                    {{ form.billing_issues_reported.label(class="form-label") }}
-                                                    {% for error in form.billing_issues_reported.errors %}
-                                                        <div class="invalid-feedback d-block">{{ error }}</div>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Enhanced Action Buttons -->
-                                    <div class="action-buttons">
-                                        <button type="submit" name="predict" class="btn btn-primary-gradient btn-lg px-5">
-                                            <i class="bi bi-cpu me-2"></i>
-                                            <span class="btn-text">Predict Churn</span>
-                                            <div class="btn-loader"></div>
-                                        </button>
-                                        <button type="submit" name="add_another" class="btn btn-outline-primary btn-lg px-4">
-                                            <i class="bi bi-plus-circle me-2"></i>Predict & Add Another
-                                        </button>
-                                        <button type="button" class="btn btn-outline-primary btn-lg px-4" onclick="clearForm()">
-                                            <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Enhanced Batch Prediction -->
-                    <div class="tab-pane fade" id="batch-prediction">
-                        <div class="enhanced-card animate__animated animate__fadeInUp">
-                            <div class="card-header-gradient">
-                                <h5 class="mb-0 text-white">
-                                    <i class="bi bi-cloud-upload me-2"></i>Batch Prediction Analytics
-                                </h5>
-                            </div>
-                            <div class="card-body p-4">
-                                <form id="batchForm" method="POST" action="{{ url_for('batch_predict') }}" enctype="multipart/form-data">
-                                    <div class="upload-section">
-                                        <div class="upload-area" id="uploadArea">
-                                            <i class="bi bi-cloud-upload upload-icon"></i>
-                                            <h6>Drag & Drop CSV File or Click to Browse</h6>
-                                            <input type="file" class="form-control" id="csvFile" name="file" accept=".csv" style="display: none;" required>
-                                            <div class="upload-info">
-                                                <small class="text-muted">
-                                                    <i class="bi bi-info-circle me-1"></i>
-                                                    Maximum file size: 50MB | Supported format: CSV
-                                                </small>
-                                            </div>
-                                            <div class="file-preview" id="filePreview" style="display: none;">
-                                                <div class="file-info">
-                                                    <i class="bi bi-file-earmark-spreadsheet file-icon"></i>
-                                                    <div class="file-details">
-                                                        <div class="file-name"></div>
-                                                        <div class="file-size"></div>
-                                                    </div>
-                                                    <button type="button" class="btn btn-sm btn-danger" onclick="removeFile()">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="action-buttons">
-                                     <button type="submit" class="btn btn-primary-gradient btn-lg px-5" id="batchSubmitBtn" disabled>
-                                            <i class="bi bi-rocket-takeoff me-2"></i>
-                                            <span>Process Batch Prediction</span>
-                                        </button>
-                                       </div>
-                                    <div class="required-columns">
-                                        <h6 class="d-flex justify-content-between align-items-center mb-3">
-                                            <span><i class="bi bi-list-check me-2"></i>Required CSV Columns</span>
-                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#columnsTable">
-                                                <i class="bi bi-eye me-1"></i>View Requirements
-                                            </button>
-                                        </h6>
-                                        <div class="collapse" id="columnsTable">
-                                            <div class="table-responsive">
-                                                <table class="table table-hover custom-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Column Name</th>
-                                                            <th>Type</th>
-                                                            <th>Description</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr><td><code>CustomerID</code></td><td>String</td><td>Unique customer identifier</td></tr>
-                                                        <tr><td><code>TelecomCompany</code></td><td>String</td><td>Service provider name</td></tr>
-                                                        <tr><td><code>Region</code></td><td>String</td><td>Customer's geographical region</td></tr>
-                                                        <tr><td><code>Age</code></td><td>Integer</td><td>Customer age (18-100)</td></tr>
-                                                        <tr><td><code>Gender</code></td><td>String</td><td>Customer gender</td></tr>
-                                                        <tr><td><code>ContractType</code></td><td>String</td><td>Prepaid or Postpaid</td></tr>
-                                                        <tr><td><code>ContractDuration</code></td><td>String</td><td>Duration of contract</td></tr>
-                                                        <tr><td><code>TenureMonths</code></td><td>Integer</td><td>Months with company</td></tr>
-                                                        <tr><td><code>MonthlyCharges</code></td><td>Float</td><td>Monthly billing amount</td></tr>
-                                                        <tr><td><code>DataUsageGB</code></td><td>Float</td><td>Data consumption in GB</td></tr>
-                                                        <tr><td><code>CallDurationMinutes</code></td><td>Integer</td><td>Total call duration</td></tr>
-                                                        <tr><td><code>ComplaintsFiled</code></td><td>Integer</td><td>Number of complaints</td></tr>
-                                                        <tr><td><code>CustomerSupportCalls</code></td><td>Integer</td><td>Number of support calls</td></tr>
-                                                        <tr><td><code>PaymentMethod</code></td><td>String</td><td>Payment method</td></tr>
-                                                        <tr><td><code>InternetService</code></td><td>String</td><td>Type of internet service</td></tr>
-                                                        <tr><td><code>AdditionalServices</code></td><td>String</td><td>Additional services</td></tr>
-                                                        <tr><td><code>DiscountOfferUsed</code></td><td>String</td><td>Discount usage</td></tr>
-                                                        <tr><td><code>BillingIssuesReported</code></td><td>Integer</td><td>Billing issues reported</td></tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="action-buttons">
-                    
-                                        <a href="{{ url_for('download_sample_csv') }}" class="btn btn-outline-secondary btn-lg px-4">
-                                            <i class="bi bi-download me-2"></i>Download Sample
-                                        </a>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Enhanced Results Column -->
-            <div class="col-lg-4">
-                {% if batch_results is defined %}
-                    <div class="enhanced-card mb-4 animate__animated animate__fadeInRight">
-                        <div class="card-header-gradient bg-info-gradient">
-                            <h5 class="mb-0 text-white">
-                                <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction Results
-                                <button class="btn btn-sm btn-light ms-auto" onclick="toggleForm()">Show Form</button>
-                            </h5>
-                        </div>
-                        <div class="card-body p-4">
-                            {% if batch_results %}
-                                {% set total_customers = batch_results|length %}
-                                {% set churn_count = batch_results|selectattr('prediction', 'equalto', 'Yes')|list|length %}
-                                {% set non_churn_count = batch_results|selectattr('prediction', 'equalto', 'No')|list|length %}
-                                {% set churn_percentage = (churn_count / total_customers * 100)|round(2) %}
-                                {% set non_churn_percentage = (non_churn_count / total_customers * 100)|round(2) %}
-
-                                <p>Total customers processed: {{ total_customers }}</p>
-                                <p>Customers predicted to churn: {{ churn_count }} ({{ churn_percentage }}%)</p>
-                                <p>Customers not predicted to churn: {{ non_churn_count }} ({{ non_churn_percentage }}%)</p>
-
-                                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                    <table class="table table-striped table-bordered table-hover custom-table">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">Customer ID</th>
-                                                <th scope="col">Prediction</th>
-                                                <th scope="col">Probability</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for result in batch_results %}
-                                            <tr>
-                                                <td>{{ result.customer_id }}</td>
-                                                <td class="{% if result.prediction == 'Yes' %}text-danger{% else %}text-success{% endif %}">{{ result.prediction }}</td>
-                                                <td>{{ (result.probability * 100)|round(2) }}%</td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <!-- Insights and Recommendations -->
-                                <div class="mt-4">
-                                    <h6 class="text-primary"><i class="bi bi-bar-chart-fill me-2"></i>Insights & Recommendations</h6>
-                                    <div class="card bg-light p-3">
-                                        <h6 class="mb-2">Insights:</h6>
-                                        <ul class="list-group list-group-flush">
-                                            <li class="list-group-item">Churn rate: {{ churn_percentage }}% of customers are at risk of churning.</li>
-                                            {% if churn_percentage > 30 %}
-                                                <li class="list-group-item text-warning">High churn rate detected (>30%). Immediate action is recommended.</li>
-                                            {% elif churn_percentage > 15 %}
-                                                <li class="list-group-item text-info">Moderate churn rate detected (>15%). Monitoring and targeted retention needed.</li>
-                                            {% else %}
-                                                <li class="list-group-item text-success">Low churn rate detected (<15%). Maintain current strategies.</li>
-                                            {% endif %}
-                                        </ul>
-
-                                        <h6 class="mt-3 mb-2">Recommendations:</h6>
-                                        <ul class="list-group list-group-flush">
-                                            {% if churn_percentage > 30 %}
-                                                <li class="list-group-item">Implement urgent retention campaigns with personalized discounts (e.g., 20% off for 3 months).</li>
-                                                <li class="list-group-item">Assign dedicated account managers to high-risk customers.</li>
-                                                <li class="list-group-item">Resolve all reported billing issues within 48 hours.</li>
-                                            {% elif churn_percentage > 15 %}
-                                                <li class="list-group-item">Offer targeted promotions to at-risk customers (e.g., free data bundles).</li>
-                                                <li class="list-group-item">Conduct satisfaction surveys to identify pain points.</li>
-                                                <li class="list-group-item">Enhance customer support availability.</li>
-                                            {% else %}
-                                                <li class="list-group-item">Continue current service quality and monitor trends monthly.</li>
-                                                <li class="list-group-item">Offer loyalty rewards to maintain customer satisfaction.</li>
-                                                <li class="list-group-item">Proactively check in with long-term customers.</li>
-                                            {% endif %}
-                                            <li class="list-group-item">Analyze customer data (e.g., tenure, complaints) for deeper insights into churn drivers.</li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <!-- Download Link -->
-                                {% if batch_id %}
-                                    <div class="mt-3">
-                                        <a href="{{ url_for('download_batch_results', batch_id=batch_id) }}" class="btn btn-outline-primary btn-lg w-100">
-                                            <i class="bi bi-download me-2"></i>Download Full Results (CSV)
-                                        </a>
-                                    </div>
-                                {% endif %}
-                            {% else %}
-                                <div class="alert alert-info-custom">
-                                    <i class="bi bi-info-circle me-2"></i>
-                                    No valid customers found in the uploaded CSV.
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% elif result %}
-                    <div class="enhanced-card mb-4 animate__animated animate__fadeInRight">
-                        <div class="card-header {% if result.prediction == 'Yes' %}bg-danger-gradient{% else %}bg-success-gradient{% endif %}">
-                            <h5 class="mb-0 text-white">
-                                <i class="bi bi-{% if result.prediction == 'Yes' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
-                                Prediction Result
-                                <button class="btn btn-sm btn-light ms-auto" onclick="toggleForm()">Show Form</button>
-                            </h5>
-                        </div>
-                        <div class="card-body text-center p-4">
-                            <div class="prediction-result">
-                                <div class="prediction-circle {% if result.prediction == 'Yes' %}danger{% else %}success{% endif %}">
-                                    <div class="prediction-text">{{ result.prediction }}</div>
-                                    <div class="prediction-prob">{{ (result.probability * 100)|round(2) }}%</div>
-                                </div>
-                            </div>
-                            
-                            <div class="recommendation-box {% if result.prediction == 'Yes' %}alert-danger{% else %}alert-success{% endif %}">
-                                <i class="bi bi-{% if result.prediction == 'Yes' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
-                                <strong>{{ result.recommendation }}</strong>
-                            </div>
-                            
-                            {% if prediction_id %}
-                                <div class="mt-3">
-                                    <a href="{{ url_for('download_pdf', prediction_id=prediction_id) }}" class="btn btn-outline-primary btn-lg w-100">
-                                        <i class="bi bi-download me-2"></i>Download Report (PDF)
-                                    </a>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <!-- Enhanced Churn Report -->
-                    {% if report %}
-                        <div class="enhanced-card animate__animated animate__fadeInRight">
-                            <div class="card-header bg-info-gradient">
-                                <h5 class="mb-0 text-white">
-                                    <i class="bi bi-graph-up-arrow me-2"></i>Churn Analysis Report
-                                </h5>
-                            </div>
-                            <div class="card-body p-4">
-                                <!-- Risk Factors -->
-                                {% if report.risk_factors %}
-                                    <div class="report-section mb-4">
-                                        <h6 class="report-title danger">
-                                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Risk Factors
-                                        </h6>
-                                        <div class="report-items">
-                                            {% for factor in report.risk_factors %}
-                                                <div class="report-item danger">
-                                                    <i class="bi bi-arrow-right me-2"></i>{{ factor }}
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% endif %}
-                                
-                                <!-- Retention Opportunities -->
-                                {% if report.retention_opportunities %}
-                                    <div class="report-section mb-4">
-                                        <h6 class="report-title warning">
-                                            <i class="bi bi-lightbulb-fill me-2"></i>Retention Opportunities
-                                        </h6>
-                                        <div class="report-items">
-                                            {% for opp in report.retention_opportunities %}
-                                                <div class="report-item warning">
-                                                    <i class="bi bi-arrow-right me-2"></i>{{ opp }}
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% endif %}
-                                
-                                <!-- Actionable Insights -->
-                                {% if report.actionable_insights %}
-                                    <div class="report-section">
-                                        <h6 class="report-title success">
-                                            <i class="bi bi-check-circle-fill me-2"></i>Actionable Insights
-                                        </h6>
-                                        <div class="report-items">
-                                            {% for insight in report.actionable_insights %}
-                                                <div class="report-item success">
-                                                    <i class="bi bi-arrow-right me-2"></i>{{ insight }}
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <div class="enhanced-card animate__animated animate__fadeInRight" id="instructionsCard">
-                        <div class="card-header-gradient">
-                            <h5 class="mb-0 text-white">
-                                <i class="bi bi-lightbulb me-2"></i>Getting Started
-                            </h5>
-                        </div>
-                        <div class="card-body p-4">
-                            <div class="instruction-timeline">
-                                <div class="instruction-step active" data-step="1">
-                                    <div class="step-icon">
-                                        <i class="bi bi-1-circle-fill"></i>
-                                    </div>
-                                    <div class="step-content">
-                                        <h6>Choose Prediction Type</h6>
-                                        <p>Select single customer analysis or batch processing</p>
-                                    </div>
-                                </div>
-                                <div class="instruction-step" data-step="2">
-                                    <div class="step-icon">
-                                        <i class="bi bi-2-circle-fill"></i>
-                                    </div>
-                                    <div class="step-content">
-                                        <h6>Input Customer Data</h6>
-                                        <p>Fill in all required fields for accurate predictions</p>
-                                    </div>
-                                </div>
-                                <div class="instruction-step" data-step="3">
-                                    <div class="step-icon">
-                                        <i class="bi bi-3-circle-fill"></i>
-                                    </div>
-                                    <div class="step-content">
-                                        <h6>Get AI Insights</h6>
-                                        <p>Receive detailed churn analysis and recommendations</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="feature-highlights mt-4">
-                                <h6 class="mb-3">
-                                    <i class="bi bi-star-fill me-2 text-warning"></i>Key Features
-                                </h6>
-                                <div class="feature-list">
-                                    <div class="feature-item">
-                                        <i class="bi bi-shield-check text-success"></i>
-                                        <span>94.2% Prediction Accuracy</span>
-                                    </div>
-                                    <div class="feature-item">
-                                        <i class="bi-lightning-charge text-warning"></i>
-                                        <span>Real-time Processing</span>
-                                    </div>
-                                    <div class="feature-item">
-                                        <i class="bi bi-graph-up text-primary"></i>
-                                        <span>Advanced Analytics</span>
-                                    </div>
-                                    <div class="feature-item">
-                                        <i class="bi bi-file-earmark-pdf text-danger"></i>
-                                        <span>Detailed Reports</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // Toggle form visibility
-        function toggleForm() {
-            const formSection = document.getElementById('formSection');
-            formSection.style.display = formSection.style.display === 'none' ? 'block' : 'none';
-        }
+<!-- External Libraries -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
 
-        // Show Single Prediction
-        function showSinglePrediction() {
-            document.getElementById('single-prediction').classList.add('show', 'active');
-            document.getElementById('batch-prediction').classList.remove('show', 'active');
-            document.getElementById('singleModeBtn').classList.add('active');
-            document.getElementById('batchModeBtn').classList.remove('active');
-        }
+<script>
+    // Initialize Select2 for searchable region field
+   // Initialize Select2 for searchable region field
+    $(document).ready(function() {
+    $('.searchable').select2({
+        width: '100%',
+        placeholder: 'Select a region',
+        allowClear: true
+    });
+});
 
-        // Show Batch Prediction
-        function showBatchPrediction() {
-            document.getElementById('batch-prediction').classList.add('show', 'active');
-            document.getElementById('single-prediction').classList.remove('show', 'active');
-            document.getElementById('batchModeBtn').classList.add('active');
-            document.getElementById('singleModeBtn').classList.remove('active');
-        }
-
-        // Form progress tracking
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('predictionForm');
-            const inputs = form.querySelectorAll('input, select');
-            const progressCircle = document.querySelector('.progress-circle');
-            const progressText = document.querySelector('.progress-text');
-            const sections = document.querySelectorAll('.form-section');
-
-            function updateProgress() {
-                const totalFields = inputs.length;
-                let filledFields = 0;
-
-                inputs.forEach(input => {
-                    if (input.value) filledFields++;
-                });
-
-                const progress = (filledFields / totalFields) * 100;
-                progressText.textContent = `${Math.round(progress)}%`;
-                progressCircle.style.background = `conic-gradient(#667eea ${progress * 3.6}deg, rgba(255, 255, 255, 0.3) ${progress * 3.6}deg)`;
-
-                sections.forEach(section => {
-                    const sectionInputs = section.querySelectorAll('input, select');
-                    const sectionFilled = Array.from(sectionInputs).every(input => input.value);
-                    const indicator = section.querySelector('.section-indicator');
-                    if (sectionFilled) {
-                        indicator.classList.remove('bi-circle');
-                        indicator.classList.add('bi-check-circle-fill');
-                        section.classList.add('completed');
-                    } else {
-                        indicator.classList.remove('bi-check-circle-fill');
-                        indicator.classList.add('bi-circle');
-                        section.classList.remove('completed');
-                    }
-                });
-            }
-
-            inputs.forEach(input => {
-                input.addEventListener('input', updateProgress);
-            });
-
-            // Clear form function
-            window.clearForm = function() {
-                form.reset();
-                updateProgress();
-                sections.forEach(section => {
-                    const indicator = section.querySelector('.section-indicator');
-                    indicator.classList.remove('bi-check-circle-fill');
-                    indicator.classList.add('bi-circle');
-                    section.classList.remove('completed');
-                });
-                progressText.textContent = '0%';
-                progressCircle.style.background = 'conic-gradient(#667eea 0deg, rgba(255, 255, 255, 0.3) 0deg)';
-            };
-
-            // File upload handling
-            const uploadArea = document.getElementById('uploadArea');
-            const fileInput = document.getElementById('csvFile');
-            const filePreview = document.getElementById('filePreview');
-            const fileName = document.querySelector('.file-name');
-            const fileSize = document.querySelector('.file-size');
-            const submitBtn = document.getElementById('batchSubmitBtn');
-
-            uploadArea.addEventListener('click', () => fileInput.click());
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                const file = e.dataTransfer.files[0];
-                handleFile(file);
-            });
-            fileInput.addEventListener('change', () => {
-                if (fileInput.files.length > 0) {
-                    handleFile(fileInput.files[0]);
-                }
-            });
-
-            function handleFile(file) {
-                if (file && file.type === 'text/csv' && file.size <= 50 * 1024 * 1024) {
-                    fileName.textContent = file.name;
-                    fileSize.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
-                    filePreview.style.display = 'flex';
-                    submitBtn.disabled = false;
-                } else {
-                    fileName.textContent = 'Invalid file';
-                    fileSize.textContent = 'Please upload a CSV file (max 50MB)';
-                    filePreview.style.display = 'flex';
-                    submitBtn.disabled = true;
-                    fileInput.value = '';
-                }
-            }
-
-            window.removeFile = function() {
-                fileInput.value = '';
-                filePreview.style.display = 'none';
-                submitBtn.disabled = true;
-            };
-
-            // Initialize particles.js
-            particlesJS('particles-canvas', {
-                particles: {
-                    number: { value: 80, density: { enable: true, value_area: 800 } },
-                    color: { value: '#ffffff' },
-                    shape: { type: 'circle' },
-                    opacity: { value: 0.5, random: true },
-                    size: { value: 3, random: true },
-                    line_linked: { enable: true, distance: 150, color: '#ffffff', opacity: 0.4, width: 1 },
-                    move: { enable: true, speed: 2, direction: 'none', random: true, out_mode: 'out' }
-                },
-                interactivity: {
-                    events: {
-                        onhover: { enable: true, mode: 'grab' },
-                        onclick: { enable: true, mode: 'push' }
-                    },
-                    modes: { grab: { distance: 140, line_linked: { opacity: 1 } }, push: { particles_nb: 4 } }
-                },
-                retina_detect: true
-            });
+// Toggle form visibility with enhanced animation
+function toggleForm() {
+    const formSection = document.getElementById('formSection');
+    const isHidden = formSection.style.display === 'none' || !formSection.style.display;
+    
+    if (isHidden) {
+        // Show with slide down and fade in
+        formSection.style.display = 'block';
+        formSection.style.opacity = '0';
+        formSection.style.transform = 'translateY(-20px) scale(0.95)';
+        formSection.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        requestAnimationFrame(() => {
+            formSection.style.opacity = '1';
+            formSection.style.transform = 'translateY(0) scale(1)';
         });
-    </script>
+    } else {
+        // Hide with slide up and fade out
+        formSection.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.6, 1)';
+        formSection.style.opacity = '0';
+        formSection.style.transform = 'translateY(-20px) scale(0.95)';
+        
+        setTimeout(() => {
+            formSection.style.display = 'none';
+        }, 300);
+    }
+}
 
-    <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
-            --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-            --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --secondary-gradient: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-            --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-            --card-hover-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-            --glassmorphism: backdrop-filter: blur(20px);
+// Enhanced Single Prediction with staggered animations
+function showSinglePrediction() {
+    const singlePane = document.getElementById('single-prediction');
+    const batchPane = document.getElementById('batch-prediction');
+    const singleBtn = document.getElementById('singleModeBtn');
+    const batchBtn = document.getElementById('batchModeBtn');
+
+    // Animate button states first
+    animateButtonTransition(singleBtn, batchBtn);
+
+    // Enhanced batch pane hide animation
+    batchPane.style.transition = 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    batchPane.style.opacity = '0';
+    batchPane.style.transform = 'translateX(-30px) scale(0.98)';
+    batchPane.classList.remove('show', 'active');
+
+    setTimeout(() => {
+        batchPane.style.display = 'none';
+        
+        // Enhanced single pane show animation with stagger
+        singlePane.style.display = 'block';
+        singlePane.style.opacity = '0';
+        singlePane.style.transform = 'translateX(30px) scale(0.98)';
+        singlePane.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        
+        requestAnimationFrame(() => {
+            singlePane.style.opacity = '1';
+            singlePane.style.transform = 'translateX(0) scale(1)';
+            singlePane.classList.add('show', 'active', 'animate__animated', 'animate__fadeInRight');
+        });
+
+        // Stagger animation for form elements
+        staggerFormElements(singlePane);
+    }, 200);
+}
+
+// Enhanced Batch Prediction with staggered animations
+function showBatchPrediction() {
+    const singlePane = document.getElementById('single-prediction');
+    const batchPane = document.getElementById('batch-prediction');
+    const singleBtn = document.getElementById('singleModeBtn');
+    const batchBtn = document.getElementById('batchModeBtn');
+
+    // Animate button states first
+    animateButtonTransition(batchBtn, singleBtn);
+
+    // Enhanced single pane hide animation
+    singlePane.style.transition = 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    singlePane.style.opacity = '0';
+    singlePane.style.transform = 'translateX(30px) scale(0.98)';
+    singlePane.classList.remove('show', 'active');
+
+    setTimeout(() => {
+        singlePane.style.display = 'none';
+        
+        // Enhanced batch pane show animation
+        batchPane.style.display = 'block';
+        batchPane.style.opacity = '0';
+        batchPane.style.transform = 'translateX(-30px) scale(0.98)';
+        batchPane.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        
+        requestAnimationFrame(() => {
+            batchPane.style.opacity = '1';
+            batchPane.style.transform = 'translateX(0) scale(1)';
+            batchPane.classList.add('show', 'active', 'animate__animated', 'animate__fadeInLeft');
+        });
+
+        // Stagger animation for upload elements
+        staggerUploadElements(batchPane);
+    }, 200);
+}
+
+// Enhanced button animation
+function animateButtonTransition(activeBtn, inactiveBtn) {
+    // Add bounce effect to active button
+    activeBtn.style.transform = 'scale(1.05)';
+    activeBtn.style.transition = 'all 0.2s cubic-bezier(0.68, -0.55, 0.565, 1.55)';
+    activeBtn.classList.add('active');
+    
+    // Shrink inactive button slightly
+    inactiveBtn.style.transform = 'scale(0.95)';
+    inactiveBtn.style.transition = 'all 0.2s ease-out';
+    inactiveBtn.classList.remove('active');
+    
+    // Reset transforms after animation
+    setTimeout(() => {
+        activeBtn.style.transform = 'scale(1)';
+        inactiveBtn.style.transform = 'scale(1)';
+    }, 200);
+}
+
+// Stagger animation for form elements
+function staggerFormElements(container) {
+    const elements = container.querySelectorAll('.form-section, .form-group, .btn');
+    elements.forEach((el, index) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        setTimeout(() => {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        }, index * 100 + 300);
+    });
+}
+
+// Stagger animation for upload elements
+function staggerUploadElements(container) {
+    const elements = container.querySelectorAll('.upload-area, .file-preview, .btn');
+    elements.forEach((el, index) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px) scale(0.95)';
+        el.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        setTimeout(() => {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0) scale(1)';
+        }, index * 150 + 300);
+    });
+}
+
+// Enhanced form progress tracking
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('predictionForm');
+    const inputs = form.querySelectorAll('input, select');
+    const progressCircle = document.querySelector('.progress-circle');
+    const progressText = document.querySelector('.progress-text');
+    const sections = document.querySelectorAll('.form-section');
+
+    function updateProgress() {
+        const totalFields = inputs.length;
+        let filledFields = 0;
+
+        inputs.forEach(input => {
+            if (input.value) filledFields++;
+        });
+
+        const progress = (filledFields / totalFields) * 100;
+        
+        // Animate progress text
+        animateProgressText(progressText, Math.round(progress));
+        
+        // Enhanced progress circle animation
+        progressCircle.style.transition = 'background 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        progressCircle.style.background = `conic-gradient(
+            #667eea ${progress * 3.6}deg, 
+            rgba(255, 255, 255, 0.3) ${progress * 3.6}deg
+        )`;
+
+        // Enhanced section completion animation
+        sections.forEach((section, index) => {
+            const sectionInputs = section.querySelectorAll('input, select');
+            const sectionFilled = Array.from(sectionInputs).every(input => input.value);
+            const indicator = section.querySelector('.section-indicator');
+            
+            if (sectionFilled && !section.classList.contains('completed')) {
+                // Completion animation
+                setTimeout(() => {
+                    indicator.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.565, 1.55)';
+                    indicator.style.transform = 'scale(1.2)';
+                    indicator.classList.remove('bi-circle');
+                    indicator.classList.add('bi-check-circle-fill');
+                    section.classList.add('completed');
+                    
+                    // Add ripple effect
+                    createRippleEffect(indicator);
+                    
+                    setTimeout(() => {
+                        indicator.style.transform = 'scale(1)';
+                    }, 300);
+                }, index * 100);
+            } else if (!sectionFilled && section.classList.contains('completed')) {
+                // Revert animation
+                indicator.style.transition = 'all 0.2s ease-out';
+                indicator.style.transform = 'scale(1)';
+                indicator.classList.remove('bi-check-circle-fill');
+                indicator.classList.add('bi-circle');
+                section.classList.remove('completed');
+            }
+        });
+    }
+
+    // Animate progress text counting
+    function animateProgressText(element, targetValue) {
+        const currentValue = parseInt(element.textContent) || 0;
+        const increment = targetValue > currentValue ? 1 : -1;
+        const duration = Math.abs(targetValue - currentValue) * 30;
+        
+        if (currentValue !== targetValue) {
+            const startTime = Date.now();
+            const animate = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const current = currentValue + (targetValue - currentValue) * progress;
+                
+                element.textContent = `${Math.round(current)}%`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            };
+            requestAnimationFrame(animate);
         }
+    }
 
-        * {
-            box-sizing: border-box;
+    // Create ripple effect
+    function createRippleEffect(element) {
+        const ripple = document.createElement('div');
+        ripple.style.position = 'absolute';
+        ripple.style.borderRadius = '50%';
+        ripple.style.background = 'rgba(102, 126, 234, 0.3)';
+        ripple.style.transform = 'scale(0)';
+        ripple.style.animation = 'ripple 0.6s linear';
+        ripple.style.pointerEvents = 'none';
+        
+        const rect = element.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = rect.left - size/2 + rect.width/2 + 'px';
+        ripple.style.top = rect.top - size/2 + rect.height/2 + 'px';
+        
+        document.body.appendChild(ripple);
+        
+        setTimeout(() => {
+            document.body.removeChild(ripple);
+        }, 600);
+    }
+
+    // Add CSS for ripple animation
+    if (!document.getElementById('ripple-styles')) {
+        const style = document.createElement('style');
+        style.id = 'ripple-styles';
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    inputs.forEach(input => {
+        input.addEventListener('input', updateProgress);
+        
+        // Add focus animations
+        input.addEventListener('focus', function() {
+            this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            this.style.transform = 'scale(1.02)';
+            this.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.15)';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = '';
+        });
+    });
+
+    // Enhanced clear form function
+    window.clearForm = function() {
+        // Add clearing animation
+        const formElements = form.querySelectorAll('.form-group');
+        formElements.forEach((el, index) => {
+            setTimeout(() => {
+                el.style.transition = 'all 0.2s ease-out';
+                el.style.opacity = '0.5';
+                el.style.transform = 'scale(0.98)';
+                
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'scale(1)';
+                }, 100);
+            }, index * 50);
+        });
+        
+        form.reset();
+        updateProgress();
+        
+        sections.forEach((section, index) => {
+            setTimeout(() => {
+                const indicator = section.querySelector('.section-indicator');
+                indicator.style.transition = 'all 0.3s ease-out';
+                indicator.classList.remove('bi-check-circle-fill');
+                indicator.classList.add('bi-circle');
+                section.classList.remove('completed');
+            }, index * 100);
+        });
+        
+        progressText.textContent = '0%';
+        progressCircle.style.background = 'conic-gradient(#667eea 0deg, rgba(255, 255, 255, 0.3) 0deg)';
+    };
+
+    // Enhanced file upload handling
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('csvFile');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.querySelector('.file-name');
+    const fileSize = document.querySelector('.file-size');
+    const submitBtn = document.getElementById('batchSubmitBtn');
+
+    // Enhanced upload area interactions
+    uploadArea.addEventListener('click', () => {
+        uploadArea.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            uploadArea.style.transform = 'scale(1)';
+            fileInput.click();
+        }, 100);
+    });
+
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+        uploadArea.style.transform = 'scale(1.02)';
+        uploadArea.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+        uploadArea.style.transform = 'scale(1)';
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        uploadArea.style.transform = 'scale(1)';
+        
+        // Add drop animation
+        uploadArea.style.animation = 'pulse 0.6s cubic-bezier(0.4, 0, 0.6, 1)';
+        setTimeout(() => {
+            uploadArea.style.animation = '';
+        }, 600);
+        
+        const file = e.dataTransfer.files[0];
+        handleFile(file);
+    });
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            handleFile(fileInput.files[0]);
         }
+    });
 
-        body {
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    function handleFile(file) {
+        if (file && file.type === 'text/csv' && file.size <= 50 * 1024 * 1024) {
+            fileName.textContent = file.name;
+            fileSize.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+            
+            // Animate file preview appearance
+            filePreview.style.display = 'flex';
+            filePreview.style.opacity = '0';
+            filePreview.style.transform = 'translateY(10px) scale(0.95)';
+            filePreview.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            
+            requestAnimationFrame(() => {
+                filePreview.style.opacity = '1';
+                filePreview.style.transform = 'translateY(0) scale(1)';
+            });
+            
+            submitBtn.disabled = false;
+            submitBtn.style.transition = 'all 0.3s ease';
+            submitBtn.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                submitBtn.style.transform = 'scale(1)';
+            }, 200);
+        } else {
+            fileName.textContent = 'Invalid file';
+            fileSize.textContent = 'Please upload a CSV file (max 50MB)';
+            
+            // Error animation
+            filePreview.style.display = 'flex';
+            filePreview.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                filePreview.style.animation = '';
+            }, 500);
+            
+            submitBtn.disabled = true;
+            fileInput.value = '';
         }
+    }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+    window.removeFile = function() {
+        // Animate removal
+        filePreview.style.transition = 'all 0.3s ease-out';
+        filePreview.style.opacity = '0';
+        filePreview.style.transform = 'translateY(-10px) scale(0.95)';
+        
+        setTimeout(() => {
+            fileInput.value = '';
+            filePreview.style.display = 'none';
+            submitBtn.disabled = true;
+        }, 300);
+    };
 
-        .header-banner {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 3rem 2rem;
-            border-radius: 25px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-        }
+    // Add additional CSS animations
+    if (!document.getElementById('enhanced-animations')) {
+        const style = document.createElement('style');
+        style.id = 'enhanced-animations';
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+            .form-section.completed {
+                background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+            }
+        `;
+        document.head.appendChild(style);
+    }
 
-        #particles-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
+    // Enhanced particles.js configuration
+    particlesJS('particles-canvas', {
+        particles: {
+            number: { value: 120, density: { enable: true, value_area: 800 } },
+            color: { value: ['#667eea', '#764ba2', '#ffffff'] },
+            shape: { 
+                type: ['circle', 'triangle'],
+                stroke: { width: 0, color: '#000000' }
+            },
+            opacity: { 
+                value: 0.6, 
+                random: true,
+                anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false }
+            },
+            size: { 
+                value: 4, 
+                random: true,
+                anim: { enable: true, speed: 2, size_min: 0.5, sync: false }
+            },
+            line_linked: { 
+                enable: true, 
+                distance: 200, 
+                color: '#667eea', 
+                opacity: 0.3, 
+                width: 1.5 
+            },
+            move: { 
+                enable: true, 
+                speed: 3, 
+                direction: 'none', 
+                random: true, 
+                straight: false,
+                out_mode: 'out',
+                bounce: false,
+                attract: { enable: true, rotateX: 600, rotateY: 1200 }
+            }
+        },
+        interactivity: {
+            detect_on: 'canvas',
+            events: {
+                onhover: { enable: true, mode: 'grab' },
+                onclick: { enable: true, mode: 'push' },
+                resize: true
+            },
+            modes: { 
+                grab: { 
+                    distance: 180, 
+                    line_linked: { opacity: 0.8 } 
+                }, 
+                push: { particles_nb: 6 },
+                repulse: { distance: 100, duration: 0.4 }
+            }
+        },
+        retina_detect: true
+    });
+});
+</script>
 
-        .header-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-        }
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --secondary-gradient: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        --card-hover-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        --glassmorphism: backdrop-filter: blur(20px);
+    }
 
-        .stats-row {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            flex-wrap: wrap;
-        }
+    * {
+        box-sizing: border-box;
+    }
 
-        .stat-item {
-            text-align: center;
-            color: white;
-        }
+    body {
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            line-height: 1;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
 
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            margin-top: 0.5rem;
-        }
+    .header-banner {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 3rem 2rem;
+        border-radius: 25px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+    }
 
-        .enhanced-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            box-shadow: var(--card-shadow);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            overflow: hidden;
-        }
+    #particles-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
 
-        .enhanced-card:hover {
-            box-shadow: var(--card-hover-shadow);
-            transform: translateY(-5px);
-        }
+    .header-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
 
-        .card-header-gradient {
-            background: var(--primary-gradient);
-            padding: 1.5rem 2rem;
-            border: none;
-            position: relative;
-            overflow: hidden;
-        }
+    .stats-row {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        flex-wrap: wrap;
+    }
 
-        .card-header-gradient::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            animation: shimmer 3s infinite;
-        }
+    .stat-item {
+        text-align: center;
+        color: white;
+    }
 
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
 
-        .mode-toggle-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 1rem;
-            box-shadow: var(--card-shadow);
-        }
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-top: 0.5rem;
+    }
 
-        .btn-group .btn {
-            border-radius: 15px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
+    .enhanced-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        overflow: hidden;
+    }
 
-        .btn-group .btn.active {
-            background: var(--primary-gradient);
-            color: white;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
+    .enhanced-card:hover {
+        box-shadow: var(--card-hover-shadow);
+        transform: translateY(-5px);
+    }
 
-        .form-section {
-            position: relative;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 15px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
+    .card-header-gradient {
+        background: var(--primary-gradient);
+        padding: 1.5rem 2rem;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+    .tab-pane {
+    transition: opacity 0.6s ease;
+    }
+    .tab-pane.animate__fadeIn {
+    --animate-duration: 0.5s; /* Default is 1s */
+}
+    .card-header-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        animation: shimmer 3s infinite;
+    }
 
-        .form-section:hover {
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        }
+    @keyframes shimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
 
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
+    .mode-toggle-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        padding: 1rem;
+        box-shadow: var(--card-shadow);
+    }
 
-        .section-title {
-            color: #495057;
-            font-weight: 600;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            margin: 0;
-        }
+    .btn-group .btn {
+        border-radius: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
 
-        .section-status {
-            margin-left: auto;
-        }
+    .btn-group .btn.active {
+        background: var(--primary-gradient);
+        color: white;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
 
-        .section-indicator {
-            color: #dee2e6;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
+    .form-section {
+        position: relative;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 15px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
 
-        .form-section.completed .section-indicator {
-            color: #28a745;
-        }
+    .form-section:hover {
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
 
-        .form-floating {
-            position: relative;
-        }
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
 
-        .form-control, .form-select {
-            border: 2px solid rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-        }
+    .section-title {
+        color: #495057;
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        margin: 0;
+    }
 
-        .form-control:focus, .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-            background: white;
-        }
+    .section-status {
+        margin-left: auto;
+    }
 
-        .form-floating > label {
-            color: #6c757d;
-            font-weight: 500;
-        }
+    .section-indicator {
+        color: #dee2e6;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
 
-        .input-group-enhanced {
-            display: flex;
-            align-items: stretch;
-        }
+    .form-section.completed .section-indicator {
+        color: #28a745;
+    }
 
-        .currency-badge, .unit-badge {
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            padding: 0 1rem;
-        }
+    .form-floating {
+        position: relative;
+    }
 
-        .currency-badge {
-            border-radius: 12px 0 0 12px;
-        }
+    .form-control, .form-select {
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
+    }
 
-        .unit-badge {
-            border-radius: 0 12px 12px 0;
-        }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        background: white;
+    }
 
-        .form-progress {
-            display: flex;
-            align-items: center;
-        }
+    .form-floating > label {
+        color: #6c757d;
+        font-weight: 500;
+    }
 
-        .progress-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: conic-gradient(#667eea 0deg, rgba(255, 255, 255, 0.3) 0deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            transition: all 0.3s ease;
-        }
+    .input-group-enhanced {
+        display: flex;
+        align-items: stretch;
+    }
 
-        .progress-circle::before {
-            content: '';
-            position: absolute;
-            width: 45px;
-            height: 45px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-        }
+    .currency-badge, .unit-badge {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+    }
 
-        .progress-text {
-            position: relative;
-            z-index: 1;
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: #667eea;
+    .currency-badge {
+        border-radius: 12px 0 0 12px;
+    }
+
+    .unit-badge {
+        border-radius: 0 12px 12px 0;
+    }
+
+    .form-progress {
+        display: flex;
+        align-items: center;
+    }
+
+    .progress-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: conic-gradient(#667eea 0deg, rgba(255, 255, 255, 0.3) 0deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .progress-circle::before {
+        content: '';
+        position: absolute;
+        width: 45px;
+        height: 45px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+    }
+
+    .progress-text {
+        position: relative;
+        z-index: 1;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #667eea;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+        margin-top: 3rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary-gradient {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 15px;
+        font-weight: 600;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary-gradient:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary-gradient:active {
+        transform: translateY(-1px);
+    }
+
+    .btn-loader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary-gradient.loading .btn-loader {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .btn-primary-gradient.loading .btn-text {
+        opacity: 0;
+    }
+
+    @keyframes spin {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .upload-section {
+        margin-bottom: 2rem;
+    }
+
+    .upload-area {
+        border: 3px dashed rgba(102, 126, 234, 0.3);
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .upload-area:hover {
+        border-color: rgba(102, 126, 234, 0.6);
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    .upload-area.dragover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.15);
+        transform: scale(1.02);
+    }
+
+    .upload-icon {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .upload-info {
+        margin-top: 1rem;
+    }
+
+    .file-preview {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: rgba(40, 167, 69, 0.1);
+        border-radius: 12px;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+
+    .file-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .file-icon {
+        font-size: 2rem;
+        color: #28a745;
+    }
+
+    .file-details {
+        flex: 1;
+    }
+
+    .file-name {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .file-size {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .required-columns {
+        margin: 2rem 0;
+    }
+
+    .custom-table {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .custom-table th {
+        background: var(--primary-gradient);
+        color: white;
+        font-weight: 600;
+        border: none;
+        padding: 1rem;
+    }
+
+    .custom-table td {
+        padding: 0.75rem 1rem;
+        border-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .custom-table code {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        font-weight: 600;
+    }
+
+    .instruction-timeline {
+        position: relative;
+    }
+
+    .instruction-step {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        opacity: 0.6;
+    }
+
+    .instruction-step.active {
+        background: rgba(102, 126, 234, 0.1);
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        opacity: 1;
+    }
+
+    .step-icon {
+        flex-shrink: 0;
+    }
+
+    .step-icon i {
+        font-size: 1.5rem;
+        color: #667eea;
+    }
+
+    .step-content h6 {
+        margin: 0 0 0.5rem 0;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .step-content p {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .feature-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .feature-item i {
+        font-size: 1.1rem;
+    }
+
+    .feature-item span {
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .prediction-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .prediction-circle.success {
+        background: var(--success-gradient);
+    }
+
+    .prediction-circle.danger {
+        background: var(--danger-gradient);
+    }
+
+    .prediction-text {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .prediction-prob {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+    }
+
+    .recommendation-box {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        border-radius: 10px;
+        border: none;
+        font-size: 1rem;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, rgba(74, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+        color: #0c7cd5;
+        border: 1px solid rgba(74, 172, 254, 0.3);
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, rgba(250, 112, 154, 0.1) 0%, rgba(254, 225, 64, 0.1) 100%);
+        color: #d63384;
+        border: 1px solid rgba(250, 112, 154, 0.3);
+    }
+
+    .report-section {
+        border-left: 4px solid #e9ecef;
+        padding-left: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .report-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .report-title.danger {
+        color: #dc3545;
+        border-left-color: #dc3545;
+    }
+
+    .report-title.warning {
+        color: #fd7e14;
+        border-left-color: #fd7e14;
+    }
+
+    .report-title.success {
+        color: #198754;
+        border-left-color: #198754;
+    }
+
+    .report-items {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .report-item {
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        transition: all 0.3s ease;
+    }
+
+    .report-item:hover {
+        transform: translateX(5px);
+    }
+
+    .report-item.danger {
+        background: rgba(220, 53, 69, 0.1);
+        border-left: 3px solid #dc3545;
+        color: #721c24;
+    }
+
+    .report-item.warning {
+        background: rgba(253, 126, 20, 0.1);
+        border-left: 3px solid #fd7e14;
+        color: #653208;
+    }
+
+    .report-item.success {
+        background: rgba(25, 135, 84, 0.1);
+        border-left: 3px solid #198754;
+        color: #0f5132;
+    }
+
+    .alert-info-custom {
+        background: linear-gradient(135deg, rgba(74, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+        color: #0c7cd5;
+        border: 1px solid rgba(74, 172, 254, 0.3);
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 0;
+    }
+
+    /* Enhanced Mobile and Desktop Responsiveness */
+    @media (max-width: 992px) {
+        .col-lg-8, .col-lg-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
         }
 
         .action-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            align-items: center;
-            margin-top: 3rem;
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: stretch;
         }
 
-        .btn-primary-gradient {
-            background: var(--primary-gradient);
-            border: none;
-            border-radius: 15px;
-            font-weight: 600;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        .mode-toggle-container {
+            padding: 0.5rem;
         }
 
-        .btn-primary-gradient:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        .btn-group .btn {
+            padding: 0.75rem;
+            font-size: 0.9rem;
         }
 
-        .btn-primary-gradient:active {
-            transform: translateY(-1px);
+        .header-banner {
+            padding: 2rem 1rem;
         }
 
-        .btn-loader {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top: 2px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+        .stats-row {
+            gap: 1.5rem;
         }
 
-        .btn-primary-gradient.loading .btn-loader {
-            opacity: 1;
-            visibility: visible;
+        .stat-number {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
         }
 
-        .btn-primary-gradient.loading .btn-text {
-            opacity: 0;
+        .form-section {
+            padding: 1rem;
         }
 
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .upload-section {
-            margin-bottom: 2rem;
+        .card-body {
+            padding: 1.5rem;
         }
 
         .upload-area {
-            border: 3px dashed rgba(102, 126, 234, 0.3);
-            border-radius: 20px;
-            padding: 3rem 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(102, 126, 234, 0.05);
-        }
-
-        .upload-area:hover {
-            border-color: rgba(102, 126, 234, 0.6);
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .upload-area.dragover {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.15);
-            transform: scale(1.02);
+            padding: 2rem 1rem;
         }
 
         .upload-icon {
-            font-size: 3rem;
-            color: #667eea;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .upload-info {
-            margin-top: 1rem;
-        }
-
-        .file-preview {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: rgba(40, 167, 69, 0.1);
-            border-radius: 12px;
-            border: 1px solid rgba(40, 167, 69, 0.3);
-        }
-
-        .file-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .file-icon {
             font-size: 2rem;
-            color: #28a745;
-        }
-
-        .file-details {
-            flex: 1;
-        }
-
-        .file-name {
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .file-size {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-
-        .required-columns {
-            margin: 2rem 0;
-        }
-
-        .custom-table {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        .custom-table th {
-            background: var(--primary-gradient);
-            color: white;
-            font-weight: 600;
-            border: none;
-            padding: 1rem;
-        }
-
-        .custom-table td {
-            padding: 0.75rem 1rem;
-            border-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .custom-table code {
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
-            padding: 0.25rem 0.5rem;
-            border-radius: 6px;
-            font-weight: 600;
-        }
-
-        .instruction-timeline {
-            position: relative;
-        }
-
-        .instruction-step {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            opacity: 0.6;
-        }
-
-        .instruction-step.active {
-            background: rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            opacity: 1;
-        }
-
-        .step-icon {
-            flex-shrink: 0;
-        }
-
-        .step-icon i {
-            font-size: 1.5rem;
-            color: #667eea;
-        }
-
-        .step-content h6 {
-            margin: 0 0 0.5rem 0;
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .step-content p {
-            margin: 0;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        .feature-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.5rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .feature-item:hover {
-            background: rgba(102, 126, 234, 0.05);
-        }
-
-        .feature-item i {
-            font-size: 1.1rem;
-        }
-
-        .feature-item span {
-            font-weight: 500;
-            color: #495057;
         }
 
         .prediction-circle {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .prediction-circle.success {
-            background: var(--success-gradient);
-        }
-
-        .prediction-circle.danger {
-            background: var(--danger-gradient);
+            width: 120px;
+            height: 120px;
         }
 
         .prediction-text {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 1.2rem;
         }
 
-        .prediction-prob {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
+        .custom-table th, .custom-table td {
+            font-size: 0.85rem;
+            padding: 0.5rem;
         }
 
-        .recommendation-box {
-            margin: 1.5rem 0;
-            padding: 1rem;
-            border-radius: 10px;
-            border: none;
-            font-size: 1rem;
+        .form-floating > label {
+            font-size: 0.9rem;
         }
 
-        .alert-success {
-            background: linear-gradient(135deg, rgba(74, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
-            color: #0c7cd5;
-            border: 1px solid rgba(74, 172, 254, 0.3);
+        .form-control, .form-select {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .header-banner {
+            padding: 1.5rem 0.5rem;
         }
 
-        .alert-danger {
-            background: linear-gradient(135deg, rgba(250, 112, 154, 0.1) 0%, rgba(254, 225, 64, 0.1) 100%);
-            color: #d63384;
-            border: 1px solid rgba(250, 112, 154, 0.3);
+        .header-content h1 {
+            font-size: 1.8rem;
         }
 
-        .report-section {
-            border-left: 4px solid #e9ecef;
-            padding-left: 1rem;
-            margin-bottom: 1.5rem;
+        .header-content p {
+            font-size: 0.9rem;
         }
 
-        .report-title {
-            font-size: 1rem;
-            font-weight: 600;
+        .btn-primary-gradient, .btn-outline-primary, .btn-outline-secondary {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .form-section {
             margin-bottom: 1rem;
         }
 
-        .report-title.danger {
-            color: #dc3545;
-            border-left-color: #dc3545;
+        .section-title {
+            font-size: 1rem;
         }
 
-        .report-title.warning {
-            color: #fd7e14;
-            border-left-color: #fd7e14;
+        .progress-circle {
+            width: 50px;
+            height: 50px;
         }
 
-        .report-title.success {
-            color: #198754;
-            border-left-color: #198754;
+        .progress-circle::before {
+            width: 35px;
+            height: 35px;
         }
 
-        .report-items {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+        .progress-text {
+            font-size: 0.8rem;
         }
-
-        .report-item {
-            padding: 0.75rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            transition: all 0.3s ease;
-        }
-
-        .report-item:hover {
-            transform: translateX(5px);
-        }
-
-        .report-item.danger {
-            background: rgba(220, 53, 69, 0.1);
-            border-left: 3px solid #dc3545;
-            color: #721c24;
-        }
-
-        .report-item.warning {
-            background: rgba(253, 126, 20, 0.1);
-            border-left: 3px solid #fd7e14;
-            color: #653208;
-        }
-
-        .report-item.success {
-            background: rgba(25, 135, 84, 0.1);
-            border-left: 3px solid #198754;
-            color: #0f5132;
-        }
-
-        .alert-info-custom {
-            background: linear-gradient(135deg, rgba(74, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
-            color: #0c7cd5;
-            border: 1px solid rgba(74, 172, 254, 0.3);
-            border-radius: 10px;
-            padding: 1rem;
-            margin: 0;
-        }
-
-        /* Enhanced Mobile and Desktop Responsiveness */
-        @media (max-width: 992px) {
-            .col-lg-8, .col-lg-4 {
-                flex: 0 0 100%;
-                max-width: 100%;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .mode-toggle-container {
-                padding: 0.5rem;
-            }
-
-            .btn-group .btn {
-                padding: 0.75rem;
-                font-size: 0.9rem;
-            }
-
-            .header-banner {
-                padding: 2rem 1rem;
-            }
-
-            .stats-row {
-                gap: 1.5rem;
-            }
-
-            .stat-number {
-                font-size: 1.5rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container-fluid {
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
-            }
-
-            .form-section {
-                padding: 1rem;
-            }
-
-            .card-body {
-                padding: 1.5rem;
-            }
-
-            .upload-area {
-                padding: 2rem 1rem;
-            }
-
-            .upload-icon {
-                font-size: 2rem;
-            }
-
-            .prediction-circle {
-                width: 120px;
-                height: 120px;
-            }
-
-            .prediction-text {
-                font-size: 1.2rem;
-            }
-
-            .custom-table th, .custom-table td {
-                font-size: 0.85rem;
-                padding: 0.5rem;
-            }
-
-            .form-floating > label {
-                font-size: 0.9rem;
-            }
-
-            .form-control, .form-select {
-                font-size: 0.9rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .header-banner {
-                padding: 1.5rem 0.5rem;
-            }
-
-            .header-content h1 {
-                font-size: 1.8rem;
-            }
-
-            .header-content p {
-                font-size: 0.9rem;
-            }
-
-            .btn-primary-gradient, .btn-outline-primary, .btn-outline-secondary {
-                padding: 0.75rem;
-                font-size: 0.9rem;
-            }
-
-            .form-section {
-                margin-bottom: 1rem;
-            }
-
-            .section-title {
-                font-size: 1rem;
-            }
-
-            .progress-circle {
-                width: 50px;
-                height: 50px;
-            }
-
-            .progress-circle::before {
-                width: 35px;
-                height: 35px;
-            }
-
-            .progress-text {
-                font-size: 0.8rem;
-            }
-        }
-    </style>
-</body>
-</html>
+    }
+</style>
 {% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Update Prediction{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Update Prediction</h2>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Edit Prediction Details</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form.telecom_company.label(class="form-label") }}
+                            {{ form.telecom_company(class="form-select") }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form.region.label(class="form-label") }}
+                            {{ form.region(class="form-select") }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form.age.label(class="form-label") }}
+                            {{ form.age(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form.gender.label(class="form-label") }}
+                            {{ form.gender(class="form-select") }}
+                        </div>
+                    </div>
+                    <!-- Include all other fields from your PredictionForm -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form.contract_type.label(class="form-label") }}
+                            {{ form.contract_type(class="form-select") }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form.contract_duration.label(class="form-label") }}
+                            {{ form.contract_duration(class="form-select") }}
+                        </div>
+                    </div>
+                    <!-- Continue with all other fields -->
+                </div>
+                
+                <div class="action-buttons mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-2"></i>Update Prediction
+                    </button>
+                    <a href="{{ url_for('predictions') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
