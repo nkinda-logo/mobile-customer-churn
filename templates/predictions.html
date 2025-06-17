@@ -152,7 +152,7 @@
             overflow: hidden;
             background: #e9ecef;
             position: relative;
-            min wid-th: 120px;
+            min-width: 120px;
         }
         
         .probability-fill {
@@ -409,29 +409,35 @@
         </div>
 
         <!-- Main Card -->
-        <div class="prediction-card fade-in">
-            <div class="card-header predictions-header">
-                <div class="d-flex justify-content-between align-items-center flex-wrap">
-                    <h4 class="mb-0 text-white">
-                        <i class="bi bi-graph-up me-2"></i>My Predictions
-                    </h4>
-                    <div class="d-flex gap-2 flex-wrap mt-2 mt-md-0">
-                        <button class="btn btn-light btn-modern" onclick="fetchPredictions()">
-                            <i class="bi bi-arrow-clockwise me-1"></i> Refresh Data
-                        </button>
-                        <div class="dropdown">
-                            <button type="button" class="btn btn-light btn-modern dropdown-toggle" data-bs-toggle="dropdown">
-                                <i class="bi bi-download me-1"></i> Export
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ url_for('export_predictions', format='csv') }}">
-                                    <i class="bi bi-file-earmark-spreadsheet me-2"></i>CSV
-                                </a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('export_predictions', format='excel') }}">
-                                    <i class="bi bi-file-earmark-excel me-2"></i>Excel
-                                </a></li>
-                            </ul>
-                        </div>
+    <div class="mx-3 mt-3 mb-4">
+    <div class="prediction-card card-modern">
+        <div class="card-header predictions-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-white">
+                <i class="bi bi-clock-history me-2"></i>Prediction History
+            </h5>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('export_predictions', format='csv') }}"
+                   aria-label="Export predictions as CSV file"
+                   data-bs-toggle="tooltip"
+                   title="Export as CSV"
+                   style="display: inline-flex; align-items: center; justify-content: center; padding: 6px 16px; font-size: 0.9rem; font-weight: 500; color: white; background-color: #28a745; border-radius: 25px; text-decoration: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: all 0.3s ease; border: none;"
+                   onmouseover="this.style.backgroundColor='#218838'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 30px rgba(0,0,0,0.1)';"
+                   onmouseout="this.style.backgroundColor='#28a745'; this.style.transform='translateY(0)'; this.style.boxShadow='0 5px 15px rgba(0,0,0,0.1)';">
+                    <i class="bi bi-file-earmark-spreadsheet me-1"></i> CSV
+                </a>
+                <a href="{{ url_for('export_predictions', format='excel') }}"
+                   aria-label="Export predictions as Excel file"
+                   data-bs-toggle="tooltip"
+                   title="Export as Excel"
+                   style="display: inline-flex; align-items: center; justify-content: center; padding: 6px 16px; font-size: 0.9rem; font-weight: 500; color: white; background-color: #1e9040; border-radius: 25px; text-decoration: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: all 0.3s ease; border: none;"
+                   onmouseover="this.style.backgroundColor='#1a7c36'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 30px rgba(0,0,0,0.1)';"
+                   onmouseout="this.style.backgroundColor='#1e9040'; this.style.transform='translateY(0)'; this.style.boxShadow='0 5px 15px rgba(0,0,0,0.1)';">
+                    <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
                         <button type="button" class="btn btn-outline-light btn-modern" onclick="clearAllPredictions()">
                             <i class="bi bi-trash me-1"></i> Clear All
                         </button>
@@ -633,31 +639,19 @@
     
     <script>
         // Store prediction data for JavaScript
-   let predictionData = {
-    count: {{ predictions|length }},
-    churn: {{ predictions|selectattr('prediction', 'equalto', 'Yes')|list|length }},
-    retention: {{ predictions|selectattr('prediction', 'equalto', 'No')|list|length }},
-    avgProbability: {{ ((predictions|sum(attribute='probability') / predictions|length) * 100)|round(2) if predictions else 0 }},
-    medianProbability: 0,
-    highRiskCount: {{ predictions|selectattr('probability', 'gt', 0.7)|list|length }},
-    recentCount: 0
-};
-
-let rawPredictions = [
-    {% for prediction in predictions %}
-    {
-        id: {{ prediction.id }},
-        customer: "{{ prediction.telecom_company|e }} ({{ prediction.region|e }})",
-        company: "{{ prediction.telecom_company|e }}",
-        region: "{{ prediction.region|e }}",
-        age: 0, // Not available in Jinja2 data, set to 0
-        tenure: 0, // Not available in Jinja2 data, set to 0
-        prediction: "{{ prediction.prediction|e }}",
-        probability: {{ prediction.probability|float }},
-        timestamp: "{{ prediction.timestamp.isoformat()|e }}"
-    }{% if not loop.last %},{% endif %}
-    {% endfor %}
-];
+        let rawPredictions = [
+            {% for prediction in predictions %}
+            {
+                id: {{ prediction.id }},
+                customer: "{{ prediction.telecom_company|e }} ({{ prediction.region|e }})",
+                company: "{{ prediction.telecom_company|e }}",
+                region: "{{ prediction.region|e }}",
+                prediction: "{{ prediction.prediction|e }}",
+                probability: {{ prediction.probability|float }},
+                timestamp: "{{ prediction.timestamp.isoformat()|e }}"
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
 
         // Initialize tooltips and filters
         document.addEventListener('DOMContentLoaded', function() {
@@ -674,14 +668,29 @@ let rawPredictions = [
             });
         }
 
+        // Debounce utility
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
         function initializeFilters() {
             const searchInput = document.getElementById('searchInput');
             const predictionFilter = document.getElementById('predictionFilter');
             const companyFilter = document.getElementById('companyFilter');
             
-            if (searchInput) searchInput.addEventListener('input', filterTable);
-            if (predictionFilter) predictionFilter.addEventListener('change', filterTable);
-            if (companyFilter) companyFilter.addEventListener('change', filterTable);
+            const debouncedFilterTable = debounce(filterTable, 300);
+            
+            if (searchInput) searchInput.addEventListener('input', debouncedFilterTable);
+            if (predictionFilter) predictionFilter.addEventListener('change', debouncedFilterTable);
+            if (companyFilter) companyFilter.addEventListener('change', debouncedFilterTable);
             
             updateCompanyFilter(rawPredictions);
         }
@@ -713,18 +722,16 @@ let rawPredictions = [
                 if (!response.ok) throw new Error('Failed to fetch predictions');
                 
                 const data = await response.json();
-                rawPredictions = data.predictions || [];
-                
-                // Update company filter options
-                updateCompanyFilter(rawPredictions);
-                
-                // Render table (handled by Jinja2 server-side rendering)
-                updateStatistics();
-                
-                // Animate stats
-                animateStatsOnLoad();
-                
-                showToast('Predictions loaded successfully!', 'success');
+                if (data.status === 'success') {
+                    rawPredictions = data.results || [];
+                    updateCompanyFilter(rawPredictions);
+                    filterTable(); // Re-apply filters after fetching
+                    updateStatistics();
+                    animateStatsOnLoad();
+                    showToast('Predictions loaded successfully!', 'success');
+                } else {
+                    throw new Error(data.error);
+                }
             } catch (error) {
                 console.error('Fetch error:', error);
                 showToast('Failed to load predictions. Using cached data.', 'error');
@@ -736,17 +743,21 @@ let rawPredictions = [
         // Update company filter options dynamically
         function updateCompanyFilter(predictions) {
             const companyFilter = document.getElementById('companyFilter');
-            const companies = [...new Set(predictions.map(p => p.company))];
+            if (!companyFilter) return;
+            
+            const companies = [...new Set(predictions.map(p => p.company))].sort();
             
             while (companyFilter.options.length > 1) {
                 companyFilter.remove(1);
             }
             
             companies.forEach(company => {
-                const option = document.createElement('option');
-                option.value = company;
-                option.textContent = company;
-                companyFilter.appendChild(option);
+                if (company) {
+                    const option = document.createElement('option');
+                    option.value = company;
+                    option.textContent = company;
+                    companyFilter.appendChild(option);
+                }
             });
         }
 
@@ -869,8 +880,8 @@ let rawPredictions = [
                 
                 setTimeout(() => {
                     rawPredictions = [];
-                    updateStatistics();
                     updateCompanyFilter(rawPredictions);
+                    updateStatistics();
                     checkEmptyState();
                     showToast(`Successfully deleted ${visibleRows.length} predictions!`, 'success');
                 }, (visibleRows.length * 50) + 500);
@@ -965,7 +976,7 @@ let rawPredictions = [
 
         // Filter table based on search and filter inputs
         function filterTable() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             const predictionFilter = document.getElementById('predictionFilter').value;
             const companyFilter = document.getElementById('companyFilter').value;
             
@@ -973,9 +984,9 @@ let rawPredictions = [
             let visibleCount = 0;
             
             rows.forEach(row => {
-                const searchData = row.getAttribute('data-search');
-                const prediction = row.getAttribute('data-prediction');
-                const company = row.getAttribute('data-company');
+                const searchData = row.getAttribute('data-search') || '';
+                const prediction = row.getAttribute('data-prediction') || '';
+                const company = row.getAttribute('data-company') || '';
                 
                 const matchesSearch = searchData.includes(searchTerm);
                 const matchesPrediction = !predictionFilter || prediction === predictionFilter;
@@ -990,6 +1001,7 @@ let rawPredictions = [
             });
             
             checkEmptyState();
+            updateStatistics();
         }
 
         // Clear all filters
@@ -1004,6 +1016,7 @@ let rawPredictions = [
             });
             
             checkEmptyState();
+            updateStatistics();
             showToast('Filters cleared', 'success');
         }
 
@@ -1050,13 +1063,51 @@ let rawPredictions = [
                 return;
             }
             
-            // Redirect to Flask routes for export
-            window.location.href = `/export_predictions?format=${format}`;
-        }
-
-        // Download individual prediction report
-        function downloadReport(predictionId) {
-            window.location.href = `/download_pdf/${predictionId}`;
+            showLoading();
+            
+            try {
+                if (format === 'csv') {
+                    let csvContent = 'data:text/csv;charset=utf-8,';
+                    csvContent += 'ID,Date,Company,Region,Prediction,Probability\n';
+                    
+                    visibleRows.forEach(row => {
+                        const id = row.getAttribute('data-id');
+                        const timestamp = row.getAttribute('data-timestamp');
+                        const date = new Date(timestamp).toISOString().split('T')[0];
+                        const company = row.getAttribute('data-company');
+                        const region = row.querySelector('td:nth-child(3)').textContent;
+                        const prediction = row.getAttribute('data-prediction');
+                        const probability = (parseFloat(row.getAttribute('data-probability')) * 100).toFixed(2) + '%';
+                        
+                        const rowData = [
+                            id,
+                            `"${date}"`,
+                            `"${company}"`,
+                            `"${region}"`,
+                            `"${prediction}"`,
+                            `"${probability}"`
+                        ];
+                        csvContent += rowData.join(',') + '\n';
+                    });
+                    
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement('a');
+                    link.setAttribute('href', encodedUri);
+                    link.setAttribute('download', `predictions_${new Date().toISOString().split('T')[0]}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    showToast('CSV exported successfully!', 'success');
+                } else if (format === 'excel') {
+                    window.location.href = `/export_predictions/excel`;
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                showToast('Failed to export data. Please try again.', 'error');
+            } finally {
+                hideLoading();
+            }
         }
 
         // Show loading spinner
@@ -1075,20 +1126,6 @@ let rawPredictions = [
             
             if (loadingSpinner) loadingSpinner.style.display = 'none';
             if (table) table.style.opacity = '1';
-        }
-
-        // Utility function to format numbers with commas
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-
-        // Utility function to calculate days ago
-        function getDaysAgo(timestamp) {
-            const now = new Date();
-            const date = new Date(timestamp);
-            const diffTime = Math.abs(now - date);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays;
         }
 
         // Keyboard shortcuts
