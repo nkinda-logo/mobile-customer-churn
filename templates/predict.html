@@ -340,9 +340,14 @@
                                         <i class="bi bi-rocket-takeoff me-2"></i>
                                         <span>Process Batch Prediction</span>
                                     </button>
-                                    <a href="{{ url_for('download_sample_csv') }}" class="btn btn-outline-secondary btn-lg px-4">
-                                        <i class="bi bi-download me-2"></i>Download Sample
-                                    </a>
+                                        <div class="container mt-5">
+                                        <a href="{{ url_for('load_csv') }}" class="btn btn-primary btn-lg px-4 me-2">
+                                        <i class="bi bi-download me-2"></i>Download Sample CSV
+                                          </a>
+                                        <a href="{{ url_for('show_csv') }}" class="btn btn-primary btn-lg px-4">
+                                         <i class="bi bi-table me-2"></i>Explore Sample CSV Data
+                                          </a>
+                                       </div>
                                 </div>
                                 <div class="required-columns">
                                     <h6 class="d-flex justify-content-between align-items-center mb-3">
@@ -392,17 +397,17 @@
             </div>
         </div>
 
-        <!-- Enhanced Results Column -->
-        <div class="col-lg-4">
+<!-- Enhanced Results Column -->
+        <div class="col-lg-4" style="width: 100%; max-width: none;">
             {% if batch_results is defined %}
-                <div class="enhanced-card mb-4 animate__animated animate__fadeInRight">
+                <div class="enhanced-card mb-4 animate__animated animate__fadeInRight" style="width: 100%; margin: 0 auto;">
                     <div class="card-header-gradient bg-info-gradient">
                         <h5 class="mb-0 text-white">
                             <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction Results
                             <button class="btn btn-sm btn-light ms-auto" onclick="toggleForm()">Show Form</button>
                         </h5>
                     </div>
-                    <div class="card-body p-4">
+                    <div class="card-body p-4" style="padding: 2rem;">
                         {% if batch_results %}
                             {% set total_customers = batch_results|length %}
                             {% set churn_count = batch_results|selectattr('prediction', 'equalto', 'Yes')|list|length %}
@@ -410,25 +415,40 @@
                             {% set churn_percentage = (churn_count / total_customers * 100)|round(2) %}
                             {% set non_churn_percentage = (non_churn_count / total_customers * 100)|round(2) %}
 
-                            <p>Total customers processed: {{ total_customers }}</p>
-                            <p>Customers predicted to churn: {{ churn_count }} ({{ churn_percentage }}%)</p>
-                            <p>Customers not predicted to churn: {{ non_churn_count }} ({{ non_churn_percentage }}%)</p>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                                <p style="font-size: 1.1rem; font-weight: 600; margin: 0;">Total customers processed: <span style="color: #0066cc;">{{ total_customers }}</span></p>
+                                <p style="font-size: 1.1rem; font-weight: 600; margin: 0;">Customers predicted to churn: <span style="color: #dc3545;">{{ churn_count }} ({{ churn_percentage }}%)</span></p>
+                                <p style="font-size: 1.1rem; font-weight: 600; margin: 0;">Customers not predicted to churn: <span style="color: #28a745;">{{ non_churn_count }} ({{ non_churn_percentage }}%)</span></p>
+                            </div>
 
-                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                <table class="table table-striped table-bordered table-hover custom-table">
-                                    <thead>
+                            <div class="table-responsive" style="max-height: 500px; overflow-y: auto; width: 100%; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                                <table class="table table-striped table-bordered table-hover custom-table" style="width: 100%; min-width: 800px; margin-bottom: 0; font-size: 1rem;">
+                                    <thead style="position: sticky; top: 0; z-index: 10; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                                         <tr>
-                                            <th scope="col">Customer ID</th>
-                                            <th scope="col">Prediction</th>
-                                            <th scope="col">Probability</th>
+                                            <th scope="col" style="padding: 1rem 1.5rem; color: white; font-weight: 600; text-align: center; border: none; font-size: 1.1rem; min-width: 150px;">Customer ID</th>
+                                            <th scope="col" style="padding: 1rem 1.5rem; color: white; font-weight: 600; text-align: center; border: none; font-size: 1.1rem; min-width: 120px;">Prediction</th>
+                                            <th scope="col" style="padding: 1rem 1.5rem; color: white; font-weight: 600; text-align: center; border: none; font-size: 1.1rem; min-width: 130px;">Probability</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for result in batch_results %}
-                                        <tr>
-                                            <td>{{ result.customer_id }}</td>
-                                            <td class="{% if result.prediction == 'Yes' %}text-danger{% else %}text-success{% endif %}">{{ result.prediction }}</td>
-                                            <td>{{ (result.probability * 100)|round(2) }}%</td>
+                                        <tr style="transition: all 0.2s ease-in-out;" onmouseover="this.style.backgroundColor='#f8f9fa'; this.style.transform='scale(1.01)'" onmouseout="this.style.backgroundColor=''; this.style.transform='scale(1)'">
+                                            <td style="padding: 1rem 1.5rem; text-align: center; font-weight: 500; font-size: 1rem; border: 1px solid #e9ecef;">{{ result.customer_id }}</td>
+                                            <td class="{% if result.prediction == 'Yes' %}text-danger{% else %}text-success{% endif %}" style="padding: 1rem 1.5rem; text-align: center; font-weight: 600; font-size: 1rem; border: 1px solid #e9ecef;">
+                                                <span style="display: inline-block; padding: 0.5rem 1rem; border-radius: 20px; {% if result.prediction == 'Yes' %}background-color: rgba(220, 53, 69, 0.1); color: #dc3545;{% else %}background-color: rgba(40, 167, 69, 0.1); color: #28a745;{% endif %}">
+                                                    {{ result.prediction }}
+                                                </span>
+                                            </td>
+                                            <td style="padding: 1rem 1.5rem; text-align: center; font-weight: 500; font-size: 1rem; border: 1px solid #e9ecef;">
+                                                <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                                    <span>{{ (result.probability * 100)|round(2) }}%</span>
+                                                    <div style="width: 60px; height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
+                                                        <div style="width: {{ (result.probability * 100)|round(2) }}%; height: 100%; background-color: {% if result.probability > 0.7 %}#dc3545{% elif result.probability > 0.4 %}#ffc107{% else %}#28a745{% endif %}; transition: width 0.3s ease;">
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
@@ -436,57 +456,64 @@
                             </div>
 
                             <!-- Insights and Recommendations -->
-                            <div class="mt-4">
-                                <h6 class="text-primary"><i class="bi bi-bar-chart-fill me-2"></i>Insights & Recommendations</h6>
-                                <div class="card bg-light p-3">
-                                    <h6 class="mb-2">Insights:</h6>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">Churn rate: {{ churn_percentage }}% of customers are at risk of churning.</li>
-                                        {% if churn_percentage > 30 %}
-                                            <li class="list-group-item text-warning">High churn rate detected (>30%). Immediate action is recommended.</li>
-                                        {% elif churn_percentage > 15 %}
-                                            <li class="list-group-item text-info">Moderate churn rate detected (>15%). Monitoring and targeted retention needed.</li>
-                                        {% else %}
-                                            <li class="list-group-item text-success">Low churn rate detected (<15%). Maintain current strategies.</li>
-                                        {% endif %}
-                                    </ul>
+                            <div class="mt-4" style="margin-top: 2rem;">
+                                <h6 class="text-primary" style="font-size: 1.3rem; font-weight: 600; margin-bottom: 1.5rem;"><i class="bi bi-bar-chart-fill me-2"></i>Insights & Recommendations</h6>
+                                <div class="card bg-light p-3" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border: none; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                        <div>
+                                            <h6 class="mb-2" style="font-size: 1.2rem; color: #495057; font-weight: 600; margin-bottom: 1rem;">Insights:</h6>
+                                            <ul class="list-group list-group-flush" style="border: none;">
+                                                <li class="list-group-item" style="background: transparent; border: none; padding: 0.75rem 0; font-size: 1rem;">Churn rate: <strong style="color: #dc3545;">{{ churn_percentage }}%</strong> of customers are at risk of churning.</li>
+                                                {% if churn_percentage > 30 %}
+                                                    <li class="list-group-item text-warning" style="background: rgba(255, 193, 7, 0.1); border: none; padding: 0.75rem 1rem; border-radius: 6px; margin: 0.5rem 0; font-size: 1rem; border-left: 4px solid #ffc107;">High churn rate detected (>30%). Immediate action is recommended.</li>
+                                                {% elif churn_percentage > 15 %}
+                                                    <li class="list-group-item text-info" style="background: rgba(13, 202, 240, 0.1); border: none; padding: 0.75rem 1rem; border-radius: 6px; margin: 0.5rem 0; font-size: 1rem; border-left: 4px solid #0dcaf0;">Moderate churn rate detected (>15%). Monitoring and targeted retention needed.</li>
+                                                {% else %}
+                                                    <li class="list-group-item text-success" style="background: rgba(40, 167, 69, 0.1); border: none; padding: 0.75rem 1rem; border-radius: 6px; margin: 0.5rem 0; font-size: 1rem; border-left: 4px solid #28a745;">Low churn rate detected (<15%). Maintain current strategies.</li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
 
-                                    <h6 class="mt-3 mb-2">Recommendations:</h6>
-                                    <ul class="list-group list-group-flush">
-                                        {% if churn_percentage > 30 %}
-                                            <li class="list-group-item">Implement urgent retention campaigns with personalized discounts (e.g., 20% off for 3 months).</li>
-                                            <li class="list-group-item">Assign dedicated account managers to high-risk customers.</li>
-                                            <li class="list-group-item">Resolve all reported billing issues within 48 hours.</li>
-                                        {% elif churn_percentage > 15 %}
-                                            <li class="list-group-item">Offer targeted promotions to at-risk customers (e.g., free data bundles).</li>
-                                            <li class="list-group-item">Conduct satisfaction surveys to identify pain points.</li>
-                                            <li class="list-group-item">Enhance customer support availability.</li>
-                                        {% else %}
-                                            <li class="list-group-item">Continue current service quality and monitor trends monthly.</li>
-                                            <li class="list-group-item">Offer loyalty rewards to maintain customer satisfaction.</li>
-                                            <li class="list-group-item">Proactively check in with long-term customers.</li>
-                                        {% endif %}
-                                        <li class="list-group-item">Analyze customer data (e.g., tenure, complaints) for deeper insights into churn drivers.</li>
-                                    </ul>
+                                        <div>
+                                            <h6 class="mt-3 mb-2" style="font-size: 1.2rem; color: #495057; font-weight: 600; margin-top: 0; margin-bottom: 1rem;">Recommendations:</h6>
+                                            <ul class="list-group list-group-flush" style="border: none;">
+                                                {% if churn_percentage > 30 %}
+                                                    <li class="list-group-item" style="background: transparent; border: none; padding: 0.5rem 0; font-size: 0.95rem; line-height: 1.5;">• Implement urgent retention campaigns with personalized discounts (e.g., 20% off for 3 months).</li>
+                                                    <li class="list-group-item" style="background: transparent; border: none; padding: 0.5rem 0; font-size: 0.95rem; line-height: 1.5;">• Assign dedicated account managers to high-risk customers.</li>
+                                                    <li class="list-group-item" style="background: transparent; border: none; padding: 0.5rem 0; font-size: 0.95rem; line-height: 1.5;">• Resolve all reported billing issues within 48 hours.</li>
+                                                {% elif churn_percentage > 15 %}
+                                                    <li class="list-group-item" style="background: transparent; border: none; padding: 0.5rem 0; font-size: 0.95rem; line-height: 1.5;">• Offer targeted promotions to at-risk customers (free data bundles).</li>
+                                                    <li class="list-group-item" style="background: transparent; border: none; padding: 0.5rem 0; font-size: 0.95rem; line-height: 1.5;">• Conduct satisfaction surveys to identify pain points.</li>
+                                                    <li class="list-group-item" style="background: transparent; border: none; padding: 0.5rem 0; font-size: 0.95rem; line-height: 1.5;">• Enhance customer support availability.</li>
+                                                {% else %}
+                                                    <li class="list-group-item" style="background: transparent; border: none; padding: 0.5rem 0; font-size: 0.95rem; line-height: 1.5;">• Continue current service quality and monitor trends monthly.</li>
+                                                    <li class="list-group-item" style="background: transparent; border: none; padding: 0.5rem 0; font-size: 0.95rem; line-height: 1.5;">• Offer loyalty rewards to maintain customer satisfaction.</li>
+                                                    <li class="list-group-item" style="background: transparent; border: none; padding: 0.5rem 0; font-size: 0.95rem; line-height: 1.5;">• Proactively check in with long-term customers.</li>
+                                                {% endif %}
+                                                <li class="list-group-item" style="background: transparent; border: none; padding: 0.5rem 0; font-size: 0.95rem; line-height: 1.5;">• Analyze customer data (customer support, tenure, complaints) for deeper insights into churn drivers.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Download Link -->
                             {% if batch_id %}
-                                <div class="mt-3">
-                                    <a href="{{ url_for('download_batch_results', batch_id=batch_id) }}" class="btn btn-outline-primary btn-lg w-100">
+                                <div class="mt-3" style="margin-top: 2rem;">
+                                    <a href="{{ url_for('download_batch_results', batch_id=batch_id) }}" class="btn btn-outline-primary btn-lg w-100" style="padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600; border-radius: 8px; transition: all 0.3s ease; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 2px solid #0066cc;" onmouseover="this.style.background='linear-gradient(135deg, #0066cc 0%, #004499 100%)'; this.style.color='white'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)'; this.style.color='#0066cc'; this.style.transform='translateY(0)'">
                                         <i class="bi bi-download me-2"></i>Download Full Results (CSV)
                                     </a>
                                 </div>
                             {% endif %}
                         {% else %}
-                            <div class="alert alert-info-custom">
+                            <div class="alert alert-info-custom" style="background: rgba(13, 202, 240, 0.1); border: 1px solid #0dcaf0; border-radius: 8px; padding: 1.5rem; color: #055160;">
                                 <i class="bi bi-info-circle me-2"></i>
                                 No valid customers found in the uploaded CSV.
                             </div>
                         {% endif %}
                     </div>
                 </div>
+                
             {% elif result %}
                 <div class="enhanced-card mb-4 animate__animated animate__fadeInRight">
                     <div class="card-header {% if result.prediction == 'Yes' %}bg-danger-gradient{% else %}bg-success-gradient{% endif %}">
@@ -658,6 +685,12 @@
     });
 });
 
+fetch('/api/csv-data')
+    .then(response => response.json())
+    .then(data => {
+        // Use the CSV data in your frontend
+        console.log(data);
+    });
 // Toggle form visibility with enhanced animation
 function toggleForm() {
     const formSection = document.getElementById('formSection');

@@ -1,0 +1,200 @@
+"TelecomCompany","Region","Age","Gender","ContractType","ContractDuration","TenureMonths","MonthlyCharges","DataUsageGB","CallDurationMinutes","ComplaintsFiled","CustomerSupportCalls","PaymentMethod","InternetService","AdditionalServices","DiscountOfferUsed","BillingIssuesReported"
+"Tigo","Mwanza",18,"Female","Postpaid","24 Months",30,22939.33,15.51,3838,3,7,"Bank Transfer","None","Cloud Storage","No",0
+"Airtel","Pemba South",69,"Female","Postpaid","12 Months",41,15067.32,86.73,657,2,6,"Mobile Money","None","Cloud Storage","Yes",4
+"Halotel","Dar es Salaam",58,"Female","Prepaid","6 Months",10,28930.31,82.55,2493,4,1,"Mobile Money","None","None","Yes",0
+"Tigo","Arusha",29,"Female","Prepaid","1 Month",6,39403.99,48.43,725,3,7,"Mobile Money","Fiber","VPN","Yes",2
+"Airtel","Dar es Salaam",21,"Male","Postpaid","1 Month",5,6756.82,1.7,707,1,8,"Bank Transfer","Mobile Data","VPN","No",2
+"Airtel","Mwanza",38,"Female","Postpaid","1 Month",20,24720.95,6.28,2316,6,7,"Cash","DSL","Streaming","No",0
+"Zantel","Lindi",23,"Female","Postpaid","6 Months",4,32503.52,86.08,2899,9,5,"Cash","Mobile Data","Streaming","No",2
+"Tigo","Arusha",57,"Female","Prepaid","1 Month",3,23357.09,1.13,831,9,2,"Cash","Mobile Data","Cloud Storage","No",1
+"Halotel","Dar es Salaam",54,"Female","Prepaid","1 Month",54,27825.5,38.69,1069,6,1,"Cash","DSL","Cloud Storage","No",1
+"Tigo","Zanzibar",36,"Female","Postpaid","1 Month",38,35858.89,67.69,3369,3,3,"Credit Card","Fiber","None","No",0
+"Vodacom","Dar es Salaam",42,"Female","Postpaid","12 Months",52,44745.95,65.13,151,6,1,"Cash","DSL","None","No",2
+"Halotel","Dodoma",45,"Male","Prepaid","6 Months",26,37513.6,53.12,3649,1,1,"Cash","Fiber","None","No",1
+"Airtel","Mbeya",35,"Female","Prepaid","6 Months",15,18993.35,10.92,452,4,8,"Mobile Money","Fiber","None","Yes",2
+"Halotel","Mbeya",22,"Female","Postpaid","12 Months",56,33334.64,91.21,3088,9,6,"Cash","Fiber","VPN","No",2
+"Halotel","Mwanza",68,"Female","Postpaid","6 Months",17,44689.48,89.48,1460,9,6,"Mobile Money","Fiber","VPN","Yes",0
+"Halotel","Zanzibar",24,"Male","Postpaid","12 Months",46,8733.58,94.33,4304,3,6,"Bank Transfer","DSL","None","No",2
+"Halotel","Arusha",49,"Female","Postpaid","24 Months",35,32879.51,58.2,3970,6,9,"Credit Card","DSL","None","No",1
+"Tigo","Arusha",40,"Female","Prepaid","6 Months",42,16461.93,99.97,2101,7,8,"Credit Card","None","Cloud Storage","No",0
+"Halotel","Zanzibar",69,"Female","Prepaid","24 Months",11,33359.37,22.02,1124,9,7,"Credit Card","DSL","Streaming","No",0
+"Halotel","Dar es Salaam",38,"Male","Postpaid","6 Months",15,49550.86,26.22,4244,9,6,"Mobile Money","Mobile Data","Cloud Storage","No",0
+"Vodacom","Singida",51,"Female","Prepaid","1 Month",32,34995.75,81.19,4906,8,8,"Bank Transfer","None","None","No",4
+"Airtel","Ruvuma",22,"Male","Postpaid","6 Months",13,19721.87,55.08,2179,8,8,"Bank Transfer","Broadband","Streaming","No",0
+"Airtel","Mwanza",62,"Female","Postpaid","6 Months",50,46441.33,38.17,290,2,4,"Bank Transfer","None","Cloud Storage","Yes",1
+"Airtel","Pemba South",49,"Female","Prepaid","6 Months",34,36903.26,92.8,4274,2,8,"Credit Card","Broadband","None","Yes",3
+"Tigo","Mwanza",59,"Male","Postpaid","6 Months",2,36568.75,72.48,4800,9,0,"Cash","DSL","Streaming","Yes",0
+"Vodacom","Arusha",59,"Female","Prepaid","6 Months",21,10394.65,25.51,1690,3,3,"Credit Card","Fiber","Streaming","No",0
+"Halotel","Zanzibar",28,"Male","Prepaid","6 Months",5,26132.7,78.8,1061,2,7,"Credit Card","Fiber","None","No",2
+"Airtel","Mwanza",63,"Male","Prepaid","12 Months",23,41550.15,51.61,2226,7,0,"Mobile Money","Fiber","None","Yes",0
+"Airtel","Zanzibar",32,"Female","Prepaid","12 Months",5,37794.05,10.15,1634,9,0,"Credit Card","None","Cloud Storage","No",2
+"Tigo","Zanzibar North",61,"Male","Postpaid","1 Month",42,21746.35,42.34,2889,2,6,"Cash","Broadband","None","Yes",4
+"Airtel","Mwanza",24,"Male","Postpaid","1 Month",28,34848.71,20.28,4410,0,8,"Cash","Fiber","Streaming","No",2
+"Tigo","Mwanza",58,"Male","Postpaid","24 Months",20,43877.93,20.67,2137,6,3,"Mobile Money","Mobile Data","Cloud Storage","No",2
+"Vodacom","Mwanza",21,"Female","Postpaid","1 Month",28,7622.46,57.71,1009,0,4,"Bank Transfer","Mobile Data","None","No",0
+"Vodacom","Dar es Salaam",50,"Male","Prepaid","6 Months",5,39264.07,92.53,1847,5,4,"Bank Transfer","None","None","No",1
+"Tigo","Mbeya",39,"Male","Postpaid","12 Months",14,26431.37,18.29,639,9,4,"Cash","None","Streaming","Yes",0
+"Vodacom","Mbeya",25,"Male","Prepaid","6 Months",47,17702.29,36.88,1042,0,7,"Cash","Fiber","Cloud Storage","No",1
+"Airtel","Arusha",46,"Male","Prepaid","6 Months",46,15698.4,11.38,3424,0,5,"Cash","Fiber","Cloud Storage","Yes",1
+"Vodacom","Mwanza",49,"Female","Prepaid","12 Months",2,37078.85,61.44,2214,6,0,"Mobile Money","None","None","No",2
+"Halotel","Mbeya",53,"Female","Postpaid","24 Months",29,20290.69,82.76,183,9,5,"Mobile Money","DSL","None","No",1
+"Halotel","Pwani",67,"Male","Prepaid","6 Months",47,44074.79,72.93,1812,5,7,"Mobile Money","None","VPN","Yes",3
+"Halotel","Zanzibar",33,"Female","Prepaid","24 Months",16,37439.25,12.84,3709,9,3,"Bank Transfer","Fiber","VPN","Yes",0
+"Tigo","Tanga",66,"Female","Postpaid","24 Months",13,46773.83,16.49,4390,0,0,"Cash","Fiber","VPN","No",0
+"Tigo","Tanga",34,"Female","Prepaid","12 Months",4,29531.05,91.13,2906,5,4,"Credit Card","Fiber","Cloud Storage","No",1
+"Airtel","Dar es Salaam",51,"Male","Postpaid","12 Months",25,46500.7,71.24,4421,1,3,"Mobile Money","Mobile Data","Cloud Storage","No",2
+"Vodacom","Arusha",41,"Female","Postpaid","6 Months",25,26517.04,50.2,4354,0,0,"Cash","None","None","No",1
+"Halotel","Arusha",67,"Female","Prepaid","12 Months",3,19723.68,37.32,1962,0,6,"Bank Transfer","None","VPN","No",2
+"Halotel","Dodoma",55,"Female","Prepaid","6 Months",29,24502.02,71.01,3125,1,6,"Cash","Mobile Data","Cloud Storage","No",2
+"Halotel","Dodoma",51,"Male","Prepaid","24 Months",27,11388.1,42.11,4573,4,4,"Bank Transfer","DSL","None","No",0
+"Vodacom","Tanga",56,"Male","Prepaid","6 Months",39,11604.07,31.66,1834,6,5,"Bank Transfer","Fiber","VPN","Yes",2
+"Tigo","Dar es Salaam",34,"Male","Postpaid","6 Months",44,42590.72,30.43,2155,2,5,"Bank Transfer","Fiber","Streaming","No",2
+"Tigo","Tanga",28,"Male","Prepaid","12 Months",41,38946.3,74.51,4925,4,5,"Bank Transfer","None","Streaming","No",2
+"Airtel","Mbeya",56,"Female","Postpaid","24 Months",43,12058.28,80.58,2140,9,6,"Cash","Fiber","Cloud Storage","No",0
+"Vodacom","Mbeya",58,"Female","Postpaid","6 Months",39,30800.82,7.59,1961,1,2,"Credit Card","None","VPN","No",0
+"Airtel","Tanga",60,"Female","Postpaid","12 Months",35,36899.84,98.14,3451,2,7,"Bank Transfer","DSL","Cloud Storage","No",2
+"Airtel","Mbeya",33,"Male","Postpaid","1 Month",57,38254.63,34.68,2405,0,6,"Credit Card","None","Cloud Storage","No",0
+"Halotel","Zanzibar",44,"Male","Postpaid","1 Month",47,20937.21,4.23,2782,6,5,"Mobile Money","DSL","None","No",0
+"Halotel","Tanga",31,"Female","Prepaid","1 Month",31,46361.35,54.37,584,7,4,"Credit Card","DSL","None","No",1
+"Halotel","Dodoma",57,"Female","Postpaid","1 Month",26,26355.68,80.47,1759,7,9,"Mobile Money","Fiber","VPN","No",1
+"Tigo","Songwe",59,"Female","Postpaid","1 Month",28,32891.11,94.94,1110,5,2,"Credit Card","None","Streaming","Yes",0
+"Airtel","Zanzibar",66,"Female","Postpaid","1 Month",36,8754.19,11.65,4309,7,1,"Credit Card","Fiber","Cloud Storage","No",1
+"Tigo","Dar es Salaam",58,"Female","Postpaid","12 Months",2,42047.84,4.78,1049,7,6,"Credit Card","Fiber","Cloud Storage","No",0
+"Tigo","Dodoma",39,"Female","Postpaid","12 Months",8,18936.76,6.37,2794,4,0,"Credit Card","Fiber","Cloud Storage","No",0
+"Halotel","Arusha",46,"Female","Postpaid","24 Months",35,49460.91,39.03,560,1,9,"Mobile Money","Fiber","VPN","No",1
+"Airtel","Mwanza",67,"Female","Postpaid","1 Month",26,5097.06,79.65,1937,2,8,"Cash","Fiber","VPN","No",0
+"Vodacom","Dar es Salaam",43,"Male","Prepaid","6 Months",49,22220.68,63.44,3925,3,3,"Mobile Money","None","Streaming","Yes",2
+"Vodacom","Arusha",22,"Male","Prepaid","24 Months",28,48700.68,55.66,3953,2,8,"Mobile Money","None","Streaming","No",0
+"Airtel","Dar es Salaam",21,"Male","Prepaid","6 Months",48,34022.98,95.7,2899,7,3,"Bank Transfer","Mobile Data","VPN","No",1
+"Tigo","Mbeya",46,"Female","Postpaid","24 Months",50,20692.09,2.6,4639,1,3,"Credit Card","Mobile Data","None","No",0
+"Tigo","Zanzibar",31,"Female","Postpaid","6 Months",24,14166.95,3.15,4926,0,9,"Mobile Money","None","VPN","No",1
+"Airtel","Dar es Salaam",34,"Male","Postpaid","12 Months",52,46970.34,4.42,167,4,3,"Credit Card","None","None","No",0
+"Vodacom","Simiyu",56,"Female","Prepaid","12 Months",23,22109.23,28.5,3182,9,3,"Mobile Money","Broadband","Cloud Storage","No",4
+"Vodacom","Dar es Salaam",22,"Male","Prepaid","24 Months",2,33234.3,46.77,494,4,4,"Bank Transfer","Mobile Data","Cloud Storage","Yes",1
+"Tigo","Arusha",35,"Female","Prepaid","12 Months",16,7240.69,97.9,1604,3,1,"Bank Transfer","Fiber","VPN","No",1
+"Tigo","Zanzibar",30,"Female","Prepaid","24 Months",1,26155.9,97.88,2361,3,3,"Cash","None","Cloud Storage","No",0
+"Vodacom","Arusha",25,"Female","Prepaid","6 Months",24,18216.68,77.57,2840,5,2,"Cash","DSL","None","No",1
+"Vodacom","Tanga",33,"Female","Postpaid","12 Months",33,28870.4,8.42,3864,2,0,"Cash","Mobile Data","VPN","No",2
+"Airtel","Dar es Salaam",31,"Female","Prepaid","1 Month",55,46846.91,62.11,2618,5,6,"Cash","Mobile Data","Cloud Storage","No",2
+"Tigo","Zanzibar",52,"Female","Postpaid","6 Months",50,40611.79,74.6,4980,9,6,"Bank Transfer","Mobile Data","VPN","Yes",2
+"Airtel","Arusha",52,"Female","Prepaid","12 Months",32,14688.95,61.96,4589,0,4,"Credit Card","Fiber","Streaming","No",1
+"Vodacom","Dar es Salaam",22,"Male","Postpaid","6 Months",20,9971.51,37.94,3123,9,1,"Cash","Mobile Data","Streaming","No",2
+"Tigo","Mwanza",51,"Male","Prepaid","12 Months",53,35950.74,14.02,1752,1,0,"Bank Transfer","None","VPN","Yes",2
+"Tigo","Zanzibar",20,"Male","Postpaid","24 Months",24,17462.52,44.23,3927,7,2,"Mobile Money","Fiber","None","No",1
+"Tigo","Mbeya",21,"Male","Prepaid","1 Month",1,23966.23,32.95,494,0,3,"Mobile Money","Fiber","Cloud Storage","No",2
+"Airtel","Dodoma",67,"Female","Prepaid","24 Months",23,41233.71,10.07,666,8,1,"Cash","Fiber","None","No",0
+"Airtel","Dar es Salaam",62,"Male","Postpaid","1 Month",11,28467.15,19.69,1699,7,6,"Mobile Money","Mobile Data","None","No",0
+"Vodacom","Zanzibar",55,"Female","Postpaid","6 Months",14,19092.86,55.65,723,4,2,"Mobile Money","Mobile Data","Cloud Storage","Yes",0
+"Vodacom","Dodoma",56,"Female","Postpaid","24 Months",2,30329.44,34.21,2313,5,9,"Mobile Money","Fiber","VPN","No",0
+"Halotel","Mbeya",54,"Male","Postpaid","6 Months",54,15958.69,70.67,621,4,9,"Mobile Money","None","Cloud Storage","No",1
+"Tigo","Mbeya",67,"Female","Prepaid","12 Months",40,39183.79,77.04,4078,7,5,"Cash","Mobile Data","Cloud Storage","No",0
+"Vodacom","Arusha",66,"Female","Postpaid","24 Months",53,38939.21,31.97,4608,7,7,"Bank Transfer","Mobile Data","Streaming","No",2
+"Vodacom","Mbeya",64,"Female","Prepaid","12 Months",36,29802.29,34.47,2803,0,0,"Bank Transfer","Fiber","Cloud Storage","No",1
+"Vodacom","Dodoma",47,"Female","Prepaid","1 Month",27,6343.94,90.63,4321,1,6,"Mobile Money","None","VPN","Yes",1
+"Tigo","Dodoma",64,"Male","Prepaid","6 Months",14,25537.21,76.62,4407,0,8,"Mobile Money","DSL","VPN","Yes",1
+"TTCL","Njombe",63,"Male","Postpaid","1 Month",50,40717.77,44.74,2714,3,2,"Mobile Money","Broadband","Cloud Storage","Yes",0
+"Halotel","Arusha",67,"Male","Postpaid","6 Months",31,36855.44,17.25,3745,6,3,"Bank Transfer","Mobile Data","Streaming","No",0
+"Tigo","Mara",59,"Male","Prepaid","12 Months",5,40409.31,11.82,3231,8,3,"Credit Card","Mobile Data","None","Yes",3
+"Vodacom","Dar es Salaam",19,"Female","Prepaid","12 Months",1,41067.99,60.16,1691,6,5,"Credit Card","DSL","VPN","Yes",2
+"Airtel","Dar es Salaam",45,"Male","Postpaid","12 Months",52,38988.18,54.05,2754,6,7,"Cash","Mobile Data","VPN","Yes",0
+"Tigo","Zanzibar",57,"Male","Prepaid","24 Months",3,35757.71,86.32,94,4,8,"Cash","DSL","Cloud Storage","No",1
+"Halotel","Dar es Salaam",44,"Male","Postpaid","1 Month",37,40395.07,16.91,4305,7,6,"Bank Transfer","None","VPN","No",1
+"Tigo","Lindi",68,"Female","Prepaid","24 Months",5,29758.88,42.89,3939,1,5,"Cash","Mobile Data","Cloud Storage","No",1
+"Airtel","Tanga",44,"Male","Postpaid","1 Month",51,41612.18,35.34,226,0,5,"Bank Transfer","Fiber","Streaming","No",1
+"Airtel","Mwanza",37,"Male","Prepaid","24 Months",24,6739.78,70.81,1797,2,8,"Mobile Money","None","Streaming","Yes",1
+"Airtel","Arusha",34,"Female","Prepaid","24 Months",21,9006.49,94.44,2794,1,4,"Mobile Money","None","VPN","No",0
+"Halotel","Mbeya",22,"Female","Postpaid","1 Month",36,7345.89,2.36,1929,9,3,"Cash","Mobile Data","VPN","No",0
+"Tigo","Mwanza",61,"Male","Postpaid","24 Months",52,22061.09,65.64,4070,7,4,"Credit Card","DSL","Streaming","No",1
+"Airtel","Zanzibar",44,"Male","Prepaid","6 Months",35,44834.6,63.31,3968,0,9,"Credit Card","DSL","VPN","No",1
+"Tigo","Ruvuma",21,"Male","Postpaid","12 Months",23,10959.83,68.93,2917,5,8,"Bank Transfer","None","None","Yes",4
+"Tigo","Arusha",42,"Male","Prepaid","6 Months",51,38160.61,26.17,4495,9,2,"Mobile Money","DSL","VPN","No",2
+"TTCL","Geita",37,"Male","Postpaid","1 Month",29,25054.34,89.74,1104,3,3,"Credit Card","Mobile Data","None","No",4
+"Halotel","Lindi",66,"Male","Postpaid","1 Month",29,9272.66,33.65,953,9,2,"Cash","None","Streaming","Yes",2
+"Airtel","Mwanza",51,"Male","Prepaid","12 Months",30,13424.75,13.14,4494,3,6,"Mobile Money","None","VPN","No",1
+"Halotel","Dodoma",33,"Female","Postpaid","12 Months",33,47160.22,78.86,473,0,2,"Bank Transfer","Fiber","Cloud Storage","Yes",2
+"Airtel","Tanga",45,"Female","Postpaid","6 Months",15,6048.35,1.63,3092,6,5,"Credit Card","Fiber","Streaming","Yes",0
+"Halotel","Tanga",39,"Female","Prepaid","6 Months",33,13784.28,28.16,1624,9,3,"Mobile Money","DSL","Cloud Storage","No",0
+"Tigo","Tanga",46,"Female","Prepaid","24 Months",52,5806.28,49.59,1509,4,7,"Bank Transfer","None","None","No",2
+"Tigo","Dodoma",36,"Female","Postpaid","6 Months",48,38244.47,12.44,2235,7,7,"Mobile Money","Fiber","Cloud Storage","No",2
+"Tigo","Tanga",42,"Male","Postpaid","6 Months",28,39085.73,19.58,3469,4,3,"Cash","Mobile Data","None","Yes",2
+"Tigo","Lindi",29,"Male","Postpaid","12 Months",36,48336,40.68,2568,1,1,"Cash","None","Streaming","Yes",2
+"Halotel","Lindi",43,"Female","Postpaid","12 Months",48,5961.59,30.97,1294,6,8,"Mobile Money","Broadband","Streaming","No",3
+"Airtel","Tanga",48,"Male","Prepaid","12 Months",1,23601.07,96.8,673,7,4,"Bank Transfer","DSL","VPN","Yes",2
+"Vodacom","Arusha",24,"Male","Postpaid","6 Months",57,11617.82,84.5,946,2,3,"Mobile Money","Mobile Data","Cloud Storage","Yes",2
+"Airtel","Dodoma",48,"Female","Postpaid","6 Months",53,13129.54,60.29,4479,4,9,"Mobile Money","DSL","None","No",2
+"Airtel","Tanga",45,"Male","Postpaid","24 Months",21,5704.24,85.38,882,9,5,"Credit Card","None","Cloud Storage","No",0
+"Airtel","Dodoma",54,"Male","Postpaid","1 Month",36,23690.54,55.27,2683,0,9,"Bank Transfer","None","None","No",0
+"Halotel","Mwanza",52,"Male","Prepaid","12 Months",3,48816.96,42.55,307,1,3,"Credit Card","Fiber","Cloud Storage","No",0
+"Vodacom","Dar es Salaam",56,"Male","Postpaid","6 Months",45,34170.73,82.29,2627,7,8,"Mobile Money","Fiber","None","Yes",2
+"Vodacom","Dar es Salaam",29,"Female","Prepaid","6 Months",38,11627.57,15.82,4229,8,9,"Credit Card","Mobile Data","None","No",2
+"Halotel","Dar es Salaam",37,"Male","Postpaid","12 Months",43,17922.49,30.84,3050,4,1,"Bank Transfer","Mobile Data","Cloud Storage","No",2
+"Halotel","Mbeya",33,"Male","Postpaid","24 Months",20,41074.89,37.66,3738,1,7,"Credit Card","Mobile Data","None","No",0
+"Airtel","Mbeya",20,"Male","Postpaid","1 Month",42,39208.94,33.34,379,9,1,"Credit Card","None","VPN","No",2
+"Vodacom","Zanzibar",50,"Female","Postpaid","24 Months",41,23600.73,57.17,4001,8,9,"Bank Transfer","DSL","VPN","Yes",1
+"Tigo","Dar es Salaam",61,"Female","Postpaid","24 Months",39,20016.9,68.67,755,5,0,"Credit Card","None","Cloud Storage","Yes",0
+"Halotel","Dar es Salaam",57,"Female","Postpaid","6 Months",15,41806.7,48.33,4396,8,5,"Cash","Fiber","Cloud Storage","No",0
+"Airtel","Zanzibar",66,"Female","Prepaid","6 Months",26,49365.15,63,265,0,9,"Cash","None","Streaming","No",1
+"Airtel","Dodoma",40,"Male","Postpaid","24 Months",43,40005.8,87.18,4731,3,8,"Mobile Money","Fiber","Cloud Storage","No",0
+"Tigo","Tanga",57,"Male","Prepaid","24 Months",14,11076.53,22.65,1470,8,6,"Mobile Money","Mobile Data","None","Yes",0
+"Halotel","Dar es Salaam",49,"Male","Prepaid","6 Months",11,21876.8,92.47,3680,6,2,"Credit Card","DSL","VPN","Yes",2
+"Halotel","Tabora",43,"Male","Postpaid","12 Months",32,42213.11,18.63,2011,3,5,"Bank Transfer","Broadband","Streaming","Yes",3
+"Halotel","Zanzibar South",53,"Female","Prepaid","12 Months",15,36252.19,80.81,751,2,4,"Credit Card","Mobile Data","Streaming","Yes",1
+"Airtel","Arusha",37,"Male","Prepaid","6 Months",7,42859.08,24.73,2758,6,6,"Credit Card","None","Cloud Storage","Yes",2
+"Halotel","Mwanza",63,"Female","Postpaid","1 Month",2,13753.98,63.33,2689,4,2,"Mobile Money","Mobile Data","Cloud Storage","No",0
+"Vodacom","Dodoma",55,"Female","Postpaid","6 Months",23,15320.79,16.12,3044,1,9,"Credit Card","DSL","VPN","Yes",0
+"Vodacom","Morogoro",41,"Male","Postpaid","12 Months",9,46441.96,61.8,3329,6,3,"Mobile Money","Broadband","Cloud Storage","Yes",1
+"Vodacom","Tanga",32,"Male","Postpaid","6 Months",1,22092.78,6.95,4750,9,1,"Mobile Money","DSL","Streaming","No",2
+"Vodacom","Kigoma",18,"Male","Postpaid","24 Months",31,8087.53,17.06,3608,1,1,"Cash","None","Cloud Storage","No",2
+"Vodacom","Zanzibar",38,"Male","Postpaid","24 Months",18,10291.38,77.56,719,2,0,"Mobile Money","DSL","Streaming","No",0
+"Zantel","Kagera",66,"Female","Postpaid","12 Months",37,17015.28,60.55,1298,7,5,"Mobile Money","Mobile Data","Cloud Storage","No",0
+"Tigo","Tanga",60,"Male","Prepaid","1 Month",21,10207.82,49.92,3072,0,1,"Mobile Money","Fiber","VPN","No",2
+"Tigo","Tanga",38,"Female","Prepaid","1 Month",28,42555,39.44,3713,1,0,"Cash","DSL","Cloud Storage","No",2
+"Airtel","Tanga",23,"Female","Prepaid","24 Months",41,20365.03,61.35,2262,2,2,"Bank Transfer","None","Cloud Storage","No",2
+"Vodacom","Dodoma",42,"Male","Postpaid","12 Months",58,18050.02,71.27,3509,8,4,"Bank Transfer","DSL","None","No",1
+"Airtel","Dar es Salaam",35,"Female","Postpaid","24 Months",39,7829.66,20.54,4241,8,2,"Mobile Money","Mobile Data","Streaming","Yes",1
+"TTCL","Lindi",65,"Female","Prepaid","6 Months",49,43997.31,83.38,3757,7,6,"Mobile Money","Broadband","None","Yes",2
+"Tigo","Zanzibar",19,"Female","Postpaid","1 Month",55,28741.56,99.39,516,2,9,"Bank Transfer","None","Cloud Storage","No",2
+"Halotel","Tanga",19,"Female","Prepaid","1 Month",52,46185.74,41.53,3282,3,5,"Bank Transfer","None","Cloud Storage","No",1
+"Tigo","Simiyu",31,"Male","Prepaid","6 Months",21,6818.84,93.5,858,5,6,"Cash","Broadband","VPN","Yes",0
+"Vodacom","Tanga",23,"Male","Prepaid","1 Month",29,7087.53,46.99,1247,0,2,"Credit Card","Mobile Data","None","Yes",2
+"Airtel","Dar es Salaam",52,"Female","Postpaid","6 Months",44,17442.64,56.12,1801,3,7,"Bank Transfer","DSL","Streaming","No",2
+"Tigo","Mbeya",69,"Male","Postpaid","1 Month",10,26089.81,62.15,3143,0,7,"Credit Card","Fiber","Cloud Storage","No",2
+"TTCL","Singida",40,"Male","Prepaid","1 Month",43,19040.39,78,344,7,6,"Bank Transfer","Mobile Data","Streaming","No",1
+"Vodacom","Zanzibar",52,"Female","Prepaid","1 Month",8,31643.85,72.86,633,9,8,"Mobile Money","Mobile Data","Streaming","No",1
+"Tigo","Mwanza",48,"Male","Prepaid","6 Months",53,27962.85,53.01,4890,1,7,"Cash","DSL","VPN","Yes",1
+"Tigo","Dar es Salaam",57,"Female","Postpaid","12 Months",2,11516.51,77.42,4859,3,3,"Cash","Mobile Data","None","Yes",1
+"Halotel","Mwanza",49,"Male","Prepaid","6 Months",2,30172.06,83.43,2369,4,9,"Mobile Money","Mobile Data","Streaming","No",2
+"Tigo","Zanzibar",20,"Male","Postpaid","1 Month",17,25372.36,89.44,2739,0,3,"Mobile Money","Mobile Data","VPN","No",2
+"Airtel","Zanzibar",39,"Female","Postpaid","24 Months",51,36226.37,42.07,4401,6,7,"Bank Transfer","Fiber","VPN","Yes",0
+"TTCL","Iringa",32,"Female","Postpaid","1 Month",18,42990.36,63.32,135,8,5,"Credit Card","None","VPN","Yes",4
+"Tigo","Arusha",45,"Male","Prepaid","1 Month",48,8844.44,53.94,1546,3,1,"Bank Transfer","DSL","None","No",0
+"Airtel","Mwanza",22,"Female","Postpaid","1 Month",19,37824,8.8,2217,9,7,"Cash","Mobile Data","Cloud Storage","No",0
+"Tigo","Mwanza",63,"Female","Postpaid","1 Month",4,9442.55,46.31,3104,6,4,"Bank Transfer","Mobile Data","Streaming","Yes",1
+"Airtel","Zanzibar",35,"Male","Prepaid","12 Months",23,10618.21,52.58,3318,3,2,"Mobile Money","Mobile Data","Cloud Storage","Yes",2
+"Airtel","Mbeya",63,"Male","Prepaid","12 Months",51,45064.43,15.83,1321,8,8,"Cash","None","Cloud Storage","No",2
+"Tigo","Dar es Salaam",25,"Male","Prepaid","12 Months",48,29363.29,27.22,3751,2,7,"Mobile Money","None","None","No",1
+"Airtel","Tanga",19,"Male","Postpaid","24 Months",24,31445,84.14,2924,1,6,"Mobile Money","DSL","Streaming","Yes",2
+"TTCL","Zanzibar West",38,"Female","Postpaid","1 Month",8,7534.07,47.48,394,1,9,"Credit Card","Broadband","Streaming","No",0
+"Halotel","Dodoma",50,"Female","Postpaid","12 Months",52,29946.85,24.41,372,8,4,"Cash","DSL","VPN","Yes",2
+"Halotel","Ruvuma",49,"Male","Prepaid","1 Month",14,29397.02,37.46,3320,3,0,"Credit Card","None","Cloud Storage","Yes",1
+"Airtel","Tanga",67,"Female","Postpaid","12 Months",29,28308.91,69.37,796,3,8,"Cash","Mobile Data","Cloud Storage","No",0
+"Halotel","Tanga",19,"Male","Prepaid","12 Months",41,12486.73,18.6,1982,6,4,"Mobile Money","DSL","Cloud Storage","No",1
+"Vodacom","Tanga",52,"Female","Prepaid","24 Months",59,47089.41,70.68,4339,5,5,"Bank Transfer","DSL","Streaming","No",1
+"Tigo","Dar es Salaam",38,"Female","Prepaid","24 Months",5,21073.52,76.34,3753,4,1,"Cash","DSL","VPN","No",1
+"Vodacom","Tanga",18,"Male","Postpaid","1 Month",43,38094.47,29.58,4669,1,7,"Mobile Money","Fiber","VPN","No",2
+"Vodacom","Arusha",20,"Female","Postpaid","12 Months",29,42740.29,50.69,2352,7,2,"Credit Card","Fiber","VPN","Yes",0
+"Vodacom","Zanzibar",64,"Female","Postpaid","12 Months",44,10092.3,44.2,1485,6,8,"Cash","None","VPN","No",1
+"Halotel","Dar es Salaam",18,"Male","Postpaid","24 Months",20,25658.95,18.11,2439,1,7,"Mobile Money","Fiber","VPN","No",1
+"Airtel","Mbeya",59,"Male","Prepaid","6 Months",32,16303.73,45.78,2989,6,2,"Bank Transfer","DSL","Streaming","No",0
+"Tigo","Dar es Salaam",34,"Female","Prepaid","1 Month",37,25319.18,73.63,2648,6,7,"Credit Card","None","None","No",2
+"Tigo","Mwanza",33,"Female","Prepaid","12 Months",27,49938,81.34,1664,1,6,"Mobile Money","Fiber","Cloud Storage","No",1
+"Halotel","Mbeya",68,"Female","Postpaid","12 Months",25,28554.83,19.6,1248,0,7,"Bank Transfer","Mobile Data","VPN","No",0
+"Halotel","Dar es Salaam",45,"Male","Prepaid","12 Months",42,10244.62,52.35,1283,8,1,"Cash","Mobile Data","Cloud Storage","Yes",0
+"Vodacom","Dodoma",67,"Female","Postpaid","24 Months",21,29920.61,45.39,2063,3,4,"Credit Card","Mobile Data","Streaming","Yes",2
+"Airtel","Zanzibar",58,"Male","Prepaid","1 Month",32,42319.81,21.31,4617,2,5,"Mobile Money","DSL","Cloud Storage","Yes",0
+"Halotel","Dar es Salaam",68,"Female","Prepaid","6 Months",55,16130.99,43.1,4514,2,8,"Credit Card","Fiber","Streaming","No",2
+"Tigo","Mbeya",22,"Male","Postpaid","6 Months",22,45621.63,27.06,3979,4,0,"Bank Transfer","Fiber","VPN","No",0
+"Halotel","Mwanza",46,"Female","Postpaid","12 Months",15,34511.46,50.6,4760,2,5,"Mobile Money","Mobile Data","None","No",0
+"Vodacom","Mbeya",66,"Male","Postpaid","12 Months",27,20138.39,84.82,608,3,3,"Mobile Money","DSL","Cloud Storage","No",1
+"Vodacom","Mwanza",33,"Male","Postpaid","24 Months",6,13161.77,81.9,390,8,7,"Bank Transfer","DSL","VPN","No",0
+"Halotel","Dar es Salaam",22,"Male","Prepaid","6 Months",47,16360.84,61.41,3073,0,1,"Bank Transfer","Fiber","Streaming","No",0

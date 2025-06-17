@@ -43,6 +43,9 @@ app.logger.handlers = logging.getLogger().handlers
 # Initialize CSRF Protection
 csrf = CSRFProtect(app)
 
+
+    
+
 # Database Setup
 db_dir = os.path.join(os.path.dirname(__file__), 'database')
 os.makedirs(db_dir, exist_ok=True)
@@ -169,22 +172,12 @@ def load_model():
     try:
         model = joblib.load(model_path)
         app.logger.info("Loaded primary churn prediction model")
-        if isinstance(model, xgb.Booster):
-            app.logger.warning("Detected XGBoost Booster model. Re-saving to ensure compatibility.")
-            model.save_model('models/churn_model.json')
-            model = xgb.Booster(model_file='models/churn_model.json')
-            joblib.dump(model, model_path)
         return model
     except Exception as e:
         app.logger.error(f"Failed to load primary model: {str(e)}")
         try:
             model = joblib.load(backup_path)
             app.logger.warning("Using backup churn prediction model")
-            if isinstance(model, xgb.Booster):
-                app.logger.warning("Detected XGBoost Booster model in backup. Re-saving.")
-                model.save_model('models/backup_churn_model.json')
-                model = xgb.Booster(model_file='models/backup_churn_model.json')
-                joblib.dump(model, backup_path)
             return model
         except Exception as e:
             app.logger.critical(f"Failed to load backup model: {str(e)}")
@@ -309,25 +302,17 @@ def generate_churn_report(prediction):
 
 # Routes: Predictions
 def decode_to_int(value):
-    """
-    Safely convert a value to integer.
-    Handles various input types including strings, numbers, and None.
-    """
+    """Safely convert a value to integer"""
     if value is None:
         return 0
     if isinstance(value, (int, float)):
         return int(value)
     if isinstance(value, str):
         try:
-            # Handle empty strings
-            if not value.strip():
-                return 0
-            # Try to convert to float first, then int (handles decimal strings)
             return int(float(value))
         except (ValueError, TypeError):
             return 0
     return 0
-
 
 @app.route('/predict', methods=['GET', 'POST'])
 @login_required
@@ -413,6 +398,34 @@ def predict():
             flash(f'Prediction failed: {str(e)}', 'danger')
     return render_template('predict.html', form=form, result=result, prediction_id=prediction_id, report=report)
 
+
+
+
+@app.route('/api/csv-data')
+def api_csv_data():
+    try:
+        df = pd.read_csv(os.path.join(os.path.dirname(__file__), 'data', 'sample_data.csv'))
+        return jsonify(df.to_dict('records'))
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/show-csv')
+def show_csv():
+    try:
+        df = pd.read_csv(os.path.join(os.path.dirname(__file__), 'data', 'sample_data.csv'))
+        return render_template('results.html', data=df.head(10).to_dict('records'))
+    except Exception as e:
+        return render_template('error.html', error=str(e)), 500
+
+# New route for downloading CSV
+@app.route('/load-csv')
+def load_csv():
+    try:
+        csv_path = os.path.join(os.path.dirname(__file__), 'data', 'sample_data.csv')
+        return send_file(csv_path, as_attachment=True, download_name='sample_data.csv')
+    except Exception as e:
+        return render_template('error.html', error=str(e)), 500
+
 @app.route('/batch_predict', methods=['POST'])
 @login_required
 def batch_predict():
@@ -428,20 +441,6 @@ def batch_predict():
         if not file.filename.endswith('.csv'):
             flash('Invalid file format. Please upload a CSV file.', 'danger')
             return render_template('predict.html', form=form, show_results=False)
-        
-        def decode_to_int(value):
-            if value is None:
-                return 0
-            if isinstance(value, bytes):
-                try:
-                    import struct
-                    return struct.unpack('<q', value)[0]
-                except (struct.error, ValueError):
-                    return 0
-            try:
-                return int(float(value))
-            except (ValueError, TypeError):
-                return 0
 
         df = pd.read_csv(file, encoding='utf-8', dtype_backend='numpy_nullable')
         required_columns = [
@@ -455,23 +454,19 @@ def batch_predict():
         if missing_columns:
             flash(f'Missing required columns: {", ".join(missing_columns)}', 'danger')
             return render_template('predict.html', form=form, show_results=False)
-        
-        # Handle missing values and decode types
+
         for col in required_columns:
             if df[col].isnull().any():
                 if df[col].dtype in ['float64', 'int64', 'Int64', 'Float64']:
                     df[col] = df[col].fillna(df[col].median())
                 else:
                     df[col] = df[col].fillna(df[col].mode()[0])
-            if df[col].dtype == 'object':
-                df[col] = df[col].apply(lambda x: x.decode('utf-8') if isinstance(x, bytes) else x)
-        
-        # Convert numeric columns
+
         numeric_columns = ['Age', 'TenureMonths', 'CallDurationMinutes', 'ComplaintsFiled',
                            'CustomerSupportCalls', 'BillingIssuesReported']
         for col in numeric_columns:
             df[col] = df[col].apply(decode_to_int)
-        
+
         processed_data = preprocess_data(df)
         predictions = model.predict(processed_data)
         probabilities = model.predict_proba(processed_data)[:, 1]
@@ -673,7 +668,6 @@ def analysis():
         flash('Failed to load analysis. Please try again.', 'danger')
         return redirect(url_for('index'))
 
-# Routes: Exports
 @app.route('/export_predictions/<format>')
 @login_required
 def export_predictions(format):
@@ -683,53 +677,46 @@ def export_predictions(format):
             flash('No predictions found to export', 'warning')
             return redirect(url_for('predictions'))
 
-        def decode_bytes_to_int(value):
-            """Convert byte string to integer, handling None or invalid bytes"""
-            if value is None:
+        def safe_float(value):
+            try:
+                return float(value) if value is not None else 0.0
+            except (ValueError, TypeError):
+                return 0.0
+
+        def safe_int(value):
+            try:
+                return int(value) if value is not None else 0
+            except (ValueError, TypeError):
                 return 0
-            if isinstance(value, bytes):
-                try:
-                    import struct
-                    return struct.unpack('<q', value)[0]  # Little-endian 8-byte integer
-                except (struct.error, ValueError) as e:
-                    app.logger.warning(f"Failed to decode bytes {value}: {str(e)}")
-                    return 0
-            if isinstance(value, (int, float)):
-                return int(value)
-            if isinstance(value, str):
-                try:
-                    return int(value)
-                except ValueError:
-                    return 0
-            return 0
+
+        def safe_str(value):
+            return str(value) if value is not None else 'N/A'
 
         data = [{
             'ID': pred.id,
-            'Telecom Company': pred.telecom_company or 'N/A',
-            'Region': pred.region or 'N/A',
-            'Age': decode_bytes_to_int(pred.age),
-            'Gender': pred.gender or 'N/A',
-            'Contract Type': pred.contract_type or 'N/A',
-            'Contract Duration': pred.contract_duration or 'N/A',
-            'Tenure (Months)': decode_bytes_to_int(pred.tenure_months),
-            'Monthly Charges': float(pred.monthly_charges) if pred.monthly_charges is not None else 0.0,
-            'Data Usage (GB)': float(pred.data_usage_gb) if pred.data_usage_gb is not None else 0.0,
-            'Call Duration (Minutes)': decode_bytes_to_int(pred.call_duration_minutes),
-            'Complaints Filed': decode_bytes_to_int(pred.complaints_filed),
-            'Customer Support Calls': decode_bytes_to_int(pred.customer_support_calls),
-            'Payment Method': pred.payment_method or 'N/A',
-            'Internet Service': pred.internet_service or 'N/A',
-            'Additional Services': pred.additional_services or 'N/A',
-            'Discount Offer Used': pred.discount_offer_used or 'N/A',
-            'Billing Issues Reported': decode_bytes_to_int(pred.billing_issues_reported),
-            'Prediction': pred.prediction or 'N/A',
-            'Probability (%)': round(pred.probability * 100, 2) if pred.probability is not None else 0.0,
-            'Date': pred.timestamp.strftime('%Y-%m-%d %H:%M:%S') if pred.timestamp else 'N/A'
+            'Date': safe_str(pred.timestamp.strftime('%Y-%m-%d %H:%M:%S') if pred.timestamp else 'N/A'),
+            'Telecom Company': safe_str(pred.telecom_company),
+            'Region': safe_str(pred.region),
+            'Age': safe_int(pred.age),
+            'Gender': safe_str(pred.gender),
+            'Contract Type': safe_str(pred.contract_type),
+            'Contract Duration': safe_str(pred.contract_duration),
+            'Tenure (Months)': safe_int(pred.tenure_months),
+            'Monthly Charges': safe_float(pred.monthly_charges),
+            'Data Usage (GB)': safe_float(pred.data_usage_gb),
+            'Call Duration (Minutes)': safe_int(pred.call_duration_minutes),
+            'Complaints Filed': safe_int(pred.complaints_filed),
+            'Customer Support Calls': safe_int(pred.customer_support_calls),
+            'Payment Method': safe_str(pred.payment_method),
+            'Internet Service': safe_str(pred.internet_service),
+            'Additional Services': safe_str(pred.additional_services),
+            'Discount Offer Used': safe_str(pred.discount_offer_used),
+            'Billing Issues Reported': safe_int(pred.billing_issues_reported),
+            'Prediction': safe_str(pred.prediction),
+            'Probability (%)': round(safe_float(pred.probability) * 100, 2)
         } for pred in predictions]
-        
+
         df = pd.DataFrame(data)
-        app.logger.info(f"DataFrame shape: {df.shape}")
-        app.logger.info(f"DataFrame dtypes: {df.dtypes}")
 
         if format == 'csv':
             output = io.BytesIO()
@@ -742,18 +729,15 @@ def export_predictions(format):
                 download_name='churn_predictions.csv'
             )
         elif format == 'excel':
-            output = io.BytesIO()
             try:
                 import openpyxl
-            except ImportError as e:
-                app.logger.error(f"openpyxl not installed: {str(e)}")
+            except ImportError:
+                app.logger.error("openpyxl not installed")
                 flash('Excel export failed: openpyxl is not installed.', 'danger')
                 return redirect(url_for('predictions'))
-            with pd.ExcelWriter(output, engine='openpyxl', mode='w') as writer:
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
                 df.to_excel(writer, index=False, sheet_name='Predictions')
-            output.seek(0, os.SEEK_END)
-            file_size = output.tell()
-            app.logger.info(f"Excel file size: {file_size} bytes")
             output.seek(0)
             return send_file(
                 output,
@@ -768,23 +752,28 @@ def export_predictions(format):
         app.logger.error(f"Export error: {str(e)}", exc_info=True)
         flash(f'Export failed: {str(e)}', 'danger')
         return redirect(url_for('predictions'))
-    
-
-
-    
 
 def generate_pdf_report(prediction, report):
     """Generate a detailed PDF report with human-readable values"""
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
 
-
-    
-    # Define mappings for categorical fields based on PredictionForm choices
     field_mappings = {
         'telecom_company': {
             'Airtel': 'Airtel', 'Tigo': 'Tigo', 'Vodacom': 'Vodacom',
             'Halotel': 'Halotel', 'TTCL': 'TTCL', 'Zantel': 'Zantel'
+        },
+        'region': {
+            'Arusha': 'Arusha', 'Dar es Salaam': 'Dar es Salaam', 'Dodoma': 'Dodoma',
+            'Geita': 'Geita', 'Iringa': 'Iringa', 'Kagera': 'Kagera',
+            'Katavi': 'Katavi', 'Kigoma': 'Kigoma', 'Kilimanjaro': 'Kilimanjaro',
+            'Lindi': 'Lindi', 'Manyara': 'Manyara', 'Mara': 'Mara',
+            'Mbeya': 'Mbeya', 'Morogoro': 'Morogoro', 'Mtwara': 'Mtwara',
+            'Mwanza': 'Mwanza', 'Njombe': 'Njombe', 'Pemba North': 'Pemba North',
+            'Pemba South': 'Pemba South', 'Pwani': 'Pwani', 'Rukwa': 'Rukwa',
+            'Ruvuma': 'Ruvuma', 'Shinyanga': 'Shinyanga', 'Simiyu': 'Simiyu',
+            'Singida': 'Singida', 'Songwe': 'Songwe', 'Tabora': 'Tabora',
+            'Tanga': 'Tanga', 'Unguja North': 'Unguja North', 'Unguja South': 'Unguja South'
         },
         'gender': {'Male': 'Male', 'Female': 'Female'},
         'contract_type': {'Prepaid': 'Prepaid', 'Postpaid': 'Postpaid', 'Hybrid': 'Hybrid'},
@@ -808,32 +797,20 @@ def generate_pdf_report(prediction, report):
         'prediction': {'Yes': 'Will Churn', 'No': 'Will Not Churn'}
     }
 
-    def decode_bytes_to_int(value):
-        """Convert byte string to integer, handling None or invalid bytes"""
-        if value is None:
-            return 'N/A'
-        if isinstance(value, bytes):
-            try:
-                import struct
-                return str(struct.unpack('<q', value)[0])  # Return as string for PDF
-            except (struct.error, ValueError) as e:
-                app.logger.warning(f"Failed to decode bytes {value}: {str(e)}")
-                return 'N/A'
-        return str(value)
+    def safe_value(value):
+        """Return a safe string representation of a value"""
+        return str(value) if value is not None else 'N/A'
 
     def get_display_value(field_name, value):
-        """Return human-readable value for a field, handling None or encoded values"""
-        if value is None:
-            return 'N/A'
+        """Return human-readable value for a field"""
         if field_name in field_mappings:
-            value_str = str(value)
-            return field_mappings[field_name].get(value_str, value_str).title()
-        return str(value).title()
+            return field_mappings[field_name].get(safe_value(value), safe_value(value))
+        return safe_value(value)
 
     def format_currency(value):
         """Format a number as currency"""
         try:
-            return f"TZS {float(value):.2f}"  # Changed to TZS for Tanzania
+            return f"TZS {float(value):,.2f}"
         except (TypeError, ValueError):
             return 'N/A'
 
@@ -856,24 +833,24 @@ def generate_pdf_report(prediction, report):
     p.drawString(100, 680, "Customer Details:")
     p.setFont("Helvetica", 12)
     details = [
-        f"Customer ID: {prediction.customer_id or 'N/A'}",
+        f"Customer ID: {safe_value(prediction.customer_id)}",
         f"Telecom Company: {get_display_value('telecom_company', prediction.telecom_company)}",
         f"Region: {get_display_value('region', prediction.region)}",
-        f"Age: {decode_bytes_to_int(prediction.age)}",
+        f"Age: {safe_value(prediction.age)}",
         f"Gender: {get_display_value('gender', prediction.gender)}",
         f"Contract Type: {get_display_value('contract_type', prediction.contract_type)}",
         f"Contract Duration: {get_display_value('contract_duration', prediction.contract_duration)}",
-        f"Tenure (Months): {decode_bytes_to_int(prediction.tenure_months)}",
+        f"Tenure (Months): {safe_value(prediction.tenure_months)}",
         f"Monthly Charges: {format_currency(prediction.monthly_charges)}",
         f"Data Usage (GB): {format_float(prediction.data_usage_gb)}",
-        f"Call Duration (Minutes): {decode_bytes_to_int(prediction.call_duration_minutes)}",
-        f"Complaints Filed: {decode_bytes_to_int(prediction.complaints_filed)}",
-        f"Customer Support Calls: {decode_bytes_to_int(prediction.customer_support_calls)}",
+        f"Call Duration (Minutes): {safe_value(prediction.call_duration_minutes)}",
+        f"Complaints Filed: {safe_value(prediction.complaints_filed)}",
+        f"Customer Support Calls: {safe_value(prediction.customer_support_calls)}",
         f"Payment Method: {get_display_value('payment_method', prediction.payment_method)}",
         f"Internet Service: {get_display_value('internet_service', prediction.internet_service)}",
         f"Additional Services: {get_display_value('additional_services', prediction.additional_services)}",
         f"Discount Offer Used: {get_display_value('discount_offer_used', prediction.discount_offer_used)}",
-        f"Billing Issues Reported: {decode_bytes_to_int(prediction.billing_issues_reported)}"
+        f"Billing Issues Reported: {safe_value(prediction.billing_issues_reported)}"
     ]
     y_position = 660
     for detail in details:
@@ -888,10 +865,10 @@ def generate_pdf_report(prediction, report):
     p.drawString(120, y_position - 60, f"Probability: {format_float(prediction.probability * 100, 2)}%")
 
     # Risk Analysis
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(100, y_position - 100, "Risk Analysis:")
+    p.setFont("Helvetica", 12)
     if report['risk_factors']:
-        p.setFont("Helvetica-Bold", 14)
-        p.drawString(100, y_position - 100, "Risk Analysis:")
-        p.setFont("Helvetica", 12)
         p.drawString(120, y_position - 120, "Key Risk Factors:")
         y_position -= 140
         for factor in report['risk_factors']:
@@ -902,23 +879,13 @@ def generate_pdf_report(prediction, report):
         y_position -= 140
 
     # Recommendations
-    if prediction.prediction == 'Yes':
-        recommendations = [
-            "Immediate retention actions recommended:",
-            "- Offer personalized discounts or promotions",
-            "- Assign dedicated account manager",
-            "- Resolve any outstanding complaints",
-            "- Provide value-added services trial",
-            "- Conduct satisfaction survey"
-        ]
-    else:
-        recommendations = [
-            "Maintenance actions recommended:",
-            "- Continue current service quality",
-            "- Monitor for early warning signs",
-            "- Offer loyalty rewards",
-            "- Proactive customer check-ins"
-        ]
+    recommendations = [
+        "Immediate retention actions recommended:" if prediction.prediction == 'Yes' else "Maintenance actions recommended:",
+        "- Offer personalized discounts or promotions" if prediction.prediction == 'Yes' else "- Continue current service quality",
+        "- Assign dedicated account manager" if prediction.prediction == 'Yes' else "- Monitor for early warning signs",
+        "- Resolve any outstanding complaints" if prediction.prediction == 'Yes' else "- Offer loyalty rewards",
+        "- Provide value-added services trial" if prediction.prediction == 'Yes' else "- Proactive customer check-ins"
+    ]
     p.setFont("Helvetica-Bold", 14)
     p.drawString(100, y_position - 20, "Recommendations:")
     p.setFont("Helvetica", 12)
