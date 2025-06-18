@@ -4,18 +4,17 @@
 
 {% block content %}
 <div class="container-fluid px-4 py-3">
-    <!-- Enhanced Header Section with Particles Background -->
+    <!-- Header Section -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="header-banner">
-                <canvas id="particles-canvas"></canvas>
+                <canvas id="particles-canvas" role="presentation" aria-hidden="true"></canvas>
                 <div class="header-content animate__animated animate__fadeInDown">
                     <h1 class="display-4 fw-bold text-white mb-2">
-                        <i class="bi bi-graph-up-arrow me-3"></i>Customer Churn Prediction
+                        <i class="bi bi-graph-up-arrow me-3" aria-hidden="true"></i>Customer Churn Prediction
                     </h1>
                     <p class="lead text-white-75">AI-powered customer retention analytics with real-time insights</p>
-                    <div class="stats-row mt-4">
-                    </div>
+                    <div class="stats-row mt-4"></div>
                 </div>
             </div>
         </div>
@@ -27,7 +26,7 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="alert alert-success alert-dismissible fade show shadow-sm animate__animated animate__slideInDown" role="alert" id="successAlert">
-                        <i class="bi bi-check-circle me-2"></i>
+                        <i class="bi bi-check-circle me-2" aria-hidden="true"></i>
                         <span id="successMessage">
                             {% for category, message in messages %}
                                 {{ message }}
@@ -41,75 +40,75 @@
     {% endwith %}
 
     <div class="row g-4">
-        <!-- Enhanced Main Form Section -->
+        <!-- Main Form Section -->
         <div class="col-lg-8" id="formSection" {% if result or batch_results is defined %}style="display: none;"{% endif %}>
             <!-- Prediction Mode Toggle -->
             <div class="mode-toggle-container mb-4 animate__animated animate__fadeInUp">
-                <div class="btn-group w-100" role="group">
-                    <button type="button" class="btn btn-primary-gradient active" id="singleModeBtn" onclick="showSinglePrediction()">
-                        <i class="bi bi-person-fill me-2"></i>Single Prediction
+                <div class="btn-group w-100" role="group" aria-label="Prediction Mode Toggle">
+                    <button type="button" class="btn btn-primary-gradient active" id="singleModeBtn" onclick="showSinglePrediction()" aria-pressed="true">
+                        <i class="bi bi-person-fill me-2" aria-hidden="true"></i>Single Prediction
                     </button>
-                    <button type="button" class="btn btn-outline-primary" id="batchModeBtn" onclick="showBatchPrediction()">
-                        <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction
+                    <button type="button" class="btn btn-outline-primary" id="batchModeBtn" onclick="showBatchPrediction()" aria-pressed="false">
+                        <i class="bi bi-file-earmark-spreadsheet me-2" aria-hidden="true"></i>Batch Prediction
                     </button>
                 </div>
             </div>
 
             <div class="tab-content" id="predictionTabContent">
-                <!-- Enhanced Single Prediction Form -->
-                <div class="tab-pane fade show active" id="single-prediction">
+                <!-- Single Prediction Form -->
+                <div class="tab-pane fade show active" id="single-prediction" role="tabpanel" aria-labelledby="singleModeBtn">
                     <div class="enhanced-card animate__animated animate__fadeInUp">
                         <div class="card-header-gradient">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0 text-white">
-                                    <i class="bi bi-person-plus me-2"></i>Customer Intelligence Form
+                                    <i class="bi bi-person-plus me-2" aria-hidden="true"></i>Customer Intelligence Form
                                 </h5>
                                 <div class="form-progress">
-                                    <div class="progress-circle">
+                                    <div class="progress-circle" role="status" aria-live="polite">
                                         <div class="progress-text">0%</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body p-4">
-                            <form method="POST" action="{{ url_for('predict') }}" id="predictionForm">
+                            <form method="POST" action="{{ url_for('predict') }}" id="predictionForm" novalidate>
                                 {{ form.hidden_tag() }}
                                 
                                 <!-- Personal Information Section -->
                                 <div class="form-section mb-5" data-section="1">
                                     <div class="section-header">
                                         <h6 class="section-title">
-                                            <i class="bi bi-person-circle me-2"></i>Personal Information
+                                            <i class="bi bi-person-circle me-2" aria-hidden="true"></i>Personal Information
                                             <div class="section-status">
-                                                <i class="bi bi-circle section-indicator"></i>
+                                                <i class="bi bi-circle section-indicator" aria-hidden="true"></i>
                                             </div>
                                         </h6>
                                     </div>
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.telecom_company(class="form-select", required="required") }}
+                                                {{ form.telecom_company(class="form-select", required="required", id="telecom_company", **{'aria-required': 'true'}) }}
                                                 {{ form.telecom_company.label(class="form-label") }}
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-0">
-                                                {{ form.region.label(class="form-label") }}
-                                                {{ form.region(class="form-select searchable", required="required") }}
+                                                {{ form.region.label(class="form-label", for="region") }}
+                                                {{ form.region(class="form-select searchable", required="required", id="region", **{'aria-required': 'true'}) }}
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.age(class="form-control", placeholder="Age", min="18", max="100", required="required") }}
+                                                {{ form.age(class="form-control", placeholder="Age", min="18", max="100", required="required", id="age", type="number", **{'aria-required': 'true'}) }}
                                                 {{ form.age.label(class="form-label") }}
                                                 {% for error in form.age.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                    <div class="invalid-feedback d-block" role="alert">{{ error }}</div>
                                                 {% endfor %}
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.gender(class="form-select", required="required") }}
+                                                {{ form.gender(class="form-select", required="required", id="gender", **{'aria-required': 'true'}) }}
                                                 {{ form.gender.label(class="form-label") }}
                                             </div>
                                         </div>
@@ -120,31 +119,31 @@
                                 <div class="form-section mb-5" data-section="2">
                                     <div class="section-header">
                                         <h6 class="section-title">
-                                            <i class="bi bi-file-text me-2"></i>Contract Details
+                                            <i class="bi bi-file-text me-2" aria-hidden="true"></i>Contract Details
                                             <div class="section-status">
-                                                <i class="bi bi-circle section-indicator"></i>
+                                                <i class="bi bi-circle section-indicator" aria-hidden="true"></i>
                                             </div>
                                         </h6>
                                     </div>
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.contract_type(class="form-select", required="required") }}
+                                                {{ form.contract_type(class="form-select", required="required", id="contract_type", **{'aria-required': 'true'}) }}
                                                 {{ form.contract_type.label(class="form-label") }}
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.contract_duration(class="form-select", required="required") }}
+                                                {{ form.contract_duration(class="form-select", required="required", id="contract_duration", **{'aria-required': 'true'}) }}
                                                 {{ form.contract_duration.label(class="form-label") }}
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.tenure_months(class="form-control", placeholder="Tenure in Months", min="1", max="100", required="required") }}
+                                                {{ form.tenure_months(class="form-control", placeholder="Tenure in Months", min="1", max="100", required="required", id="tenure_months", type="number", **{'aria-required': 'true'}) }}
                                                 {{ form.tenure_months.label(class="form-label") }}
                                                 {% for error in form.tenure_months.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                    <div class="invalid-feedback d-block" role="alert">{{ error }}</div>
                                                 {% endfor %}
                                             </div>
                                         </div>
@@ -152,12 +151,12 @@
                                             <div class="input-group-enhanced">
                                                 <span class="input-group-text currency-badge">TZS</span>
                                                 <div class="form-floating">
-                                                    {{ form.monthly_charges(class="form-control", placeholder="Monthly Charges", step="0.01", min="0", required="required") }}
+                                                    {{ form.monthly_charges(class="form-control", placeholder="Monthly Charges", step="0.01", min="0", required="required", id="monthly_charges", type="number", **{'aria-required': 'true'}) }}
                                                     {{ form.monthly_charges.label(class="form-label") }}
                                                 </div>
                                             </div>
                                             {% for error in form.monthly_charges.errors %}
-                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                                <div class="invalid-feedback d-block" role="alert">{{ error }}</div>
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -167,9 +166,9 @@
                                 <div class="form-section mb-5" data-section="3">
                                     <div class="section-header">
                                         <h6 class="section-title">
-                                            <i class="bi bi-graph-up me-2"></i>Usage Information
+                                            <i class="bi bi-graph-up me-2" aria-hidden="true"></i>Usage Information
                                             <div class="section-status">
-                                                <i class="bi bi-circle section-indicator"></i>
+                                                <i class="bi bi-circle section-indicator" aria-hidden="true"></i>
                                             </div>
                                         </h6>
                                     </div>
@@ -177,25 +176,25 @@
                                         <div class="col-md-6">
                                             <div class="input-group-enhanced">
                                                 <div class="form-floating">
-                                                    {{ form.data_usage_gb(class="form-control", placeholder="Data Usage", step="0.1", min="0", required="required") }}
+                                                    {{ form.data_usage_gb(class="form-control", placeholder="Data Usage", step="0.1", min="0", required="required", id="data_usage_gb", type="number", **{'aria-required': 'true'}) }}
                                                     {{ form.data_usage_gb.label(class="form-label") }}
                                                 </div>
                                                 <span class="input-group-text unit-badge">GB</span>
                                             </div>
                                             {% for error in form.data_usage_gb.errors %}
-                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                                <div class="invalid-feedback d-block" role="alert">{{ error }}</div>
                                             {% endfor %}
                                         </div>
                                         <div class="col-md-6">
                                             <div class="input-group-enhanced">
                                                 <div class="form-floating">
-                                                    {{ form.call_duration_minutes(class="form-control", placeholder="Call Duration", min="0", required="required") }}
+                                                    {{ form.call_duration_minutes(class="form-control", placeholder="Call Duration", min="0", required="required", id="call_duration_minutes", type="number", **{'aria-required': 'true'}) }}
                                                     {{ form.call_duration_minutes.label(class="form-label") }}
                                                 </div>
                                                 <span class="input-group-text unit-badge">mins</span>
                                             </div>
                                             {% for error in form.call_duration_minutes.errors %}
-                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                                <div class="invalid-feedback d-block" role="alert">{{ error }}</div>
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -205,28 +204,28 @@
                                 <div class="form-section mb-5" data-section="4">
                                     <div class="section-header">
                                         <h6 class="section-title">
-                                            <i class="bi bi-headset me-2"></i>Customer Support
+                                            <i class="bi bi-headset me-2" aria-hidden="true"></i>Customer Support
                                             <div class="section-status">
-                                                <i class="bi bi-circle section-indicator"></i>
+                                                <i class="bi bi-circle section-indicator" aria-hidden="true"></i>
                                             </div>
                                         </h6>
                                     </div>
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.complaints_filed(class="form-control", placeholder="Complaints Filed", min="0", required="required") }}
+                                                {{ form.complaints_filed(class="form-control", placeholder="Complaints Filed", min="0", required="required", id="complaints_filed", type="number", **{'aria-required': 'true'}) }}
                                                 {{ form.complaints_filed.label(class="form-label") }}
                                                 {% for error in form.complaints_filed.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                    <div class="invalid-feedback d-block" role="alert">{{ error }}</div>
                                                 {% endfor %}
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.customer_support_calls(class="form-control", placeholder="Support Calls", min="0", required="required") }}
+                                                {{ form.customer_support_calls(class="form-control", placeholder="Support Calls", min="0", required="required", id="customer_support_calls", type="number", **{'aria-required': 'true'}) }}
                                                 {{ form.customer_support_calls.label(class="form-label") }}
                                                 {% for error in form.customer_support_calls.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                    <div class="invalid-feedback d-block" role="alert">{{ error }}</div>
                                                 {% endfor %}
                                             </div>
                                         </div>
@@ -237,61 +236,61 @@
                                 <div class="form-section mb-5" data-section="5">
                                     <div class="section-header">
                                         <h6 class="section-title">
-                                            <i class="bi bi-credit-card me-2"></i>Payment & Services
+                                            <i class="bi bi-credit-card me-2" aria-hidden="true"></i>Payment & Services
                                             <div class="section-status">
-                                                <i class="bi bi-circle section-indicator"></i>
+                                                <i class="bi bi-circle section-indicator" aria-hidden="true"></i>
                                             </div>
                                         </h6>
                                     </div>
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.payment_method(class="form-select", required="required") }}
+                                                {{ form.payment_method(class="form-select", required="required", id="payment_method", **{'aria-required': 'true'}) }}
                                                 {{ form.payment_method.label(class="form-label") }}
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.internet_service(class="form-select", required="required") }}
+                                                {{ form.internet_service(class="form-select", required="required", id="internet_service", **{'aria-required': 'true'}) }}
                                                 {{ form.internet_service.label(class="form-label") }}
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.additional_services(class="form-select", required="required") }}
+                                                {{ form.additional_services(class="form-select", required="required", id="additional_services", **{'aria-required': 'true'}) }}
                                                 {{ form.additional_services.label(class="form-label") }}
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.discount_offer_used(class="form-select", required="required") }}
+                                                {{ form.discount_offer_used(class="form-select", required="required", id="discount_offer_used", **{'aria-required': 'true'}) }}
                                                 {{ form.discount_offer_used.label(class="form-label") }}
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating">
-                                                {{ form.billing_issues_reported(class="form-control", placeholder="Billing Issues", min="0", required="required") }}
+                                                {{ form.billing_issues_reported(class="form-control", placeholder="Billing Issues", min="0", required="required", id="billing_issues_reported", type="number", **{'aria-required': 'true'}) }}
                                                 {{ form.billing_issues_reported.label(class="form-label") }}
                                                 {% for error in form.billing_issues_reported.errors %}
-                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                    <div class="invalid-feedback d-block" role="alert">{{ error }}</div>
                                                 {% endfor %}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <!-- Enhanced Action Buttons -->
+                                <!-- Action Buttons -->
                                 <div class="action-buttons">
-                                    <button type="submit" name="predict" class="btn btn-primary-gradient btn-lg px-5">
-                                        <i class="bi bi-cpu me-2"></i>
+                                    <button type="submit" name="predict" class="btn btn-primary-gradient btn-lg px-5" aria-label="Predict Churn">
+                                        <i class="bi bi-cpu me-2" aria-hidden="true"></i>
                                         <span class="btn-text">Predict Churn</span>
-                                        <div class="btn-loader"></div>
+                                        <div class="btn-loader" aria-hidden="true"></div>
                                     </button>
-                                    <button type="submit" name="add_another" class="btn btn-outline-primary btn-lg px-4">
-                                        <i class="bi bi-plus-circle me-2"></i>Predict & Add Another
+                                    <button type="submit" name="add_another" class="btn btn-outline-primary btn-lg px-4" aria-label="Predict and Add Another">
+                                        <i class="bi bi-plus-circle me-2" aria-hidden="true"></i>Predict & Add Another
                                     </button>
-                                    <button type="button" class="btn btn-outline-primary btn-lg px-4" onclick="clearForm()">
-                                        <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
+                                    <button type="button" class="btn btn-outline-primary btn-lg px-4" onclick="clearForm()" aria-label="Reset Form">
+                                        <i class="bi bi-arrow-clockwise me-2" aria-hidden="true"></i>Reset Form
                                     </button>
                                 </div>
                             </form>
@@ -299,71 +298,73 @@
                     </div>
                 </div>
 
-                <!-- Enhanced Batch Prediction -->
-                <div class="tab-pane fade" id="batch-prediction">
+                <!-- Batch Prediction -->
+                <div class="tab-pane fade" id="batch-prediction" role="tabpanel" aria-labelledby="batchModeBtn">
                     <div class="enhanced-card animate__animated animate__fadeInUp">
                         <div class="card-header-gradient">
                             <h5 class="mb-0 text-white">
-                                <i class="bi bi-cloud-upload me-2"></i>Batch Prediction Analytics
+                                <i class="bi bi-cloud-upload me-2" aria-hidden="true"></i>Batch Prediction Analytics
                             </h5>
                         </div>
                         <div class="card-body p-4">
-                            <form id="batchForm" method="POST" action="{{ url_for('batch_predict') }}" enctype="multipart/form-data">
+                            <form id="batchForm" method="POST" action="{{ url_for('batch_predict') }}" enctype="multipart/form-data" novalidate>
                                 {{ form.hidden_tag() }}
                                 <div class="upload-section">
-                                    <div class="upload-area" id="uploadArea">
-                                        <i class="bi bi-cloud-upload upload-icon"></i>
+                                    <div class="upload-area" id="uploadArea" role="button" aria-label="Upload CSV file">
+                                        <i class="bi bi-cloud-upload upload-icon" aria-hidden="true"></i>
                                         <h6>Drag & Drop CSV File or Click to Browse</h6>
-                                        <input type="file" class="form-control" id="csvFile" name="file" accept=".csv" style="display: none;" required>
+                                        <input type="file" class="form-control visually-hidden" id="csvFile" name="file" accept=".csv" required aria-required="true">
                                         <div class="upload-info">
                                             <small class="text-muted">
-                                                <i class="bi bi-info-circle me-1"></i>
+                                                <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
                                                 Maximum file size: 50MB | Supported format: CSV
                                             </small>
                                         </div>
                                         <div class="file-preview" id="filePreview" style="display: none;">
                                             <div class="file-info">
-                                                <i class="bi bi-file-earmark-spreadsheet file-icon"></i>
+                                                <i class="bi bi-file-earmark-spreadsheet file-icon" aria-hidden="true"></i>
                                                 <div class="file-details">
                                                     <div class="file-name"></div>
                                                     <div class="file-size"></div>
                                                 </div>
-                                                <button type="button" class="btn btn-sm btn-danger" onclick="removeFile()">
-                                                    <i class="bi bi-trash"></i>
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="removeFile()" aria-label="Remove selected file">
+                                                    <i class="bi bi-trash" aria-hidden="true"></i>
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="action-buttons">
-                                    <button type="submit" class="btn btn-primary-gradient btn-lg px-5" id="batchSubmitBtn" disabled>
-                                        <i class="bi bi-rocket-takeoff me-2"></i>
-                                        <span>Process Batch Prediction</span>
+                                    <button type="submit" class="btn btn-primary-gradient btn-lg px-5" id="batchSubmitBtn" disabled aria-label="Process Batch Prediction">
+                                        <i class="bi bi-rocket-takeoff me-2" aria-hidden="true"></i>
+                                        <span class="btn-text">Process Batch Prediction</span>
+                                        <div class="btn-loader" aria-hidden="true"></div>
                                     </button>
-                                        <div class="container mt-5">
-                                        <a href="{{ url_for('load_csv') }}" class="btn btn-primary btn-lg px-4 me-2">
-                                        <i class="bi bi-download me-2"></i>Download Sample CSV
-                                          </a>
-                                        <a href="{{ url_for('show_csv') }}" class="btn btn-primary btn-lg px-4">
-                                         <i class="bi bi-table me-2"></i>Explore Sample CSV Data
-                                          </a>
-                                       </div>
+                                    <div class="container mt-5">
+                                        <a href="{{ url_for('load_csv') }}" class="btn btn-primary btn-lg px-4 me-2" aria-label="Download Sample CSV">
+                                            <i class="bi bi-download me-2" aria-hidden="true"></i>Download Sample CSV
+                                        </a>
+                                        <a href="{{ url_for('show_csv') }}" class="btn btn-primary btn-lg px-4" aria-label="Explore Sample CSV Data">
+                                            <i class="bi bi-table me-2" aria-hidden="true"></i>Explore Sample CSV Data
+                                        </a>
+                                    </div>
                                 </div>
                                 <div class="required-columns">
                                     <h6 class="d-flex justify-content-between align-items-center mb-3">
-                                        <span><i class="bi bi-list-check me-2"></i>Required CSV Columns</span>
-                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#columnsTable">
-                                            <i class="bi bi-eye me-1"></i>View Requirements
+                                        <span><i class="bi bi-list-check me-2" aria-hidden="true"></i>Required CSV Columns</span>
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#columnsTable" aria-expanded="false" aria-controls="columnsTable">
+                                            <i class="bi bi-eye me-1" aria-hidden="true"></i>View Requirements
                                         </button>
                                     </h6>
                                     <div class="collapse" id="columnsTable">
                                         <div class="table-responsive">
                                             <table class="table table-hover custom-table">
+                                                <caption class="visually-hidden">Required CSV Columns for Batch Prediction</caption>
                                                 <thead>
                                                     <tr>
-                                                        <th>Column Name</th>
-                                                        <th>Type</th>
-                                                        <th>Description</th>
+                                                        <th scope="col">Column Name</th>
+                                                        <th scope="col">Type</th>
+                                                        <th scope="col">Description</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -397,14 +398,14 @@
             </div>
         </div>
 
-<!-- Enhanced Results Column -->
+        <!-- Results Column -->
         <div class="col-lg-4" style="width: 100%; max-width: none;">
             {% if batch_results is defined %}
                 <div class="enhanced-card mb-4 animate__animated animate__fadeInRight" style="width: 100%; margin: 0 auto;">
                     <div class="card-header-gradient bg-info-gradient">
                         <h5 class="mb-0 text-white">
-                            <i class="bi bi-file-earmark-spreadsheet me-2"></i>Batch Prediction Results
-                            <button class="btn btn-sm btn-light ms-auto" onclick="toggleForm()">Show Form</button>
+                            <i class="bi bi-file-earmark-spreadsheet me-2" aria-hidden="true"></i>Batch Prediction Results
+                            <button class="btn btn-sm btn-light ms-auto" onclick="toggleForm()" aria-label="Show Form">Show Form</button>
                         </h5>
                     </div>
                     <div class="card-body p-4" style="padding: 2rem;">
@@ -423,6 +424,7 @@
 
                             <div class="table-responsive" style="max-height: 500px; overflow-y: auto; width: 100%; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                                 <table class="table table-striped table-bordered table-hover custom-table" style="width: 100%; min-width: 800px; margin-bottom: 0; font-size: 1rem;">
+                                    <caption class="visually-hidden">Batch Prediction Results</caption>
                                     <thead style="position: sticky; top: 0; z-index: 10; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                                         <tr>
                                             <th scope="col" style="padding: 1rem 1.5rem; color: white; font-weight: 600; text-align: center; border: none; font-size: 1.1rem; min-width: 150px;">Customer ID</th>
@@ -432,7 +434,7 @@
                                     </thead>
                                     <tbody>
                                         {% for result in batch_results %}
-                                        <tr style="transition: all 0.2s ease-in-out;" onmouseover="this.style.backgroundColor='#f8f9fa'; this.style.transform='scale(1.01)'" onmouseout="this.style.backgroundColor=''; this.style.transform='scale(1)'">
+                                        <tr style="transition: all 0.2s ease-in-out;">
                                             <td style="padding: 1rem 1.5rem; text-align: center; font-weight: 500; font-size: 1rem; border: 1px solid #e9ecef;">{{ result.customer_id }}</td>
                                             <td class="{% if result.prediction == 'Yes' %}text-danger{% else %}text-success{% endif %}" style="padding: 1rem 1.5rem; text-align: center; font-weight: 600; font-size: 1rem; border: 1px solid #e9ecef;">
                                                 <span style="display: inline-block; padding: 0.5rem 1rem; border-radius: 20px; {% if result.prediction == 'Yes' %}background-color: rgba(220, 53, 69, 0.1); color: #dc3545;{% else %}background-color: rgba(40, 167, 69, 0.1); color: #28a745;{% endif %}">
@@ -443,9 +445,7 @@
                                                 <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                                                     <span>{{ (result.probability * 100)|round(2) }}%</span>
                                                     <div style="width: 60px; height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
-                                                        <div style="width: {{ (result.probability * 100)|round(2) }}%; height: 100%; background-color: {% if result.probability > 0.7 %}#dc3545{% elif result.probability > 0.4 %}#ffc107{% else %}#28a745{% endif %}; transition: width 0.3s ease;">
-                                                            
-                                                        </div>
+                                                        <div style="width: {{ (result.probability * 100)|round(2) }}%; height: 100%; background-color: {% if result.probability > 0.7 %}#dc3545{% elif result.probability > 0.4 %}#ffc107{% else %}#28a745{% endif %}; transition: width 0.3s ease;"></div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -457,7 +457,7 @@
 
                             <!-- Insights and Recommendations -->
                             <div class="mt-4" style="margin-top: 2rem;">
-                                <h6 class="text-primary" style="font-size: 1.3rem; font-weight: 600; margin-bottom: 1.5rem;"><i class="bi bi-bar-chart-fill me-2"></i>Insights & Recommendations</h6>
+                                <h6 class="text-primary" style="font-size: 1.3rem; font-weight: 600; margin-bottom: 1.5rem;"><i class="bi bi-bar-chart-fill me-2" aria-hidden="true"></i>Insights & Recommendations</h6>
                                 <div class="card bg-light p-3" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border: none; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                                         <div>
@@ -473,7 +473,6 @@
                                                 {% endif %}
                                             </ul>
                                         </div>
-
                                         <div>
                                             <h6 class="mt-3 mb-2" style="font-size: 1.2rem; color: #495057; font-weight: 600; margin-top: 0; margin-bottom: 1rem;">Recommendations:</h6>
                                             <ul class="list-group list-group-flush" style="border: none;">
@@ -500,14 +499,14 @@
                             <!-- Download Link -->
                             {% if batch_id %}
                                 <div class="mt-3" style="margin-top: 2rem;">
-                                    <a href="{{ url_for('download_batch_results', batch_id=batch_id) }}" class="btn btn-outline-primary btn-lg w-100" style="padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600; border-radius: 8px; transition: all 0.3s ease; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 2px solid #0066cc;" onmouseover="this.style.background='linear-gradient(135deg, #0066cc 0%, #004499 100%)'; this.style.color='white'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)'; this.style.color='#0066cc'; this.style.transform='translateY(0)'">
-                                        <i class="bi bi-download me-2"></i>Download Full Results (CSV)
+                                    <a href="{{ url_for('download_batch_results', batch_id=batch_id) }}" class="btn btn-outline-primary btn-lg w-100" style="padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600; border-radius: 8px; transition: all 0.3s ease; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 2px solid #0066cc;" aria-label="Download Full Results as CSV">
+                                        <i class="bi bi-download me-2" aria-hidden="true"></i>Download Full Results (CSV)
                                     </a>
                                 </div>
                             {% endif %}
                         {% else %}
-                            <div class="alert alert-info-custom" style="background: rgba(13, 202, 240, 0.1); border: 1px solid #0dcaf0; border-radius: 8px; padding: 1.5rem; color: #055160;">
-                                <i class="bi bi-info-circle me-2"></i>
+                            <div class="alert alert-info-custom" style="background: rgba(13, 202, 240, 0.1); border: 1px solid #0dcaf0; border-radius: 8px; padding: 1.5rem; color: #055160;" role="alert">
+                                <i class="bi bi-info-circle me-2" aria-hidden="true"></i>
                                 No valid customers found in the uploaded CSV.
                             </div>
                         {% endif %}
@@ -518,40 +517,40 @@
                 <div class="enhanced-card mb-4 animate__animated animate__fadeInRight">
                     <div class="card-header {% if result.prediction == 'Yes' %}bg-danger-gradient{% else %}bg-success-gradient{% endif %}">
                         <h5 class="mb-0 text-white">
-                            <i class="bi bi-{% if result.prediction == 'Yes' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
+                            <i class="bi bi-{% if result.prediction == 'Yes' %}exclamation-triangle{% else %}check-circle{% endif %} me-2" aria-hidden="true"></i>
                             Prediction Result
-                            <button class="btn btn-sm btn-light ms-auto" onclick="toggleForm()">Show Form</button>
+                            <button class="btn btn-sm btn-light ms-auto" onclick="toggleForm()" aria-label="Show Form">Show Form</button>
                         </h5>
                     </div>
                     <div class="card-body text-center p-4">
                         <div class="prediction-result">
-                            <div class="prediction-circle {% if result.prediction == 'Yes' %}danger{% else %}success{% endif %}">
+                            <div class="prediction-circle {% if result.prediction == 'Yes' %}danger{% else %}success{% endif %}" role="status" aria-live="polite">
                                 <div class="prediction-text">{{ result.prediction }}</div>
                                 <div class="prediction-prob">{{ (result.probability * 100)|round(2) }}%</div>
                             </div>
                         </div>
                         
-                        <div class="recommendation-box {% if result.prediction == 'Yes' %}alert-danger{% else %}alert-success{% endif %}">
-                            <i class="bi bi-{% if result.prediction == 'Yes' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
+                        <div class="recommendation-box {% if result.prediction == 'Yes' %}alert-danger{% else %}alert-success{% endif %}" role="alert">
+                            <i class="bi bi-{% if result.prediction == 'Yes' %}exclamation-triangle{% else %}check-circle{% endif %} me-2" aria-hidden="true"></i>
                             <strong>{{ result.recommendation }}</strong>
                         </div>
                         
                         {% if prediction_id %}
                             <div class="mt-3">
-                                <a href="{{ url_for('download_pdf', prediction_id=prediction_id) }}" class="btn btn-outline-primary btn-lg w-100">
-                                    <i class="bi bi-download me-2"></i>Download Report (PDF)
+                                <a href="{{ url_for('download_pdf', prediction_id=prediction_id) }}" class="btn btn-outline-primary btn-lg w-100" aria-label="Download Report as PDF">
+                                    <i class="bi bi-download me-2" aria-hidden="true"></i>Download Report (PDF)
                                 </a>
                             </div>
                         {% endif %}
                     </div>
                 </div>
                 
-                <!-- Enhanced Churn Report -->
+                <!-- Churn Report -->
                 {% if report %}
                     <div class="enhanced-card animate__animated animate__fadeInRight">
                         <div class="card-header bg-info-gradient">
                             <h5 class="mb-0 text-white">
-                                <i class="bi bi-graph-up-arrow me-2"></i>Churn Analysis Report
+                                <i class="bi bi-graph-up-arrow me-2" aria-hidden="true"></i>Churn Analysis Report
                             </h5>
                         </div>
                         <div class="card-body p-4">
@@ -559,12 +558,12 @@
                             {% if report.risk_factors %}
                                 <div class="report-section mb-4">
                                     <h6 class="report-title danger">
-                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Risk Factors
+                                        <i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>Risk Factors
                                     </h6>
                                     <div class="report-items">
                                         {% for factor in report.risk_factors %}
                                             <div class="report-item danger">
-                                                <i class="bi bi-arrow-right me-2"></i>{{ factor }}
+                                                <i class="bi bi-arrow-right me-2" aria-hidden="true"></i>{{ factor }}
                                             </div>
                                         {% endfor %}
                                     </div>
@@ -575,12 +574,12 @@
                             {% if report.retention_opportunities %}
                                 <div class="report-section mb-4">
                                     <h6 class="report-title warning">
-                                        <i class="bi bi-lightbulb-fill me-2"></i>Retention Opportunities
+                                        <i class="bi bi-lightbulb-fill me-2" aria-hidden="true"></i>Retention Opportunities
                                     </h6>
                                     <div class="report-items">
                                         {% for opp in report.retention_opportunities %}
                                             <div class="report-item warning">
-                                                <i class="bi bi-arrow-right me-2"></i>{{ opp }}
+                                                <i class="bi bi-arrow-right me-2" aria-hidden="true"></i>{{ opp }}
                                             </div>
                                         {% endfor %}
                                     </div>
@@ -591,12 +590,12 @@
                             {% if report.actionable_insights %}
                                 <div class="report-section">
                                     <h6 class="report-title success">
-                                        <i class="bi bi-check-circle-fill me-2"></i>Actionable Insights
+                                        <i class="bi bi-check-circle-fill me-2" aria-hidden="true"></i>Actionable Insights
                                     </h6>
                                     <div class="report-items">
                                         {% for insight in report.actionable_insights %}
                                             <div class="report-item success">
-                                                <i class="bi bi-arrow-right me-2"></i>{{ insight }}
+                                                <i class="bi bi-arrow-right me-2" aria-hidden="true"></i>{{ insight }}
                                             </div>
                                         {% endfor %}
                                     </div>
@@ -609,14 +608,14 @@
                 <div class="enhanced-card animate__animated animate__fadeInRight" id="instructionsCard">
                     <div class="card-header-gradient">
                         <h5 class="mb-0 text-white">
-                            <i class="bi bi-lightbulb me-2"></i>Getting Started
+                            <i class="bi bi-lightbulb me-2" aria-hidden="true"></i>Getting Started
                         </h5>
                     </div>
                     <div class="card-body p-4">
                         <div class="instruction-timeline">
                             <div class="instruction-step active" data-step="1">
                                 <div class="step-icon">
-                                    <i class="bi bi-1-circle-fill"></i>
+                                    <i class="bi bi-1-circle-fill" aria-hidden="true"></i>
                                 </div>
                                 <div class="step-content">
                                     <h6>Choose Prediction Type</h6>
@@ -625,7 +624,7 @@
                             </div>
                             <div class="instruction-step" data-step="2">
                                 <div class="step-icon">
-                                    <i class="bi bi-2-circle-fill"></i>
+                                    <i class="bi bi-2-circle-fill" aria-hidden="true"></i>
                                 </div>
                                 <div class="step-content">
                                     <h6>Input Customer Data</h6>
@@ -634,7 +633,7 @@
                             </div>
                             <div class="instruction-step" data-step="3">
                                 <div class="step-icon">
-                                    <i class="bi bi-3-circle-fill"></i>
+                                    <i class="bi bi-3-circle-fill" aria-hidden="true"></i>
                                 </div>
                                 <div class="step-content">
                                     <h6>Get AI Insights</h6>
@@ -645,19 +644,19 @@
                         
                         <div class="feature-highlights mt-4">
                             <h6 class="mb-3">
-                                <i class="bi bi-star-fill me-2 text-warning"></i>Key Features
+                                <i class="bi bi-star-fill me-2 text-warning" aria-hidden="true"></i>Key Features
                             </h6>
                             <div class="feature-list">
                                 <div class="feature-item">
-                                    <i class="bi-lightning-charge text-warning"></i>
+                                    <i class="bi bi-lightning-charge text-warning" aria-hidden="true"></i>
                                     <span>Real-time Processing</span>
                                 </div>
                                 <div class="feature-item">
-                                    <i class="bi bi-graph-up text-primary"></i>
+                                    <i class="bi bi-graph-up text-primary" aria-hidden="true"></i>
                                     <span>Advanced Analytics</span>
                                 </div>
                                 <div class="feature-item">
-                                    <i class="bi bi-file-earmark-pdf text-danger"></i>
+                                    <i class="bi bi-file-earmark-pdf text-danger" aria-hidden="true"></i>
                                     <span>Detailed Reports</span>
                                 </div>
                             </div>
@@ -669,1279 +668,738 @@
     </div>
 </div>
 
-<!-- External Libraries -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
+<!-- External Libraries with Fallbacks -->
+<!--[if lt IE 9]>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/3.23.3/minified.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/3.6.2/fetch.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet" integrity="sha512-aD9ophpFQ61nFZP6hXYu4Q/bdV0FbwJswpC47TaFIK1I0N1p梅+tl7xF6V6KMgH26cTFV4zQ2UqV0GOv+DQjA==" crossorigin="anonymous">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha512-t4GWSVZO7sLTFQ8nBDhDJCt6SYuPjxwBaA/qE6iokfHW1Mwez4z5Vwf1njsLEXr0Q0ah+O0sT9No0k3S1NUrJLg==" crossorigin="anonymous">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet" integrity="sha512-c42qTSw/wPZ3/5LBzD+Bw5f7bSF2oxou6wEb+I/lqeaKV5FDIfMvvRp772y4jcJLKuGUOpbJMdg/BTl50fJYAw==" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js" integrity="sha512-Op9b3Zc2bE6gX9yT1/mS46AjYDrq99r0hQhJniQ8VHEG+edP3Ck+WP3gH7OQJVsUiJ/2z0K9RwK3x/7+YfK+PA==" crossorigin="anonymous" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js" integrity="sha512-VK2zcvntE8y2v5uS7aRZ33tnW3MUpBs0vH3BBN8gZjmW2wzO7ZmQNTN3JHj4++MSc0gVQ8wnsANptWp/4i8Y/0A==" crossorigin="anonymous" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js" integrity="sha512-Kef5sc7gfTacR7TZKelcrRs15ipf7+t+n7Zh6mKNJ5oqox5pUrHr1V66K0M+dWjAMB8j+2qDqBhqQeh+pf0vuw==" crossorigin="anonymous" defer></script>
+<!-- Local Fallbacks -->
+<script>
+    if (!window.jQuery) {
+        document.write('<script src="/static/js/jquery.min.js" defer><\/script>');
+    }
+    if (!window.Select2) {
+        document.write('<script src="/static/js/select2.min.js" defer><\/script>');
+    }
+    if (!window.bootstrap) {
+        document.write('<script src="/static/js/bootstrap.bundle.min.js" defer><\/script>');
+    }
+    if (!window.particlesJS) {
+        document.write('<script src="/static/js/particles.min.js" defer><\/script>');
+    }
+</script>
 
 <script>
-    // Initialize Select2 for searchable region field
-   // Initialize Select2 for searchable region field
-    $(document).ready(function() {
-    $('.searchable').select2({
-        width: '100%',
-        placeholder: 'Select a region',
-        allowClear: true
-    });
-});
-
-fetch('/api/csv-data')
-    .then(response => response.json())
-    .then(data => {
-        // Use the CSV data in your frontend
-        console.log(data);
-    });
-// Toggle form visibility with enhanced animation
-function toggleForm() {
-    const formSection = document.getElementById('formSection');
-    const isHidden = formSection.style.display === 'none' || !formSection.style.display;
-    
-    if (isHidden) {
-        // Show with slide down and fade in
-        formSection.style.display = 'block';
-        formSection.style.opacity = '0';
-        formSection.style.transform = 'translateY(-20px) scale(0.95)';
-        formSection.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-        
-        requestAnimationFrame(() => {
-            formSection.style.opacity = '1';
-            formSection.style.transform = 'translateY(0) scale(1)';
-        });
-    } else {
-        // Hide with slide up and fade out
-        formSection.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.6, 1)';
-        formSection.style.opacity = '0';
-        formSection.style.transform = 'translateY(-20px) scale(0.95)';
-        
-        setTimeout(() => {
-            formSection.style.display = 'none';
-        }, 300);
-    }
-}
-
-// Enhanced Single Prediction with staggered animations
-function showSinglePrediction() {
-    const singlePane = document.getElementById('single-prediction');
-    const batchPane = document.getElementById('batch-prediction');
-    const singleBtn = document.getElementById('singleModeBtn');
-    const batchBtn = document.getElementById('batchModeBtn');
-
-    // Animate button states first
-    animateButtonTransition(singleBtn, batchBtn);
-
-    // Enhanced batch pane hide animation
-    batchPane.style.transition = 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-    batchPane.style.opacity = '0';
-    batchPane.style.transform = 'translateX(-30px) scale(0.98)';
-    batchPane.classList.remove('show', 'active');
-
-    setTimeout(() => {
-        batchPane.style.display = 'none';
-        
-        // Enhanced single pane show animation with stagger
-        singlePane.style.display = 'block';
-        singlePane.style.opacity = '0';
-        singlePane.style.transform = 'translateX(30px) scale(0.98)';
-        singlePane.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        
-        requestAnimationFrame(() => {
-            singlePane.style.opacity = '1';
-            singlePane.style.transform = 'translateX(0) scale(1)';
-            singlePane.classList.add('show', 'active', 'animate__animated', 'animate__fadeInRight');
-        });
-
-        // Stagger animation for form elements
-        staggerFormElements(singlePane);
-    }, 200);
-}
-
-// Enhanced Batch Prediction with staggered animations
-function showBatchPrediction() {
-    const singlePane = document.getElementById('single-prediction');
-    const batchPane = document.getElementById('batch-prediction');
-    const singleBtn = document.getElementById('singleModeBtn');
-    const batchBtn = document.getElementById('batchModeBtn');
-
-    // Animate button states first
-    animateButtonTransition(batchBtn, singleBtn);
-
-    // Enhanced single pane hide animation
-    singlePane.style.transition = 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-    singlePane.style.opacity = '0';
-    singlePane.style.transform = 'translateX(30px) scale(0.98)';
-    singlePane.classList.remove('show', 'active');
-
-    setTimeout(() => {
-        singlePane.style.display = 'none';
-        
-        // Enhanced batch pane show animation
-        batchPane.style.display = 'block';
-        batchPane.style.opacity = '0';
-        batchPane.style.transform = 'translateX(-30px) scale(0.98)';
-        batchPane.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        
-        requestAnimationFrame(() => {
-            batchPane.style.opacity = '1';
-            batchPane.style.transform = 'translateX(0) scale(1)';
-            batchPane.classList.add('show', 'active', 'animate__animated', 'animate__fadeInLeft');
-        });
-
-        // Stagger animation for upload elements
-        staggerUploadElements(batchPane);
-    }, 200);
-}
-
-// Enhanced button animation
-function animateButtonTransition(activeBtn, inactiveBtn) {
-    // Add bounce effect to active button
-    activeBtn.style.transform = 'scale(1.05)';
-    activeBtn.style.transition = 'all 0.2s cubic-bezier(0.68, -0.55, 0.565, 1.55)';
-    activeBtn.classList.add('active');
-    
-    // Shrink inactive button slightly
-    inactiveBtn.style.transform = 'scale(0.95)';
-    inactiveBtn.style.transition = 'all 0.2s ease-out';
-    inactiveBtn.classList.remove('active');
-    
-    // Reset transforms after animation
-    setTimeout(() => {
-        activeBtn.style.transform = 'scale(1)';
-        inactiveBtn.style.transform = 'scale(1)';
-    }, 200);
-}
-
-// Stagger animation for form elements
-function staggerFormElements(container) {
-    const elements = container.querySelectorAll('.form-section, .form-group, .btn');
-    elements.forEach((el, index) => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-        
-        setTimeout(() => {
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0)';
-        }, index * 100 + 300);
-    });
-}
-
-// Stagger animation for upload elements
-function staggerUploadElements(container) {
-    const elements = container.querySelectorAll('.upload-area, .file-preview, .btn');
-    elements.forEach((el, index) => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px) scale(0.95)';
-        el.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-        
-        setTimeout(() => {
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0) scale(1)';
-        }, index * 150 + 300);
-    });
-}
-
-// Enhanced form progress tracking
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('predictionForm');
-    const inputs = form.querySelectorAll('input, select');
-    const progressCircle = document.querySelector('.progress-circle');
-    const progressText = document.querySelector('.progress-text');
-    const sections = document.querySelectorAll('.form-section');
-
-    function updateProgress() {
-        const totalFields = inputs.length;
-        let filledFields = 0;
-
-        inputs.forEach(input => {
-            if (input.value) filledFields++;
-        });
-
-        const progress = (filledFields / totalFields) * 100;
-        
-        // Animate progress text
-        animateProgressText(progressText, Math.round(progress));
-        
-        // Enhanced progress circle animation
-        progressCircle.style.transition = 'background 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-        progressCircle.style.background = `conic-gradient(
-            #667eea ${progress * 3.6}deg, 
-            rgba(255, 255, 255, 0.3) ${progress * 3.6}deg
-        )`;
-
-        // Enhanced section completion animation
-        sections.forEach((section, index) => {
-            const sectionInputs = section.querySelectorAll('input, select');
-            const sectionFilled = Array.from(sectionInputs).every(input => input.value);
-            const indicator = section.querySelector('.section-indicator');
-            
-            if (sectionFilled && !section.classList.contains('completed')) {
-                // Completion animation
-                setTimeout(() => {
-                    indicator.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.565, 1.55)';
-                    indicator.style.transform = 'scale(1.2)';
-                    indicator.classList.remove('bi-circle');
-                    indicator.classList.add('bi-check-circle-fill');
-                    section.classList.add('completed');
-                    
-                    // Add ripple effect
-                    createRippleEffect(indicator);
-                    
-                    setTimeout(() => {
-                        indicator.style.transform = 'scale(1)';
-                    }, 300);
-                }, index * 100);
-            } else if (!sectionFilled && section.classList.contains('completed')) {
-                // Revert animation
-                indicator.style.transition = 'all 0.2s ease-out';
-                indicator.style.transform = 'scale(1)';
-                indicator.classList.remove('bi-check-circle-fill');
-                indicator.classList.add('bi-circle');
-                section.classList.remove('completed');
-            }
-        });
-    }
-
-    // Animate progress text counting
-    function animateProgressText(element, targetValue) {
-        const currentValue = parseInt(element.textContent) || 0;
-        const increment = targetValue > currentValue ? 1 : -1;
-        const duration = Math.abs(targetValue - currentValue) * 30;
-        
-        if (currentValue !== targetValue) {
-            const startTime = Date.now();
-            const animate = () => {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const current = currentValue + (targetValue - currentValue) * progress;
-                
-                element.textContent = `${Math.round(current)}%`;
-                
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                }
-            };
-            requestAnimationFrame(animate);
+// Polyfill for older browsers
+if (!Element.prototype.closest) {
+    Element.prototype.closest = function(s) {
+        var el = this;
+        while (el && el.nodeType === 1) {
+            if (el.matches(s)) return el;
+            el = el.parentElement || el.parentNode;
         }
+        return null;
+    };
+}
+if (!Element.prototype.matches) {
+    Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+}
+
+// Initialize Select2 with fallback
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.jQuery && jQuery.fn.select2) {
+        try {
+            jQuery('.searchable').select2({
+                width: '100%',
+                placeholder: 'Select a region',
+                allowClear: true,
+                dropdownAutoWidth: true,
+                minimumResultsForSearch: 10
+            }).on('select2:open', function() {
+                jQuery(this).next('.select2-container').find('.select2-search__field').attr('aria-label', 'Search regions');
+            });
+        } catch (e) {
+            console.warn('Select2 failed to initialize, falling back to native select:', e);
+            document.querySelectorAll('.searchable').forEach(function(el) {
+                el.style.width = '100%';
+                el.style.appearance = 'auto';
+                el.setAttribute('aria-label', 'Select a region');
+            });
+        }
+    } else {
+        console.warn('jQuery or Select2 not loaded, using native select');
+        document.querySelectorAll('.searchable').forEach(function(el) {
+            el.style.width = '100%';
+            el.style.appearance = 'auto';
+            el.setAttribute('aria-label', 'Select a region');
+        });
     }
 
-    // Create ripple effect
-    function createRippleEffect(element) {
-        const ripple = document.createElement('div');
-        ripple.style.position = 'absolute';
-        ripple.style.borderRadius = '50%';
-        ripple.style.background = 'rgba(102, 126, 234, 0.3)';
-        ripple.style.transform = 'scale(0)';
-        ripple.style.animation = 'ripple 0.6s linear';
-        ripple.style.pointerEvents = 'none';
-        
-        const rect = element.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = rect.left - size/2 + rect.width/2 + 'px';
-        ripple.style.top = rect.top - size/2 + rect.height/2 + 'px';
-        
-        document.body.appendChild(ripple);
-        
-        setTimeout(() => {
-            document.body.removeChild(ripple);
-        }, 600);
+    // Fetch CSV data with fallback
+    if (window.fetch) {
+        fetch('/api/csv-data')
+            .then(function(response) { return response.json(); })
+            .then(function(data) { console.log(data); })
+            .catch(function(e) {
+                console.warn('Fetch failed, using fallback data:', e);
+                console.log({ message: 'No data available' });
+            });
+    } else {
+        console.warn('Fetch API not supported, skipping data fetch');
     }
 
-    // Add CSS for ripple animation
-    if (!document.getElementById('ripple-styles')) {
-        const style = document.createElement('style');
-        style.id = 'ripple-styles';
-        style.textContent = `
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    inputs.forEach(input => {
-        input.addEventListener('input', updateProgress);
+    // Toggle form visibility
+    window.toggleForm = function() {
+        var formSection = document.getElementById('formSection');
+        var isHidden = formSection.style.display === 'none' || !formSection.style.display;
         
-        // Add focus animations
-        input.addEventListener('focus', function() {
-            this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            this.style.transform = 'scale(1.02)';
-            this.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.15)';
-        });
-        
-        input.addEventListener('blur', function() {
-            this.style.transform = 'scale(1)';
-            this.style.boxShadow = '';
-        });
-    });
-
-    // Enhanced clear form function
-    window.clearForm = function() {
-        // Add clearing animation
-        const formElements = form.querySelectorAll('.form-group');
-        formElements.forEach((el, index) => {
-            setTimeout(() => {
-                el.style.transition = 'all 0.2s ease-out';
-                el.style.opacity = '0.5';
-                el.style.transform = 'scale(0.98)';
-                
-                setTimeout(() => {
-                    el.style.opacity = '1';
-                    el.style.transform = 'scale(1)';
-                }, 100);
-            }, index * 50);
-        });
-        
-        form.reset();
-        updateProgress();
-        
-        sections.forEach((section, index) => {
-            setTimeout(() => {
-                const indicator = section.querySelector('.section-indicator');
-                indicator.style.transition = 'all 0.3s ease-out';
-                indicator.classList.remove('bi-check-circle-fill');
-                indicator.classList.add('bi-circle');
-                section.classList.remove('completed');
-            }, index * 100);
-        });
-        
-        progressText.textContent = '0%';
-        progressCircle.style.background = 'conic-gradient(#667eea 0deg, rgba(255, 255, 255, 0.3) 0deg)';
+        if (isHidden) {
+            formSection.style.display = 'block';
+            formSection.style.opacity = '0';
+            formSection.style.transform = 'translateY(-20px)';
+            formSection.style.transition = 'all 0.4s ease';
+            requestAnimationFrame(function() {
+                formSection.style.opacity = '1';
+                formSection.style.transform = 'translateY(0)';
+            });
+            formSection.setAttribute('aria-hidden', 'false');
+        } else {
+            formSection.style.opacity = '0';
+            formSection.style.transform = 'translateY(-20px)';
+            formSection.style.transition = 'all 0.3s ease';
+            setTimeout(function() {
+                formSection.style.display = 'none';
+                formSection.setAttribute('aria-hidden', 'true');
+            }, 300);
+        }
     };
 
-    // Enhanced file upload handling
-    const uploadArea = document.getElementById('uploadArea');
-    const fileInput = document.getElementById('csvFile');
-    const filePreview = document.getElementById('filePreview');
-    const fileName = document.querySelector('.file-name');
-    const fileSize = document.querySelector('.file-size');
-    const submitBtn = document.getElementById('batchSubmitBtn');
+    // Show single prediction form
+    window.showSinglePrediction = function() {
+        var singlePane = document.getElementById('single-prediction');
+        var batchPane = document.getElementById('batch-prediction');
+        var singleBtn = document.getElementById('singleModeBtn');
+        var batchBtn = document.getElementById('batchModeBtn');
 
-    // Enhanced upload area interactions
-    uploadArea.addEventListener('click', () => {
-        uploadArea.style.transform = 'scale(0.98)';
-        setTimeout(() => {
-            uploadArea.style.transform = 'scale(1)';
-            fileInput.click();
-        }, 100);
+        singleBtn.classList.add('active');
+        batchBtn.classList.remove('active');
+        singleBtn.setAttribute('aria-pressed', 'true');
+        batchBtn.setAttribute('aria-pressed', 'false');
+
+        batchPane.style.display = 'none';
+        batchPane.classList.remove('show', 'active');
+        batchPane.setAttribute('aria-hidden', 'true');
+
+        singlePane.style.display = 'block';
+        singlePane.style.opacity = '0';
+        singlePane.style.transform = 'translateX(30px)';
+        singlePane.style.transition = 'all 0.5s ease';
+        requestAnimationFrame(function() {
+            singlePane.style.opacity = '1';
+            singlePane.style.transform = 'translateX(0)';
+            singlePane.classList.add('show', 'active');
+            singlePane.setAttribute('aria-hidden', 'false');
+        });
+    };
+
+    // Show batch prediction form
+    window.showBatchPrediction = function() {
+        var singlePane = document.getElementById('single-prediction');
+        var batchPane = document.getElementById('batch-prediction');
+        var singleBtn = document.getElementById('singleModeBtn');
+        var batchBtn = document.getElementById('batchModeBtn');
+
+        singleBtn.classList.remove('active');
+        batchBtn.classList.add('active');
+        singleBtn.setAttribute('aria-pressed', 'false');
+        batchBtn.setAttribute('aria-pressed', 'true');
+
+        singlePane.style.display = 'none';
+        singlePane.classList.remove('show', 'active');
+        singlePane.setAttribute('aria-hidden', 'true');
+
+        batchPane.style.display = 'block';
+        batchPane.style.opacity = '0';
+        batchPane.style.transform = 'translateX(-30px)';
+        batchPane.style.transition = 'all 0.5s ease';
+        requestAnimationFrame(function() {
+            batchPane.style.opacity = '1';
+            batchPane.style.transform = 'translateX(0)';
+            batchPane.classList.add('show', 'active');
+            batchPane.setAttribute('aria-hidden', 'false');
+        });
+    };
+
+    // Form progress tracking
+    var form = document.getElementById('predictionForm');
+    var inputs = form.querySelectorAll('input, select');
+    var progressCircle = document.querySelector('.progress-circle');
+    var progressText = document.querySelector('.progress-text');
+    var sections = document.querySelectorAll('.form-section');
+
+    function updateProgress() {
+        var totalFields = inputs.length;
+        var filledFields = 0;
+
+        inputs.forEach(function(input) {
+            if (input.value && input.value.trim() !== '') filledFields++;
+        });
+
+        var progress = (filledFields / totalFields) * 100;
+        progressText.textContent = Math.round(progress) + '%';
+        progressCircle.style.background = 'conic-gradient(#667eea ' + (progress * 3.6) + 'deg, #e9ecef 0deg)';
+        progressCircle.setAttribute('aria-valuenow', Math.round(progress));
+        progressCircle.setAttribute('aria-valuetext', progress + '% completed');
+
+        sections.forEach(function(section) {
+            var sectionInputs = section.querySelectorAll('input, select');
+            var sectionFilled = Array.from(sectionInputs).every(function(input) {
+                return input.value && input.value.trim() !== '';
+            });
+            var indicator = section.querySelector('.section-indicator');
+            if (sectionFilled) {
+                indicator.classList.remove('bi-circle');
+                indicator.classList.add('bi-check-circle-fill');
+                section.classList.add('completed');
+            } else {
+                indicator.classList.remove('bi-check-circle-fill');
+                indicator.classList.add('bi-circle');
+                section.classList.remove('completed');
+            }
+        });
+    }
+
+    inputs.forEach(function(input) {
+        input.addEventListener('input', updateProgress);
+        input.addEventListener('change', updateProgress);
     });
 
-    uploadArea.addEventListener('dragover', (e) => {
+    window.clearForm = function() {
+        form.reset();
+        updateProgress();
+        progressText.textContent = '0%';
+        progressCircle.style.background = 'conic-gradient(#667eea 0deg, #e9ecef 0deg)';
+        sections.forEach(function(section) {
+            var indicator = section.querySelector('.section-indicator');
+            indicator.classList.remove('bi-check-circle-fill');
+            indicator.classList.add('bi-circle');
+            section.classList.remove('completed');
+        });
+    };
+
+    // File upload handling
+    var uploadArea = document.getElementById('uploadArea');
+    var fileInput = document.getElementById('csvFile');
+    var filePreview = document.getElementById('filePreview');
+    var fileName = document.querySelector('.file-name');
+    var fileSize = document.querySelector('.file-size');
+    var submitBtn = document.getElementById('batchSubmitBtn');
+
+    uploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    uploadArea.addEventListener('dragover', function(e) {
         e.preventDefault();
         uploadArea.classList.add('dragover');
-        uploadArea.style.transform = 'scale(1.02)';
-        uploadArea.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
     });
 
-    uploadArea.addEventListener('dragleave', () => {
+    uploadArea.addEventListener('dragleave', function() {
         uploadArea.classList.remove('dragover');
-        uploadArea.style.transform = 'scale(1)';
     });
 
-    uploadArea.addEventListener('drop', (e) => {
+    uploadArea.addEventListener('drop', function(e) {
         e.preventDefault();
         uploadArea.classList.remove('dragover');
-        uploadArea.style.transform = 'scale(1)';
-        
-        // Add drop animation
-        uploadArea.style.animation = 'pulse 0.6s cubic-bezier(0.4, 0, 0.6, 1)';
-        setTimeout(() => {
-            uploadArea.style.animation = '';
-        }, 600);
-        
-        const file = e.dataTransfer.files[0];
+        var file = e.dataTransfer.files[0];
         handleFile(file);
     });
 
-    fileInput.addEventListener('change', () => {
+    fileInput.addEventListener('change', function() {
         if (fileInput.files.length > 0) {
             handleFile(fileInput.files[0]);
         }
     });
 
     function handleFile(file) {
-        if (file && file.type === 'text/csv' && file.size <= 50 * 1024 * 1024) {
-            fileName.textContent = file.name;
-            fileSize.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
-            
-            // Animate file preview appearance
-            filePreview.style.display = 'flex';
-            filePreview.style.opacity = '0';
-            filePreview.style.transform = 'translateY(10px) scale(0.95)';
-            filePreview.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            
-            requestAnimationFrame(() => {
-                filePreview.style.opacity = '1';
-                filePreview.style.transform = 'translateY(0) scale(1)';
-            });
-            
-            submitBtn.disabled = false;
-            submitBtn.style.transition = 'all 0.3s ease';
-            submitBtn.style.transform = 'scale(1.05)';
-            setTimeout(() => {
-                submitBtn.style.transform = 'scale(1)';
-            }, 200);
+        if (file && (file.type === 'text/csv' || file.name.endsWith('.csv'))) {
+            if (file.size <= 50 * 1024 * 1024) {
+                fileName.textContent = file.name;
+                fileSize.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+                filePreview.style.display = 'flex';
+                submitBtn.disabled = false;
+                filePreview.setAttribute('aria-hidden', 'false');
+            } else {
+                fileName.textContent = 'File too large';
+                fileSize.textContent = 'Please upload a CSV file (max 50MB)';
+                filePreview.style.display = 'flex';
+                submitBtn.disabled = true;
+                fileInput.value = '';
+                filePreview.setAttribute('aria-hidden', 'false');
+            }
         } else {
-            fileName.textContent = 'Invalid file';
-            fileSize.textContent = 'Please upload a CSV file (max 50MB)';
-            
-            // Error animation
+            fileName.textContent = 'Invalid file type';
+            fileSize.textContent = 'Please upload a CSV file';
             filePreview.style.display = 'flex';
-            filePreview.style.animation = 'shake 0.5s ease-in-out';
-            setTimeout(() => {
-                filePreview.style.animation = '';
-            }, 500);
-            
             submitBtn.disabled = true;
             fileInput.value = '';
+            filePreview.setAttribute('aria-hidden', 'false');
         }
     }
 
     window.removeFile = function() {
-        // Animate removal
-        filePreview.style.transition = 'all 0.3s ease-out';
-        filePreview.style.opacity = '0';
-        filePreview.style.transform = 'translateY(-10px) scale(0.95)';
-        
-        setTimeout(() => {
-            fileInput.value = '';
-            filePreview.style.display = 'none';
-            submitBtn.disabled = true;
-        }, 300);
+        fileInput.value = '';
+        filePreview.style.display = 'none';
+        submitBtn.disabled = true;
+        filePreview.setAttribute('aria-hidden', 'true');
     };
 
-    // Add additional CSS animations
-    if (!document.getElementById('enhanced-animations')) {
-        const style = document.createElement('style');
-        style.id = 'enhanced-animations';
-        style.textContent = `
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-                100% { transform: scale(1); }
-            }
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                25% { transform: translateX(-5px); }
-                75% { transform: translateX(5px); }
-            }
-            .form-section.completed {
-                background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-                transform: translateY(-2px);
-                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
-            }
-        `;
-        document.head.appendChild(style);
+    // Fallback for Bootstrap
+    if (!window.bootstrap) {
+        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var target = document.querySelector(btn.dataset.bsTarget);
+                target.style.display = target.style.display === 'none' ? 'block' : 'none';
+                var isExpanded = target.style.display === 'block';
+                btn.setAttribute('aria-expanded', isExpanded);
+            });
+        });
+
+        document.querySelectorAll('[data-bs-dismiss="alert"]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var alert = btn.closest('.alert');
+                alert.style.display = 'none';
+                alert.setAttribute('aria-hidden', 'true');
+            });
+        });
     }
 
-    // Enhanced particles.js configuration
-    particlesJS('particles-canvas', {
-        particles: {
-            number: { value: 120, density: { enable: true, value_area: 800 } },
-            color: { value: ['#667eea', '#764ba2', '#ffffff'] },
-            shape: { 
-                type: ['circle', 'triangle'],
-                stroke: { width: 0, color: '#000000' }
-            },
-            opacity: { 
-                value: 0.6, 
-                random: true,
-                anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false }
-            },
-            size: { 
-                value: 4, 
-                random: true,
-                anim: { enable: true, speed: 2, size_min: 0.5, sync: false }
-            },
-            line_linked: { 
-                enable: true, 
-                distance: 200, 
-                color: '#667eea', 
-                opacity: 0.3, 
-                width: 1.5 
-            },
-            move: { 
-                enable: true, 
-                speed: 3, 
-                direction: 'none', 
-                random: true, 
-                straight: false,
-                out_mode: 'out',
-                bounce: false,
-                attract: { enable: true, rotateX: 600, rotateY: 1200 }
-            }
-        },
-        interactivity: {
-            detect_on: 'canvas',
-            events: {
-                onhover: { enable: true, mode: 'grab' },
-                onclick: { enable: true, mode: 'push' },
-                resize: true
-            },
-            modes: { 
-                grab: { 
-                    distance: 180, 
-                    line_linked: { opacity: 0.8 } 
-                }, 
-                push: { particles_nb: 6 },
-                repulse: { distance: 100, duration: 0.4 }
-            }
-        },
-        retina_detect: true
+    // Particles.js with fallback
+    if (window.particlesJS) {
+        try {
+            particlesJS('particles-canvas', {
+                particles: {
+                    number: { value: 60, density: { enable: true, value_area: 800 } },
+                    color: { value: ['#667eea', '#764ba2', '#ffffff'] },
+                    shape: { type: 'circle' },
+                    opacity: { value: 0.6, random: true },
+                    size: { value: 3, random: true },
+                    move: { enable: true, speed: 2 }
+                },
+                interactivity: {
+                    events: { onhover: { enable: true, mode: 'grab' } }
+                },
+                retina_detect: true
+            });
+        } catch (e) {
+            console.warn('Particles.js failed, using static background:', e);
+            document.getElementById('particles-canvas').style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+        }
+    } else {
+        document.getElementById('particles-canvas').style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+    }
+
+    // Keyboard navigation
+    document.querySelectorAll('.btn, input, select').forEach(function(el) {
+        el.addEventListener('focus', function() {
+            this.style.outline = '2px solid #667eea';
+        });
+        el.addEventListener('blur', function() {
+            this.style.outline = '';
+        });
     });
 });
 </script>
 
 <style>
-    :root {
-        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
-        --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        --secondary-gradient: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-        --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-        --card-hover-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-        --glassmorphism: backdrop-filter: blur(20px);
-    }
-
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-        background-size: 400% 400%;
-        animation: gradientShift 15s ease infinite;
-        min-height: 100vh;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    @keyframes gradientShift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-
-    .header-banner {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 3rem 2rem;
-        border-radius: 25px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: var(--card-shadow);
-    }
-
-    #particles-canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-    }
-
-    .header-content {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-    }
-
-    .stats-row {
-        display: flex;
-        justify-content: center;
-        gap: 3rem;
-        flex-wrap: wrap;
-    }
-
-    .stat-item {
-        text-align: center;
-        color: white;
-    }
-
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        line-height: 1;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .stat-label {
-        font-size: 0.9rem;
-        opacity: 0.9;
-        margin-top: 0.5rem;
-    }
-
-    .enhanced-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 20px;
-        box-shadow: var(--card-shadow);
-        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        overflow: hidden;
-    }
-
-    .enhanced-card:hover {
-        box-shadow: var(--card-hover-shadow);
-        transform: translateY(-5px);
-    }
-
-    .card-header-gradient {
-        background: var(--primary-gradient);
-        padding: 1.5rem 2rem;
-        border: none;
-        position: relative;
-        overflow: hidden;
-    }
-    .tab-pane {
-    transition: opacity 0.6s ease;
-    }
-    .tab-pane.animate__fadeIn {
-    --animate-duration: 0.5s; /* Default is 1s */
+/* CSS Reset for cross-browser consistency */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
-    .card-header-gradient::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        animation: shimmer 3s infinite;
-    }
+html {
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
 
-    @keyframes shimmer {
-        0% { left: -100%; }
-        100% { left: 100%; }
-    }
+/* Vendor Prefixes and Cross-Browser Styles */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+    --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --secondary-gradient: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    --card-hover-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
 
-    .mode-toggle-container {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 20px;
-        padding: 1rem;
-        box-shadow: var(--card-shadow);
-    }
+body {
+    background: #f8f9fa;
+    min-height: 100vh;
+}
 
-    .btn-group .btn {
-        border-radius: 15px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
+.header-banner {
+    background: var(--primary-gradient);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 3rem 2rem;
+    border-radius: 25px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
 
-    .btn-group .btn.active {
-        background: var(--primary-gradient);
-        color: white;
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-    }
+#particles-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: block;
+}
 
-    .form-section {
-        position: relative;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        background: rgba(255, 255, 255, 0.7);
-        border-radius: 15px;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-    }
+.header-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
 
-    .form-section:hover {
-        background: rgba(255, 255, 255, 0.9);
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-    }
+.enhanced-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+}
 
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
+.enhanced-card:hover {
+    box-shadow: var(--card-hover-shadow);
+    transform: translateY(-5px);
+    -webkit-transform: translateY(-5px);
+    -moz-transform: translateY(-5px);
+}
 
-    .section-title {
-        color: #495057;
-        font-weight: 600;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        margin: 0;
-    }
+.card-header-gradient {
+    background: var(--primary-gradient);
+    padding: 1.5rem 2rem;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
 
-    .section-status {
-        margin-left: auto;
-    }
+.mode-toggle-container {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 1rem;
+    box-shadow: var(--card-shadow);
+}
 
-    .section-indicator {
-        color: #dee2e6;
-        font-size: 1.2rem;
-        transition: all 0.3s ease;
-    }
+.btn-group .btn {
+    border-radius: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+}
 
-    .form-section.completed .section-indicator {
-        color: #28a745;
-    }
+.btn-group .btn.active {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
 
-    .form-floating {
-        position: relative;
-    }
+.form-section {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 15px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+}
 
-    .form-control, .form-select {
-        border: 2px solid rgba(0, 0, 0, 0.1);
-        border-radius: 12px;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.9);
-    }
+.form-section.completed {
+    background: rgba(102, 126, 234, 0.1);
+}
 
-    .form-control:focus, .form-select:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        background: white;
-    }
+.form-control, .form-select {
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
 
-    .form-floating > label {
-        color: #6c757d;
-        font-weight: 500;
-    }
+.form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    outline: none;
+}
 
-    .input-group-enhanced {
-        display: flex;
+.input-group-enhanced {
+    display: flex;
+    align-items: stretch;
+    -webkit-align-items: stretch;
+}
+
+.currency-badge, .unit-badge {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.progress-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: conic-gradient(#667eea 0deg, #e9ecef 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: background 0.3s ease;
+    -webkit-transition: background 0.3s ease;
+}
+
+.progress-circle::before {
+    content: '';
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+}
+
+.progress-text {
+    position: relative;
+    z-index: 1;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #667eea;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+}
+
+.btn-primary-gradient {
+    background: var(--primary-gradient);
+    border: none;
+    border-radius: 15px;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+}
+
+.btn-primary-gradient:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+}
+
+.btn-loader {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.btn-primary-gradient.loading .btn-loader {
+    display: block;
+}
+
+.btn-primary-gradient.loading .btn-text {
+    visibility: hidden;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.upload-area {
+    border: 3px dashed rgba(102, 126, 234, 0.3);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+}
+
+.upload-area.dragover {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.15);
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.file-preview {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(40, 167, 69, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+    display: flex;
+    align-items: center;
+}
+
+.custom-table {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.custom-table th {
+    background: var(--primary-gradient);
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 1rem;
+}
+
+.instruction-step {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+}
+
+.instruction-step.active {
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.prediction-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.prediction-circle.success {
+    background: var(--success-gradient);
+}
+
+.prediction-circle.danger {
+    background: var(--danger-gradient);
+}
+
+.alert-info-custom {
+    background: rgba(13, 202, 240, 0.1);
+    color: #055160;
+    border: 1px solid #0dcaf0;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+/* Accessibility Enhancements */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+[role="button"]:focus {
+    outline: 2px solid #667eea;
+}
+
+@media (max-width: 992px) {
+    .col-lg-8, .col-lg-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .action-buttons {
+        flex-direction: column;
         align-items: stretch;
     }
+}
 
-    .currency-badge, .unit-badge {
-        background: var(--primary-gradient);
-        color: white;
-        border: none;
-        font-weight: 600;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        padding: 0 1rem;
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
     }
-
-    .currency-badge {
-        border-radius: 12px 0 0 12px;
-    }
-
-    .unit-badge {
-        border-radius: 0 12px 12px 0;
-    }
-
-    .form-progress {
-        display: flex;
-        align-items: center;
-    }
-
-    .progress-circle {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: conic-gradient(#667eea 0deg, rgba(255, 255, 255, 0.3) 0deg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        transition: all 0.3s ease;
-    }
-
-    .progress-circle::before {
-        content: '';
-        position: absolute;
-        width: 45px;
-        height: 45px;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 50%;
-    }
-
-    .progress-text {
-        position: relative;
-        z-index: 1;
-        font-weight: 700;
-        font-size: 0.9rem;
-        color: #667eea;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        align-items: center;
-        margin-top: 3rem;
-        flex-wrap: wrap;
-    }
-
-    .btn-primary-gradient {
-        background: var(--primary-gradient);
-        border: none;
-        border-radius: 15px;
-        font-weight: 600;
-        position: relative;
-        overflow: hidden;
-        transition: all 0.4s ease;
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-    }
-
-    .btn-primary-gradient:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-primary-gradient:active {
-        transform: translateY(-1px);
-    }
-
-    .btn-loader {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 20px;
-        height: 20px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top: 2px solid white;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-    }
-
-    .btn-primary-gradient.loading .btn-loader {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .btn-primary-gradient.loading .btn-text {
-        opacity: 0;
-    }
-
-    @keyframes spin {
-        0% { transform: translate(-50%, -50%) rotate(0deg); }
-        100% { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-
-    .upload-section {
-        margin-bottom: 2rem;
-    }
-
-    .upload-area {
-        border: 3px dashed rgba(102, 126, 234, 0.3);
-        border-radius: 20px;
-        padding: 3rem 2rem;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        background: rgba(102, 126, 234, 0.05);
-    }
-
-    .upload-area:hover {
-        border-color: rgba(102, 126, 234, 0.6);
-        background: rgba(102, 126, 234, 0.1);
-    }
-
-    .upload-area.dragover {
-        border-color: #667eea;
-        background: rgba(102, 126, 234, 0.15);
-        transform: scale(1.02);
-    }
-
-    .upload-icon {
-        font-size: 3rem;
-        color: #667eea;
-        margin-bottom: 1rem;
-        display: block;
-    }
-
-    .upload-info {
-        margin-top: 1rem;
-    }
-
-    .file-preview {
-        margin-top: 1.5rem;
-        padding: 1rem;
-        background: rgba(40, 167, 69, 0.1);
-        border-radius: 12px;
-        border: 1px solid rgba(40, 167, 69, 0.3);
-    }
-
-    .file-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .file-icon {
-        font-size: 2rem;
-        color: #28a745;
-    }
-
-    .file-details {
-        flex: 1;
-    }
-
-    .file-name {
-        font-weight: 600;
-        color: #495057;
-    }
-
-    .file-size {
-        font-size: 0.9rem;
-        color: #6c757d;
-    }
-
-    .required-columns {
-        margin: 2rem 0;
-    }
-
-    .custom-table {
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    }
-
-    .custom-table th {
-        background: var(--primary-gradient);
-        color: white;
-        font-weight: 600;
-        border: none;
+    .form-section {
         padding: 1rem;
     }
-
-    .custom-table td {
-        padding: 0.75rem 1rem;
-        border-color: rgba(0, 0, 0, 0.05);
-    }
-
-    .custom-table code {
-        background: rgba(102, 126, 234, 0.1);
-        color: #667eea;
-        padding: 0.25rem 0.5rem;
-        border-radius: 6px;
-        font-weight: 600;
-    }
-
-    .instruction-timeline {
-        position: relative;
-    }
-
-    .instruction-step {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-        padding: 1rem;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        opacity: 0.6;
-    }
-
-    .instruction-step.active {
-        background: rgba(102, 126, 234, 0.1);
-        border: 1px solid rgba(102, 126, 234, 0.2);
-        opacity: 1;
-    }
-
-    .step-icon {
-        flex-shrink: 0;
-    }
-
-    .step-icon i {
-        font-size: 1.5rem;
-        color: #667eea;
-    }
-
-    .step-content h6 {
-        margin: 0 0 0.5rem 0;
-        font-weight: 600;
-        color: #495057;
-    }
-
-    .step-content p {
-        margin: 0;
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-
-    .feature-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .feature-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
+    .custom-table th, .custom-table td {
+        font-size: 0.85rem;
         padding: 0.5rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
     }
+}
 
-    .feature-item:hover {
-        background: rgba(102, 126, 234, 0.05);
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
     }
-
-    .feature-item i {
-        font-size: 1.1rem;
-    }
-
-    .feature-item span {
-        font-weight: 500;
-        color: #495057;
-    }
-
-    .prediction-circle {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-
-    .prediction-circle.success {
-        background: var(--success-gradient);
-    }
-
-    .prediction-circle.danger {
-        background: var(--danger-gradient);
-    }
-
-    .prediction-text {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: white;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .prediction-prob {
-        font-size: 1rem;
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 500;
-    }
-
-    .recommendation-box {
-        margin: 1.5rem 0;
-        padding: 1rem;
-        border-radius: 10px;
-        border: none;
-        font-size: 1rem;
-    }
-
-    .alert-success {
-        background: linear-gradient(135deg, rgba(74, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
-        color: #0c7cd5;
-        border: 1px solid rgba(74, 172, 254, 0.3);
-    }
-
-    .alert-danger {
-        background: linear-gradient(135deg, rgba(250, 112, 154, 0.1) 0%, rgba(254, 225, 64, 0.1) 100%);
-        color: #d63384;
-        border: 1px solid rgba(250, 112, 154, 0.3);
-    }
-
-    .report-section {
-        border-left: 4px solid #e9ecef;
-        padding-left: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .report-title {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
-
-    .report-title.danger {
-        color: #dc3545;
-        border-left-color: #dc3545;
-    }
-
-    .report-title.warning {
-        color: #fd7e14;
-        border-left-color: #fd7e14;
-    }
-
-    .report-title.success {
-        color: #198754;
-        border-left-color: #198754;
-    }
-
-    .report-items {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .report-item {
-        padding: 0.75rem;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        line-height: 1.4;
-        transition: all 0.3s ease;
-    }
-
-    .report-item:hover {
-        transform: translateX(5px);
-    }
-
-    .report-item.danger {
-        background: rgba(220, 53, 69, 0.1);
-        border-left: 3px solid #dc3545;
-        color: #721c24;
-    }
-
-    .report-item.warning {
-        background: rgba(253, 126, 20, 0.1);
-        border-left: 3px solid #fd7e14;
-        color: #653208;
-    }
-
-    .report-item.success {
-        background: rgba(25, 135, 84, 0.1);
-        border-left: 3px solid #198754;
-        color: #0f5132;
-    }
-
-    .alert-info-custom {
-        background: linear-gradient(135deg, rgba(74, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
-        color: #0c7cd5;
-        border: 1px solid rgba(74, 172, 254, 0.3);
-        border-radius: 10px;
-        padding: 1rem;
-        margin: 0;
-    }
-
-    /* Enhanced Mobile and Desktop Responsiveness */
-    @media (max-width: 992px) {
-        .col-lg-8, .col-lg-4 {
-            flex: 0 0 100%;
-            max-width: 100%;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .mode-toggle-container {
-            padding: 0.5rem;
-        }
-
-        .btn-group .btn {
-            padding: 0.75rem;
-            font-size: 0.9rem;
-        }
-
-        .header-banner {
-            padding: 2rem 1rem;
-        }
-
-        .stats-row {
-            gap: 1.5rem;
-        }
-
-        .stat-number {
-            font-size: 1.5rem;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .container-fluid {
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-        }
-
-        .form-section {
-            padding: 1rem;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .upload-area {
-            padding: 2rem 1rem;
-        }
-
-        .upload-icon {
-            font-size: 2rem;
-        }
-
-        .prediction-circle {
-            width: 120px;
-            height: 120px;
-        }
-
-        .prediction-text {
-            font-size: 1.2rem;
-        }
-
-        .custom-table th, .custom-table td {
-            font-size: 0.85rem;
-            padding: 0.5rem;
-        }
-
-        .form-floating > label {
-            font-size: 0.9rem;
-        }
-
-        .form-control, .form-select {
-            font-size: 0.9rem;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .header-banner {
-            padding: 1.5rem 0.5rem;
-        }
-
-        .header-content h1 {
-            font-size: 1.8rem;
-        }
-
-        .header-content p {
-            font-size: 0.9rem;
-        }
-
-        .btn-primary-gradient, .btn-outline-primary, .btn-outline-secondary {
-            padding: 0.75rem;
-            font-size: 0.9rem;
-        }
-
-        .form-section {
-            margin-bottom: 1rem;
-        }
-
-        .section-title {
-            font-size: 1rem;
-        }
-
-        .progress-circle {
-            width: 50px;
-            height: 50px;
-        }
-
-        .progress-circle::before {
-            width: 35px;
-            height: 35px;
-        }
-
-        .progress-text {
-            font-size: 0.8rem;
-        }
-    }
+}
 </style>
 {% endblock %}
