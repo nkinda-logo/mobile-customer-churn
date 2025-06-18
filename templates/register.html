@@ -3,68 +3,223 @@
 {% block title %}Register{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h4>Register</h4>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="{{ url_for('register') }}">
-                    {{ form.hidden_tag() }}
-                    
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        {{ form.username(class="form-control") }}
-                        {% if form.username.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.username.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        {{ form.email(class="form-control") }}
-                        {% if form.email.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.email.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        {{ form.password(class="form-control") }}
-                        {% if form.password.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.password.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="confirm" class="form-label">Confirm Password</label>
-                        {{ form.confirm(class="form-control") }}
-                        {% if form.confirm.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.confirm.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Register</button>
-                    <a href="{{ url_for('login') }}" class="btn btn-link">Already have an account? Login</a>
-                </form>
-            </div>
+<style>
+    /* Container and Card Styling */
+    .register-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    .register-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: #fff;
+        max-width: 500px;
+        width: 100%;
+    }
+
+    .register-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .register-card-header {
+        background: linear-gradient(90deg, #2c3e50 0%, #3498db 100%);
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+        border-bottom: none;
+    }
+
+    .register-card-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.5rem;
+    }
+
+    .register-card-body {
+        padding: 30px;
+    }
+
+    /* Form Styling */
+    .form-label {
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        border: 1px solid #dfe6e9;
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
+        outline: none;
+    }
+
+    .form-control.is-invalid {
+        border-color: #e74c3c;
+        background-image: none;
+    }
+
+    .invalid-feedback {
+        color: #e74c3c;
+        font-size: 0.875rem;
+        margin-top: 4px;
+        display: block;
+    }
+
+    /* Button Styling */
+    .btn-primary {
+        background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
+        border: none;
+        border-radius: 6px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        font-weight: 500;
+        width: 100%;
+        transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(90deg, #2980b9 0%, #1f618d 100%);
+        transform: translateY(-2px);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-link {
+        color: #3498db;
+        text-decoration: none;
+        font-size: 0.95rem;
+        margin-top: 15px;
+        display: inline-block;
+        transition: color 0.3s ease;
+    }
+
+    .btn-link:hover {
+        color: #2980b9;
+        text-decoration: underline;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .register-card {
+            margin: 0 15px;
+        }
+
+        .register-card-body {
+            padding: 20px;
+        }
+
+        .register-card-header h4 {
+            font-size: 1.3rem;
+        }
+
+        .btn-primary {
+            padding: 10px;
+            font-size: 0.95rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .register-container {
+            padding: 15px;
+        }
+
+        .register-card-header {
+            padding: 15px;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            font-size: 0.9rem;
+            padding: 8px;
+        }
+
+        .btn-link {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="register-container">
+    <div class="col-md-6 register-card">
+        <div class="card-header register-card-header">
+            <h4>Register</h4>
+        </div>
+        <div class="card-body register-card-body">
+            <form method="POST" action="{{ url_for('register') }}">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), id="username", placeholder="Enter username") }}
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), id="email", placeholder="Enter email") }}
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="password", placeholder="Enter password") }}
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.password.errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="confirm" class="form-label">Confirm Password</label>
+                    {{ form.confirm(class="form-control" + (" is-invalid" if form.confirm.errors else ""), id="confirm", placeholder="Confirm password") }}
+                    {% if form.confirm.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.confirm.errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Register</button>
+                <a href="{{ url_for('login') }}" class="btn btn-link">Already have an account? Login</a>
+            </form>
         </div>
     </div>
 </div>

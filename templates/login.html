@@ -3,49 +3,225 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h4>Login</h4>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="{{ url_for('login') }}">
-                    {{ form.hidden_tag() }}
-                    
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        {{ form.username(class="form-control") }}
-                        {% if form.username.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.username.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        {{ form.password(class="form-control") }}
-                        {% if form.password.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.password.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="remember">
-                        <label class="form-check-label" for="remember">Remember me</label>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Login</button>
-                    <a href="{{ url_for('register') }}" class="btn btn-link">Don't have an account? Register</a>
-                </form>
-            </div>
+<style>
+    /* Container and Card Styling */
+    .login-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    .login-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: #fff;
+        max-width: 500px;
+        width: 100%;
+    }
+
+    .login-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .login-card-header {
+        background: linear-gradient(90deg, #2c3e50 0%, #3498db 100%);
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+        border-bottom: none;
+    }
+
+    .login-card-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.5rem;
+    }
+
+    .login-card-body {
+        padding: 30px;
+    }
+
+    /* Form Styling */
+    .form-label {
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        border: 1px solid #dfe6e9;
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
+        outline: none;
+    }
+
+    .form-control.is-invalid {
+        border-color: #e74c3c;
+        background-image: none;
+    }
+
+    .invalid-feedback {
+        color: #e74c3c;
+        font-size: 0.875rem;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .form-check {
+        margin: 20px 0;
+    }
+
+    .form-check-input {
+        cursor: pointer;
+        border-color: #dfe6e9;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-check-input:checked {
+        background-color: #3498db;
+        border-color: #3498db;
+    }
+
+    .form-check-label {
+        color: #2c3e50;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    /* Button Styling */
+    .btn-primary {
+        background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
+        border: none;
+        border-radius: 6px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        font-weight: 500;
+        width: 100%;
+        transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(90deg, #2980b9 0%, #1f618d 100%);
+        transform: translateY(-2px);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-link {
+        color: #3498db;
+        text-decoration: none;
+        font-size: 0.95rem;
+        margin-top: 15px;
+        display: inline-block;
+        transition: color 0.3s ease;
+    }
+
+    .btn-link:hover {
+        color: #2980b9;
+        text-decoration: underline;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .login-card {
+            margin: 0 15px;
+        }
+
+        .login-card-body {
+            padding: 20px;
+        }
+
+        .login-card-header h4 {
+            font-size: 1.3rem;
+        }
+
+        .btn-primary {
+            padding: 10px;
+            font-size: 0.95rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .login-container {
+            padding: 15px;
+        }
+
+        .login-card-header {
+            padding: 15px;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            font-size: 0.9rem;
+            padding: 8px;
+        }
+
+        .btn-link {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="login-container">
+    <div class="col-md-6 login-card">
+        <div class="card-header login-card-header">
+            <h4>Login</h4>
+        </div>
+        <div class="card-body login-card-body">
+            <form method="POST" action="{{ url_for('login') }}">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), id="username", placeholder="Enter username") }}
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="password", placeholder="Enter password") }}
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.password.errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                    <label class="form-check-label" for="remember">Remember me</label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Login</button>
+                <a href="{{ url_for('register') }}" class="btn btn-link">Don't have an account? Register</a>
+            </form>
         </div>
     </div>
 </div>
